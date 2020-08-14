@@ -1,0 +1,19 @@
+{
+  "name": "@jerome-nelson/react-backend",
+  "description": "React application to add user's, user groups and data to those groups",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jerome Nelson <jerome.nelson@skelia.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "ci:publish": "lerna publish --yes",
+    "postinstall": "lerna bootstrap",
+    "hoist:dev": "lerna link convert"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.7.36",
+    "lerna": "^3.22.1",
+    "typescript": "^3.9.7"
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "name": "@jerome-nelson/mongo-api",
+    "description": "API Layer used to communicate with MongoDB and add data",
+    "version": "0.0.0",
+    "repository": {
+        "type": "git",
+        "url": "ssh://git@github.com/jerome-nelson/react-backend.git",
+        "directory": "packages/mongo-api"
+    },
+    "dependencies": {
+        "mongoose": "^5.9.29"
+    }
+}

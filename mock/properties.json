@@ -1,0 +1,1 @@
+{"_id":{"$oid":"5f3665c68e835f79a0682da1"},"createdOn":{"$date":{"$numberLong":"1597400822000"}},"modifiedOn":{"$date":{"$numberLong":"1597400822000"}},"propertyId":{"$numberInt":"1"},"name":"1st Property Group"}

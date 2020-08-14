@@ -1,0 +1,2 @@
+{"_id":{"$oid":"5f3666218e835f79a0682da2"},"createdOn":{"$date":{"$numberLong":"1597400822000"}},"modifiedOn":{"$date":{"$numberLong":"1597400822000"}},"groupId":{"$numberInt":"1"},"name":"All Groups","description":"Whomsoever be he worthy shall have'th the power (modifies all groups)"}
+{"_id":{"$oid":"5f3666218e835f79a0682da3"},"createdOn":{"$date":{"$numberLong":"1597400822000"}},"groupId":{"$numberInt":"2"},"name":"Test Group","description":"This is a test group","dataIds":[]}
