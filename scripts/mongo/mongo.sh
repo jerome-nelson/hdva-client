@@ -8,3 +8,5 @@ mongo admin --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT
      pwd: site_pass,
      roles: ['dbOwner'],
 });"
+# TODO: Import mocks
+# mongoimport --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT_PASSWORD --dbname $DB_NAME --collection roles --
