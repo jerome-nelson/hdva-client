@@ -1,26 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import {
+    BrowserRouter as Router,
+    Switch
+} from "react-router-dom";
+import Container from '@material-ui/core/Container';
+import { ROUTES } from "./routing";
+import { PrivateRoute } from "utils/protected-route";
+import { BottomNav } from "components/navigation/bottom.nav";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
-export default App;
+export const App = () => {    
+    return <Container maxWidth="sm">
+        <Router>
+            <Switch>
+                {
+                    ROUTES.map(({ auth, exact, props, component }, key) => {
+                        return <PrivateRoute auth={auth} exact={exact} key={`${key}-test`} path={props.path} component={component} />
+                    })
+                }
+            </Switch>
+        </Router>
+    </Container>
+};
