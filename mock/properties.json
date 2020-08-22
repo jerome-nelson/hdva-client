@@ -1,0 +1,3 @@
+{"_id":{"$oid":"5f3665c68e835f79a0682da1"},"createdOn":{"$date":{"$numberLong":"1597400822000"}},"modifiedOn":{"$date":{"$numberLong":"1597400822000"}},"propertyId":{"$numberInt":"1"},"groupId":{"$numberInt":"2"},"name":"1st Property Group"}
+{"_id":{"$oid":"5f37d39f1a09d4722c686502"},"createdOn":"2020-08-14T10:27:02.000+00:00","modifiedOn":"2020-08-14T10:27:02.000+00:00","propertyId":{"$numberInt":"3"},"groupId":{"$numberInt":"2"},"name":"2nd Property Group"}
+{"_id":{"$oid":"5f37d3ad1a09d4722c686503"},"createdOn":"2020-08-14T10:27:02.000+00:00","modifiedOn":"2020-08-14T10:27:02.000+00:00","propertyId":{"$numberInt":"2"},"groupId":{"$numberInt":"2"},"name":"3rdd Property Group"}
