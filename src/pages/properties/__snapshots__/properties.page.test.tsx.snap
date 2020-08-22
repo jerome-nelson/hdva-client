@@ -1,0 +1,428 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Properties Page Component should match snapshot 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
+          />
+        </svg>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M15.95 10.78c.03-.25.05-.51.05-.78s-.02-.53-.06-.78l1.69-1.32c.15-.12.19-.34.1-.51l-1.6-2.77c-.1-.18-.31-.24-.49-.18l-1.99.8c-.42-.32-.86-.58-1.35-.78L12 2.34c-.03-.2-.2-.34-.4-.34H8.4c-.2 0-.36.14-.39.34l-.3 2.12c-.49.2-.94.47-1.35.78l-1.99-.8c-.18-.07-.39 0-.49.18l-1.6 2.77c-.1.18-.06.39.1.51l1.69 1.32c-.04.25-.07.52-.07.78s.02.53.06.78L2.37 12.1c-.15.12-.19.34-.1.51l1.6 2.77c.1.18.31.24.49.18l1.99-.8c.42.32.86.58 1.35.78l.3 2.12c.04.2.2.34.4.34h3.2c.2 0 .37-.14.39-.34l.3-2.12c.49-.2.94-.47 1.35-.78l1.99.8c.18.07.39 0 .49-.18l1.6-2.77c.1-.18.06-.39-.1-.51l-1.67-1.32zM10 13c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"
+            transform="scale(1.2, 1.2)"
+          />
+        </svg>
+      </div>
+      <div
+        class="MuiGrid-root MuiGrid-container MuiGrid-justify-xs-center MuiGrid-grid-xs-12"
+      >
+        <div
+          class="MuiGrid-root MuiGrid-item MuiGrid-align-items-xs-flex-start"
+        >
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-text"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="MuiButton-label"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"
+                />
+              </svg>
+            </span>
+            <span
+              class="MuiTouchRipple-root"
+            />
+          </button>
+        </div>
+        <div
+          class="MuiGrid-root makeStyles-title-2 MuiGrid-item"
+        >
+          <h1
+            class="MuiTypography-root MuiTypography-h1"
+          >
+            Property Name
+          </h1>
+        </div>
+      </div>
+      <sub>
+        Updated 3 days ago
+      </sub>
+      <div>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary"
+          tabindex="0"
+          type="button"
+        >
+          <span
+            class="MuiButton-label"
+          >
+            Download All
+          </span>
+          <span
+            class="MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <div
+        class="MuiTabs-root"
+      >
+        <div
+          class="MuiTabs-scroller MuiTabs-fixed"
+          style="overflow: hidden;"
+        >
+          <div
+            aria-label="simple tabs example"
+            class="MuiTabs-flexContainer"
+            role="tablist"
+          >
+            <button
+              aria-controls="simple-tabpanel-0"
+              aria-selected="true"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit Mui-selected"
+              id="simple-tab-0"
+              role="tab"
+              tabindex="0"
+              type="button"
+            >
+              <span
+                class="MuiTab-wrapper"
+              >
+                Floorplan
+              </span>
+              <span
+                class="MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              aria-controls="simple-tabpanel-1"
+              aria-selected="false"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit"
+              id="simple-tab-1"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              <span
+                class="MuiTab-wrapper"
+              >
+                Photos
+              </span>
+              <span
+                class="MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              aria-controls="simple-tabpanel-2"
+              aria-selected="false"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit"
+              id="simple-tab-2"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              <span
+                class="MuiTab-wrapper"
+              >
+                Virtual Tour
+              </span>
+              <span
+                class="MuiTouchRipple-root"
+              />
+            </button>
+          </div>
+          <span
+            class="PrivateTabIndicator-root-3 PrivateTabIndicator-colorSecondary-5 MuiTabs-indicator"
+            style="left: 0px; width: 0px;"
+          />
+        </div>
+      </div>
+      <div
+        aria-labelledby="simple-tab-0"
+        id="simple-tabpanel-0"
+        role="tabpanel"
+      >
+        <div
+          class="MuiBox-root MuiBox-root-7"
+        >
+          <p
+            class="MuiTypography-root MuiTypography-body1"
+          >
+            Item One
+          </p>
+        </div>
+      </div>
+      <div
+        aria-labelledby="simple-tab-1"
+        hidden=""
+        id="simple-tabpanel-1"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="simple-tab-2"
+        hidden=""
+        id="simple-tabpanel-2"
+        role="tabpanel"
+      />
+    </div>
+  </body>,
+  "container": <div>
+    <div>
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
+        />
+      </svg>
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M15.95 10.78c.03-.25.05-.51.05-.78s-.02-.53-.06-.78l1.69-1.32c.15-.12.19-.34.1-.51l-1.6-2.77c-.1-.18-.31-.24-.49-.18l-1.99.8c-.42-.32-.86-.58-1.35-.78L12 2.34c-.03-.2-.2-.34-.4-.34H8.4c-.2 0-.36.14-.39.34l-.3 2.12c-.49.2-.94.47-1.35.78l-1.99-.8c-.18-.07-.39 0-.49.18l-1.6 2.77c-.1.18-.06.39.1.51l1.69 1.32c-.04.25-.07.52-.07.78s.02.53.06.78L2.37 12.1c-.15.12-.19.34-.1.51l1.6 2.77c.1.18.31.24.49.18l1.99-.8c.42.32.86.58 1.35.78l.3 2.12c.04.2.2.34.4.34h3.2c.2 0 .37-.14.39-.34l.3-2.12c.49-.2.94-.47 1.35-.78l1.99.8c.18.07.39 0 .49-.18l1.6-2.77c.1-.18.06-.39-.1-.51l-1.67-1.32zM10 13c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"
+          transform="scale(1.2, 1.2)"
+        />
+      </svg>
+    </div>
+    <div
+      class="MuiGrid-root MuiGrid-container MuiGrid-justify-xs-center MuiGrid-grid-xs-12"
+    >
+      <div
+        class="MuiGrid-root MuiGrid-item MuiGrid-align-items-xs-flex-start"
+      >
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-text"
+          tabindex="0"
+          type="button"
+        >
+          <span
+            class="MuiButton-label"
+          >
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"
+              />
+            </svg>
+          </span>
+          <span
+            class="MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <div
+        class="MuiGrid-root makeStyles-title-2 MuiGrid-item"
+      >
+        <h1
+          class="MuiTypography-root MuiTypography-h1"
+        >
+          Property Name
+        </h1>
+      </div>
+    </div>
+    <sub>
+      Updated 3 days ago
+    </sub>
+    <div>
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary"
+        tabindex="0"
+        type="button"
+      >
+        <span
+          class="MuiButton-label"
+        >
+          Download All
+        </span>
+        <span
+          class="MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+    <div
+      class="MuiTabs-root"
+    >
+      <div
+        class="MuiTabs-scroller MuiTabs-fixed"
+        style="overflow: hidden;"
+      >
+        <div
+          aria-label="simple tabs example"
+          class="MuiTabs-flexContainer"
+          role="tablist"
+        >
+          <button
+            aria-controls="simple-tabpanel-0"
+            aria-selected="true"
+            class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit Mui-selected"
+            id="simple-tab-0"
+            role="tab"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="MuiTab-wrapper"
+            >
+              Floorplan
+            </span>
+            <span
+              class="MuiTouchRipple-root"
+            />
+          </button>
+          <button
+            aria-controls="simple-tabpanel-1"
+            aria-selected="false"
+            class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit"
+            id="simple-tab-1"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            <span
+              class="MuiTab-wrapper"
+            >
+              Photos
+            </span>
+            <span
+              class="MuiTouchRipple-root"
+            />
+          </button>
+          <button
+            aria-controls="simple-tabpanel-2"
+            aria-selected="false"
+            class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit"
+            id="simple-tab-2"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            <span
+              class="MuiTab-wrapper"
+            >
+              Virtual Tour
+            </span>
+            <span
+              class="MuiTouchRipple-root"
+            />
+          </button>
+        </div>
+        <span
+          class="PrivateTabIndicator-root-3 PrivateTabIndicator-colorSecondary-5 MuiTabs-indicator"
+          style="left: 0px; width: 0px;"
+        />
+      </div>
+    </div>
+    <div
+      aria-labelledby="simple-tab-0"
+      id="simple-tabpanel-0"
+      role="tabpanel"
+    >
+      <div
+        class="MuiBox-root MuiBox-root-7"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1"
+        >
+          Item One
+        </p>
+      </div>
+    </div>
+    <div
+      aria-labelledby="simple-tab-1"
+      hidden=""
+      id="simple-tabpanel-1"
+      role="tabpanel"
+    />
+    <div
+      aria-labelledby="simple-tab-2"
+      hidden=""
+      id="simple-tabpanel-2"
+      role="tabpanel"
+    />
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

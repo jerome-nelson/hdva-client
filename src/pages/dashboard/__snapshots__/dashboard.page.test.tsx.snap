@@ -1,0 +1,414 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dashboard Page should match snapshot 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="MuiGrid-root MuiGrid-container MuiGrid-justify-xs-center MuiGrid-grid-xs-12"
+      >
+        <div
+          class="MuiGrid-root makeStyles-title-2 MuiGrid-item"
+        >
+          <h1
+            class="MuiTypography-root MuiTypography-h1"
+          >
+            Dashboard
+          </h1>
+        </div>
+      </div>
+      <h2>
+        Available Downloads
+      </h2>
+      <div
+        class="MuiPaper-root MuiTableContainer-root MuiPaper-elevation1 MuiPaper-rounded"
+      >
+        <table
+          aria-label="simple table"
+          class="MuiTable-root"
+        >
+          <thead
+            class="MuiTableHead-root"
+          >
+            <tr
+              class="MuiTableRow-root MuiTableRow-head"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-head"
+                scope="col"
+              >
+                Properties
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            class="MuiTableBody-root"
+          >
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 1
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 2
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 3
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 4
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 5
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 6
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 7
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 8
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 9
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 10
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 11
+              </th>
+            </tr>
+            <tr
+              class="MuiTableRow-root"
+            >
+              <th
+                class="MuiTableCell-root MuiTableCell-body"
+                role="cell"
+                scope="row"
+              >
+                Property 12
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="MuiGrid-root MuiGrid-container MuiGrid-justify-xs-center MuiGrid-grid-xs-12"
+    >
+      <div
+        class="MuiGrid-root makeStyles-title-2 MuiGrid-item"
+      >
+        <h1
+          class="MuiTypography-root MuiTypography-h1"
+        >
+          Dashboard
+        </h1>
+      </div>
+    </div>
+    <h2>
+      Available Downloads
+    </h2>
+    <div
+      class="MuiPaper-root MuiTableContainer-root MuiPaper-elevation1 MuiPaper-rounded"
+    >
+      <table
+        aria-label="simple table"
+        class="MuiTable-root"
+      >
+        <thead
+          class="MuiTableHead-root"
+        >
+          <tr
+            class="MuiTableRow-root MuiTableRow-head"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-head"
+              scope="col"
+            >
+              Properties
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="MuiTableBody-root"
+        >
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 1
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 2
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 3
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 4
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 5
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 6
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 7
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 8
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 9
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 10
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 11
+            </th>
+          </tr>
+          <tr
+            class="MuiTableRow-root"
+          >
+            <th
+              class="MuiTableCell-root MuiTableCell-body"
+              role="cell"
+              scope="row"
+            >
+              Property 12
+            </th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

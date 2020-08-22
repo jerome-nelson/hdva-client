@@ -1,0 +1,23 @@
+import React, { useEffect, useState } from 'react';
+import {
+    BrowserRouter as Router,
+    Switch
+} from "react-router-dom";
+import Container from '@material-ui/core/Container';
+import { ROUTES } from "./routing";
+import { PrivateRoute } from "utils/protected-route";
+import { BottomNav } from "components/navigation/bottom.nav";
+
+export const App = () => {    
+    return <Container maxWidth="sm">
+        <Router>
+            <Switch>
+                {
+                    ROUTES.map(({ auth, exact, props, component }, key) => {
+                        return <PrivateRoute auth={auth} exact={exact} key={`${key}-test`} path={props.path} component={component} />
+                    })
+                }
+            </Switch>
+        </Router>
+    </Container>
+};
