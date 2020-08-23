@@ -1,8 +1,7 @@
 import express, { Application } from "express";
+import config from "./config";
 
-export function server<T>(options: any = {
-    port: 3000
-}, routes: (app: Application) => void) {
+export function server<T>(routes: (app: Application) => void) {
     const app = express();
     app.use(function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
@@ -10,7 +9,7 @@ export function server<T>(options: any = {
         next();
       });
     routes(app);
-    const callback = () => console.log(`Server is Running on http://localhost:${options.port}`);
+    const callback = () => console.log(`Server is Running on http://${config.url}:${config.serverPort}`);
       
-    app.listen(options.port, callback);
+    app.listen(config.serverPort, callback);
 }

@@ -8,5 +8,11 @@ mongo admin --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT
      pwd: site_pass,
      roles: ['dbOwner'],
 });"
-# TODO: Import mocks
-# mongoimport --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT_PASSWORD --dbname $DB_NAME --collection roles --
+
+ if [ $NODE_ENV != "production" ]; then
+    mongoimport -u $DB_USER -p $DB_PASS --db $DB_NAME -c roles --type json --file /mock/roles.json
+    mongoimport -u $DB_USER -p $DB_PASS --db $DB_NAME -c groups --type json --file /mock/groups.json
+    mongoimport -u $DB_USER -p $DB_PASS --db $DB_NAME -c properties --type json --file /mock/properties.json
+    mongoimport -u $DB_USER -p $DB_PASS --db $DB_NAME -c upload --type json --file /mock/upload.json
+    mongoimport -u $DB_USER -p $DB_PASS --db $DB_NAME -c users --type json --file /mock/users.json
+fi

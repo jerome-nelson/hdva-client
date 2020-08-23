@@ -1,29 +1,29 @@
 version: '3.7'
 services:
-  # api:
-  #   image: node:latest
-  #   restart: unless-stopped
-  #   env_file: .env
-  #   environment:
-  #     - MONGO_USERNAME=$MONGO_USERNAME
-  #     - MONGO_PASSWORD=$MONGO_PASSWORD
-  #     - MONGO_HOSTNAME=db
-  #     - MONGO_PORT=$MONGO_PORT
-  #     - MONGO_DB=$MONGO_DB 
-  #   ports:
-  #     - "80:8080"
-  #   volumes:
-  #   - "./packages/mongo-api/src:/app"
-  db:
-    image: mongo:latest
+  api:
+    command: sh -c "npm i && npm run dev"
     env_file: .env
     environment:
+      - DB_HOST=db  
+    image: node:latest
+    restart: unless-stopped
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    working_dir: "/app"
+    volumes:
+    - "./packages/mongo-api:/app"
+  db:
+    image: mongo:latest
+    environment:
+      - NODE_ENV=development
       - MONGO_INITDB_DATABASE=${DB_NAME}
       - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASS}
       - DB_PASS=${DB_PASS}
       - DB_USER=${DB_USER}
+      - DB_NAME=${DB_NAME}
     volumes:
       - "./scripts/mongo:/docker-entrypoint-initdb.d/"
+      - "./mock:/mock"
     ports:
       - "${DB_PORT}:${DB_PORT}"

@@ -12,8 +12,6 @@ async function getData(conn: mongoose.Connection) {
         uploads: []
     }
 
-    // TODO: Minify into generic handler
-    // Deal with error
     const connection = models(conn);
     await connection.roles.find((err, roles) => {
         if (err) {
@@ -62,9 +60,10 @@ async function getData(conn: mongoose.Connection) {
 export async function start() {
     const conn = await mongoInstance();
     const data = await getData(conn);
-    server({
-        port: 3001
-    }, app => {
+    server(app => {
+        app.post("/login", (req, res) => {
+            
+        });
         app.get("/roles", (_, res) => {
             res.send(data.roles);
         });
