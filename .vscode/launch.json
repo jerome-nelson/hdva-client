@@ -1,17 +1,11 @@
 {
     "configurations": [
-
         {
-            "type": "node",
+            "type": "chrome",
             "request": "launch",
-            "name": "Launch Program",
-            "runtimeArgs": [
-                "-r",
-                "ts-node-dev/register"
-            ],
-            "args": [
-                "${fileDirname}/index.ts"
-            ],
+            "name": "Local Remote Debugging",
+            "url": "http://localhost:3001",
+            "webRoot": "${workspaceRoot}"
         }
     ]
 }
