@@ -31,7 +31,6 @@ export const HeaderTitle = ({ disableBack, title }: HeaderProps) => {
                 alignContent="stretch"
                 justify="center"
                 container
-                xs={12}
             >
                 {
                     !disableBack &&

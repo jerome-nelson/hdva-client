@@ -1,8 +1,9 @@
-import { useState, useEffect, SetStateAction, Dispatch } from "react";
-const axios = require("axios");
+import { useState, useEffect, SetStateAction, Dispatch, useCallback } from "react";
+import axios from "axios";
+import querystring from "querystring";
 
-export const useAPI = <T>(endpoint: string): [{ data: T[], isLoading: boolean, isError: boolean }, Dispatch<SetStateAction<T[]>>] => {
-  const [data, setData] = useState([] as T[]);
+export const useAPI = <T>(endpoint: string, prevent: boolean = false, initialDataType: any = []): [{ data: T[], isLoading: boolean, isError: boolean }, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
+  const [data, setData] = useState(initialDataType);
   const [url, setUrl] = useState(
     endpoint
   );
@@ -11,6 +12,10 @@ export const useAPI = <T>(endpoint: string): [{ data: T[], isLoading: boolean, i
 
   useEffect(() => {
     const fetchData = async () => {
+      if (prevent) {
+        return;
+      }
+
       setIsError(false);
       setIsLoading(true);
 
@@ -24,9 +29,25 @@ export const useAPI = <T>(endpoint: string): [{ data: T[], isLoading: boolean, i
       }
 
     };
-
     fetchData();
   }, [url]);
 
-  return [{ data, isLoading, isError }, setData];
+  const callAPI = useCallback(payload => {
+    setIsLoading(true);
+    axios.post(url, querystring.stringify(payload),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+      }).then(res => {
+      setData(res.data);
+      setIsLoading(false);
+    }).catch((error: any) => {
+      console.log(error);
+      setIsError(true);
+      setIsLoading(false);
+    })
+  }, [url])
+
+  return [{ data, isLoading, isError }, setData, setUrl, callAPI];
 }

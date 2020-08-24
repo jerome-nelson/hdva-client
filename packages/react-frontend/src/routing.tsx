@@ -48,5 +48,19 @@ export const ROUTES = [
             path: '/properties/:id',
         },
         component: PropertiesPage
-    }  
+    },
+    {
+        auth: false,
+        props: {
+            path: '/privacy-policy',
+        },
+        component: () => "Privacy Policy"
+    },
+    {
+        auth: false,
+        props: {
+            path: '/terms-of-service',
+        },
+        component: () => "Terms of Service"
+    },
 ];

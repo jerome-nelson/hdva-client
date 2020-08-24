@@ -9,7 +9,7 @@ import { PrivateRoute } from "utils/protected-route";
 import { BottomNav } from "components/navigation/bottom.nav";
 
 export const App = () => {    
-    return <Container maxWidth="sm">
+    return <Container maxWidth="xl">
         <Router>
             <Switch>
                 {

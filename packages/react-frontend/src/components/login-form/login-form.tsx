@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useHistory, Link } from "react-router-dom";
 
-import { Button, IconButton, InputAdornment, OutlinedInput, makeStyles, Theme, createStyles, FormHelperText, CircularProgress } from "@material-ui/core";
+import { Button, IconButton, InputAdornment, OutlinedInput, makeStyles, Theme, createStyles, CircularProgress, Box, Grid, Hidden } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
-import { login } from "../../services/auth.service";
-import { useHistory } from "react-router-dom";
+import { setUser } from "../../services/auth.service";
+import { useAPI } from "../../utils/getData";
+import { messages } from "../../languages/en";
 
 interface LoginState {
     username: string;
@@ -24,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: `${theme.spacing(1.5)}px ${theme.spacing(1)}px`,
             marginTop: `${theme.spacing(3)}px`,
             borderRadius: `${theme.spacing(3)}px`
+        },
+        mdUpMargin: {
+            marginTop: `${theme.spacing(2)}px`
         }
     }),
 );
@@ -32,17 +37,21 @@ export const LoginForm = (props: any) => {
     const classes = useStyles();
     const history = useHistory();
 
+    const [user, setData, setUrl, callAPI] = useAPI("http://localhost:3001/login", true, {});
     const [values, setValues] = React.useState<LoginState>({
         username: '',
         password: '',
         showPassword: false,
         isLoading: false
     });
-    const [errors, setErrors] = React.useState({
-        username: false,
-        password: false,
-        unknown: false
-    });
+
+    useEffect(() => {
+        // TODO: Fix data typing of API hook
+        if (!!(user.data as any).user) {
+            setUser(user.data);
+            history.push("/");
+        }
+    }, [user]);
 
     const handleChange = (prop: keyof LoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -56,72 +65,44 @@ export const LoginForm = (props: any) => {
         event.preventDefault();
     };
 
-    const handleSubmit = async (event: any) => {
-        let newErrors = {
-            username: false,
-            password: false,
-            unknown: false
-        };
-        if (!values.username) {
-            newErrors = {
-                ...newErrors,
-                username: true
-            }
-        }
-
-        if (!values.password) {
-            newErrors = {
-                ...newErrors,
-                password: true
-            }
-        }
-
-        // try {
-            await login(values.username, values.password);
-            history.push("/");
-        // } catch (e) {
-        //     newErrors = {
-        //         ...newErrors,
-        //         unknown: true
-        //     }
-        // }
-        setErrors(newErrors);
-        setValues({
-            ...values,
-            isLoading: false
-        });
-    }
-
+    const notAllFieldsFilled = [values.username, values.password].filter(elem => !!elem).length < 2;
     return (
         <React.Fragment>
-            {errors.unknown && <div className="alert alert-danger" role="alert">There has been an unknown technical error</div>}
-            <form onSubmit={(ev) => {
-                ev.preventDefault();
-                setValues({
-                    ...values,
-                    isLoading: true
-                })
-                setTimeout(() => handleSubmit(ev), 1000)
-            }} autoComplete="off">
+            {user.isError && (
+                <Link to="/forgotten-password">
+                    <Box bgcolor="secondary.main" color="secondary.contrastText" p={2} role="alert">
+                        {messages["login.forgotten-password"]}
+                    </Box>
+                </Link>)
+            }
+            <form
+                onSubmit={event => {
+                    event.preventDefault();
+                    setValues(values);
+                    callAPI({
+                        username: values.username,
+                        password: values.password
+                    });
+                }}
+                autoComplete="off"
+            >
                 <OutlinedInput
                     className={classes.userFields}
-                    error={errors.username}
                     fullWidth={true}
-                    placeholder="Username"
+                    placeholder={messages["login.form.username"]}
                     id="username"
                     type="text"
                     value={values.username}
-                    onChange={handleChange('username')} />
-                {errors.username && <FormHelperText id="component-error-text">Please enter your username</FormHelperText>}
+                    onChange={handleChange('username')}
+                />
                 <OutlinedInput
-                    error={errors.password}
                     className={classes.userFields}
                     fullWidth={true}
                     id="standard-adornment-password"
                     type={values.showPassword ? 'text' : 'password'}
                     value={values.password}
                     onChange={handleChange('password')}
-                    placeholder="Password"
+                    placeholder={messages["login.form.password"]}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -132,12 +113,27 @@ export const LoginForm = (props: any) => {
                                 {values.showPassword ? <Visibility /> : <VisibilityOff />}
                             </IconButton>
                         </InputAdornment>
-                    } />
-                {errors.password && <FormHelperText id="component-error-text">Please enter your password</FormHelperText>}
-                <Button type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
-                    {values.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : "Login"}
-                </Button>
-                <sub>Account not activated? Please call us on +44208 444 5555</sub>
+                    }
+                />
+                <Grid container justify="flex-end">
+                    <Hidden mdDown>
+                        <Grid md={5} item className={classes.mdUpMargin}>
+                            <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
+                                {user.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
+                            </Button>
+                        </Grid>
+                        <Grid md={12} item className={classes.mdUpMargin} >
+                            <p><Link to="/forgotten-password">{messages["login.form.forgotten-password"]}</Link></p>
+                        </Grid>
+                    </Hidden>
+                    <Hidden mdUp>
+                        <Grid item xs={12}>
+                            <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
+                                {user.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
+                            </Button>
+                        </Grid>
+                    </Hidden>
+                </Grid>
             </form>
         </React.Fragment>
     );
