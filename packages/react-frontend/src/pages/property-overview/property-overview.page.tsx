@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, createStyles, makeStyles, Theme, CircularProgress, Button, TableFooter, TablePagination, IconButton, useTheme } from "@material-ui/core";
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, createStyles, makeStyles, Theme, CircularProgress, Button, TableFooter, TablePagination, IconButton, useTheme, Hidden, MenuItem, Menu } from "@material-ui/core";
 import { useAPI } from "../../hooks/useAPI";
 
 import { HeaderTitle } from "../../components/header/header";
@@ -94,6 +95,17 @@ export const PropertiesOverviewPage = () => {
         history.push("/login");
     }
 
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     const classes = useStyles();
     const [properties, _] = useAPI<Record<string, any>>(`http://localhost:3001/properties/${user.group}`);
     const [page, setPage] = React.useState(0);
@@ -114,19 +126,21 @@ export const PropertiesOverviewPage = () => {
 
     return (
         <React.Fragment>
-            <HeaderTitle disableBack title="All Properties" />
-            <TableContainer component={Paper}>
+            <Hidden mdUp>
+                <HeaderTitle disableBack title="All Properties" />
+            </Hidden>
+            <TableContainer>
                 <Table aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell component="th">Properties</TableCell>
-                            <TableCell component="th">Last Updated</TableCell>
-                            {/* <TableCell component="th" align="right">&nbsp;</TableCell> */}
+                            <TableCell component="th">Name</TableCell>
+                            <TableCell component="th">Modified</TableCell>
+                            <TableCell component="th">Viewable by</TableCell>
+                            <TableCell component="th" align="right">&nbsp;</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {properties.isLoading && <CircularProgress size="1.5rem" color="secondary" />}
-                        {!properties.isLoading && properties.data.map((row: any) => (
+                        {properties.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : properties.data.map((row: any) => (
                             <TableRow key={row.name}>
                                 <TableCell className={classes.table} component="td" scope="row">
                                     <Link
@@ -145,14 +159,32 @@ export const PropertiesOverviewPage = () => {
                                 <TableCell component="td" scope="row">
                                     {new Date(row.modifiedOn).toDateString()}
                                 </TableCell>
-                                {/* <TableCell component="td" scope="row">
-                                    <Link to={encodeURI(`/properties/${row.propertyId.toLowerCase()}`)}>
-                                        {row.hasFloorplan && (<ApartmentIcon />)}
-
-                                        {row.hasVT && (<CameraIcon />)}
-                                        {row.hasImages && (<ImageIcon />)}
-                                    </Link>
-                                </TableCell> */}
+                                <TableCell>
+                                    Test
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton
+                                        aria-label="more"
+                                        aria-controls="long-menu"
+                                        aria-haspopup="true"
+                                        onClick={handleClick}
+                                    >
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                    <Menu
+                                        id="long-menu"
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={open}
+                                        onClose={handleClose}
+                                    >
+                                        {["Test"].map((option) => (
+                                            <MenuItem key={option} onClick={handleClose}>
+                                                {option}
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

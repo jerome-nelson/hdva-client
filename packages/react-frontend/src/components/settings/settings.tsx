@@ -46,6 +46,25 @@ export const Settings = () => {
             <List
                 component="nav"
                 aria-labelledby="nested-list-subheader"
+                className={classes.root}
+            >
+                <ListItem
+                    button
+                    onClick={() => {
+                        history.push("/properties")
+                    }}
+                >
+                    <ListItemText
+                        classes={{
+                            root: classes.listItem
+                        }}
+                        primary="Properties"
+                    />
+                </ListItem>
+            </List>
+            <List
+                component="nav"
+                aria-labelledby="nested-list-subheader"
                 subheader={
                     <ListSubheader className={classes.listHeader} component="div" id="nested-list-subheader">
                         Management Settings
@@ -53,7 +72,12 @@ export const Settings = () => {
                 }
                 className={classes.root}
             >
-                <ListItem button>
+                <ListItem
+                    button
+                    onClick={() => {
+                        history.push("/user-management")
+                    }}
+                >
                     <ListItemText
                         classes={{
                             root: classes.listItem

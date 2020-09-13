@@ -1,27 +1,15 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Drawer, List, ListItem, ListItemText, makeStyles, createStyles, Theme, Grid } from "@material-ui/core";
+import { Drawer, List, ListItem, ListItemText, Grid } from "@material-ui/core";
 
 import {ROUTES} from "../../routing";
 import { Settings } from "../../components/settings/settings";
 import { getCurrentUser } from "../../services/auth.service";
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            width: `${theme.spacing(25)}px`,
-            minWidth: `${theme.spacing(25)}px`,
-        },
-        nav: {
-            marginTop: `${theme.spacing(2)}px`,
-            paddingLeft: `${theme.spacing(2)}px` 
-        }
-    })
-);
+import { sideNavStyles } from "./sidenavStyle";
 
 export const SideNav = () => {
     
-    const classes = useStyles();
+    const classes = sideNavStyles();
     const history = useHistory();
     const [currentUser,] = useState(getCurrentUser());
 

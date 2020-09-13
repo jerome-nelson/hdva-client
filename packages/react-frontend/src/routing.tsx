@@ -74,4 +74,12 @@ export const ROUTES = [
         },
         component: () => "Terms of Service"
     },
+    {
+        auth: true,
+        props: {
+            path: "/user-management",
+            allowed: ["super", "admin", "owner"]
+        },
+        component: () => "User Management"
+    }
 ];
