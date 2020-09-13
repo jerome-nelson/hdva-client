@@ -6,7 +6,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import { setUser } from "../../services/auth.service";
-import { useAPI } from "../../utils/getData";
+import { useAPI } from "../../hooks/useAPI";
 import { messages } from "../../languages/en";
 
 interface LoginState {
@@ -38,6 +38,7 @@ export const LoginForm = (props: any) => {
     const history = useHistory();
 
     const [user, setData, setUrl, callAPI] = useAPI("http://localhost:3001/login", true, {});
+    const [isLoading, setIsLoading] = React.useState(false);
     const [values, setValues] = React.useState<LoginState>({
         username: '',
         password: '',
@@ -79,10 +80,16 @@ export const LoginForm = (props: any) => {
                 onSubmit={event => {
                     event.preventDefault();
                     setValues(values);
-                    callAPI({
+                    setIsLoading(true);
+
+                    // UX Change - delayed on purpose
+                    setTimeout(() => {
+                        callAPI({
                         username: values.username,
                         password: values.password
-                    });
+                    })
+                    setIsLoading(false);
+                }, 3000);
                 }}
                 autoComplete="off"
             >
@@ -119,7 +126,7 @@ export const LoginForm = (props: any) => {
                     <Hidden mdDown>
                         <Grid md={5} item className={classes.mdUpMargin}>
                             <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
-                                {user.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
+                                {(user.isLoading || isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </Button>
                         </Grid>
                         <Grid md={12} item className={classes.mdUpMargin} >
@@ -129,7 +136,7 @@ export const LoginForm = (props: any) => {
                     <Hidden mdUp>
                         <Grid item xs={12}>
                             <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
-                                {user.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
+                                {(user.isLoading || isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </Button>
                         </Grid>
                     </Hidden>

@@ -1,8 +1,10 @@
 import React from "react";
 import { BackButton } from "../back-button/back-button";
-import { makeStyles, createStyles, Theme, Typography, Grid } from "@material-ui/core";
+import { makeStyles, createStyles, Theme, Typography, AppBar, Toolbar } from "@material-ui/core";
 
 interface HeaderProps {
+    alignText?: 'center' | 'left' | 'right';
+    disableGutters?: boolean;
     disableBack?: boolean;
     title: string;
 }
@@ -10,40 +12,28 @@ interface HeaderProps {
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            
+            boxShadow: "none",
         },
-        title: {
+        title: (props: HeaderProps ) => ({
             flexGrow: 1,
-            "& h1": {
-                padding: `${theme.spacing(1)}px 0`,
-                fontSize: '24px',
-                textAlign: "center"
-            }
-        }
+            padding: `${theme.spacing(1)}px 0`,
+            textAlign: props.alignText ? props.alignText : "center"
+        })
     }),
 );
 
-export const HeaderTitle = ({ disableBack, title }: HeaderProps) => {
-    const classes = useStyles();
+export const HeaderTitle = ({ alignText, disableGutters, disableBack, title }: HeaderProps) => {
+    const classes = useStyles({ title, alignText });
     return (
         <React.Fragment>
-            <Grid
-                alignContent="stretch"
-                justify="center"
-                container
-            >
-                {
-                    !disableBack &&
-                    <Grid alignItems="flex-start" item>
-                        <BackButton />
-                    </Grid>
-                }
-                <Grid className={classes.title} item>
-                    <Typography variant="h1">
+            <AppBar color="transparent" className={classes.root} position="static">
+                <Toolbar disableGutters={disableGutters}>
+                    {!disableBack && (<BackButton />)}
+                    <Typography className={classes.title} variant="h6">
                         {title}
                     </Typography>
-                </Grid>
-            </Grid>
+                </Toolbar>
+            </AppBar>
         </React.Fragment>
     );
 }

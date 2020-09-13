@@ -4,6 +4,7 @@ import { LoginPage } from "./pages/login/login.page";
 import { SettingsPage } from "./pages/settings/settings.page";
 import { SignUpPage } from "./pages/sign-up/sign-up.page";
 import { PropertiesPage } from "./pages/properties/properties.page";
+import { PropertiesOverviewPage } from "./pages/property-overview/property-overview.page";
 
 export const ROUTES = [
     {
@@ -16,6 +17,7 @@ export const ROUTES = [
     },
     {
         auth: false,
+        fullWidth: true,
         props: {
             path: '/login',
         },
@@ -23,6 +25,7 @@ export const ROUTES = [
     },
     {
         auth: false,
+        fullWidth: true,
         props: {
             path: '/forgotten-password',
         },
@@ -42,6 +45,14 @@ export const ROUTES = [
         },
         component: SettingsPage
     },  
+    {
+        auth: true,
+        exact: true,
+        props: {
+            path: '/properties',
+        },
+        component: PropertiesOverviewPage
+    },
     {
         auth: true,
         props: {

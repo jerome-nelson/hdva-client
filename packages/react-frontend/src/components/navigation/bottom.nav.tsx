@@ -33,12 +33,10 @@ export const BottomNav = () => {
 
     return currentUser ? (
         <AppBar className={classes.appBar} position="fixed" color="primary">
-            <BottomNavigation
-                showLabels
-            >
-                <BottomNavigationAction label="Dashboard" icon={<DashboardIcon />} />
-                <BottomNavigationAction label="Properties" icon={<HomeWorkIcon />} />
-                <BottomNavigationAction label="Settings" icon={<SettingsIcon />} />
+            <BottomNavigation showLabels>
+                <BottomNavigationAction onClick={() => { history.push("/") }} label="Dashboard" icon={<DashboardIcon />} />
+                <BottomNavigationAction onClick={() => { history.push("/properties") }}  label="Properties" icon={<HomeWorkIcon />} />
+                <BottomNavigationAction onClick={() => { history.push("/settings") }} label="Settings" icon={<SettingsIcon />} />
                 <BottomNavigationAction onClick={() => {
                     logout();
                     history.go(0);

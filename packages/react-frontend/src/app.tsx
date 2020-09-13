@@ -6,15 +6,14 @@ import {
 import Container from '@material-ui/core/Container';
 import { ROUTES } from "./routing";
 import { PrivateRoute } from "utils/protected-route";
-import { BottomNav } from "components/navigation/bottom.nav";
 
 export const App = () => {    
     return <Container maxWidth="xl">
         <Router>
             <Switch>
                 {
-                    ROUTES.map(({ auth, exact, props, component }, key) => {
-                        return <PrivateRoute auth={auth} exact={exact} key={`${key}-test`} path={props.path} component={component} />
+                    ROUTES.map(({ auth, fullWidth, exact, props, component }, key) => {
+                        return <PrivateRoute auth={auth} fullWidth={fullWidth} exact={exact} key={`${key}-test`} path={props.path} component={component} />
                     })
                 }
             </Switch>
