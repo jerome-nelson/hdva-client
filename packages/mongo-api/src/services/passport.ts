@@ -1,4 +1,4 @@
-import passport from "passport";
+import passport, { PassportStatic } from "passport";
 import { Strategy, VerifyFunction, IVerifyOptions } from "passport-local";
 
 const passportStrategy = (callback: (email: string, password: string, done:
@@ -9,7 +9,7 @@ const passportStrategy = (callback: (email: string, password: string, done:
     ) => void)
     => void) => {
     passport.use(
-        new Strategy(function (username: string, password: string, done) {
+        new Strategy(async function (username: string, password: string, done) {
             callback(username.toLowerCase(), password, done);
         }
         )

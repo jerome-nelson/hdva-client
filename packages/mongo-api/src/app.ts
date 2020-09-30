@@ -1,8 +1,10 @@
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 import { mongoInstance } from "./services/mongoose";
 import { passport, passportStrategy } from "./services/passport";
+import { uploadFilesMiddleware } from "./services/multer";
 import { server } from "./services/api";
 import { config } from "./services/config";
 import { models } from "./mongo/schema";
@@ -60,7 +62,6 @@ async function getData(conn: mongoose.Connection) {
     return data;
 }
 
-
 export async function start() {
     const conn = await mongoInstance();
     const data = await getData(conn);
@@ -68,21 +69,41 @@ export async function start() {
     // Requires x-form-data-urlencoded
     await passportStrategy(async (user, pass, done) => {
         const User = models(conn).users;
-        await User.findOne({ email: user, password: pass }, function (err, user) {
+
+        await User.findOne({ email: user }, async function (err, user) {
             if (err) { return done(err); }
             if (!user) {
-                return done(null, false, { message: 'User not found' });
+                return done(null, false, { message: 'USer not found' });
             }
-            return done(null, JSON.parse(JSON.stringify(user)));
+            const userMap = JSON.parse(JSON.stringify(user));
+            const matched = await bcrypt.compare(pass, userMap.password);
+            if (!matched) {
+                return done(null, false, { message: 'Credentials don\'t match' });
+            }
+            return done(null, userMap);
         });
     })
 
     server(app => {
+        app.post("/upload", async (req, res) => {
+            try {
+                await uploadFilesMiddleware(req, res);
+                if (!req.body.pid) {
+                    return res.send(`Property ID must be provided`);
+                }
+                if (req.file == undefined) {
+                  return res.send(`You must select a file.`);
+                }
+            
+                return res.send(`File has been uploaded.`);
+              } catch (error) {
+                console.log(error);
+                return res.send(`Error when trying upload image: ${error}`);
+              }
+        });
         app.post("/login", (req, res, next) => {
             passport.authenticate('local', { session: false }, function (err, user, info) {
                 if (err || !user) {
-                    console.log(req);
-                    console.log(res);
                     return res.status(400).json({
                         message: info.message,
                         error: err,
@@ -110,7 +131,7 @@ export async function start() {
             res.send(result)
         });
         app.get(["/properties", "/properties/:gid"], (req, res) => {
-            const result = !req.params.gid ? data.properties : data.properties.filter((elem: any) => elem.groupId === Number(req.params.gid));
+            const result = !req.params.gid  ? data.properties : data.properties.filter((elem: any) => elem.groupId === Number(req.params.gid));
             res.send(result)
         });
         app.get("/data/:gid/:pid", (req, res) => {
