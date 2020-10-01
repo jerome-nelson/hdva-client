@@ -1,20 +1,32 @@
 import passport, { PassportStatic } from "passport";
-import { Strategy, VerifyFunction, IVerifyOptions } from "passport-local";
+import { VerifyFunction, IVerifyOptions } from "passport-local";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { config } from "./config";
+import { models } from "../mongo/schema";
 
-const passportStrategy = (callback: (email: string, password: string, done:
-    (
-        error: any,
-        user?: any,
-        options?: IVerifyOptions
-    ) => void)
-    => void) => {
-    passport.use(
-        new Strategy(async function (username: string, password: string, done) {
-            callback(username.toLowerCase(), password, done);
+export const tokenConfig = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: config.jwtToken || '',
+    algorithms: ['HS256'],
+    jsonWebTokenOptions: {
+        maxAge: '2d',
+    }
+}
+
+const passportStrategy = (сonn: any, passportInstance: PassportStatic = passport) => {
+    const User = models(сonn).users;
+    passportInstance.use(new Strategy(tokenConfig, async function(jwt_payload, done) {
+        try {
+            const user = await User.findOne({ email: jwt_payload.email.toLowerCase() });
+            if (!user) {
+                throw new Error("User not found");
+            }
+            done(false, jwt_payload, "Successful Authentication");
+        } catch(e) {
+            done(e, false);
         }
-        )
-    )
-};
+    }));
+}
 
 export {
     passport,

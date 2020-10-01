@@ -13,8 +13,8 @@ export function server<T>(routes: (app: Application) => void) {
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
     });
-    app.use(passport.initialize());
     routes(app);
+    app.use(passport.initialize());
     const callback = () => console.log(`Server is Running on http://${config.url}:${config.serverPort}`);
     app.listen(config.serverPort, callback);
 }
