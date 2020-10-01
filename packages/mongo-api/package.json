@@ -23,6 +23,7 @@
         "@types/passport": "^1.0.4",
         "@types/passport-jwt": "^3.0.3",
         "@types/passport-local": "^1.0.33",
+        "@types/uuid": "^8.3.0",
         "ts-node-dev": "^1.0.0-pre.60",
         "typescript": "^3.9.7"
     },
@@ -37,6 +38,7 @@
         "multer-gridfs-storage": "^4.2.0",
         "passport": "^0.4.1",
         "passport-jwt": "^4.0.0",
-        "passport-local": "^1.0.0"
+        "passport-local": "^1.0.0",
+        "uuid": "^8.3.0"
     }
 }

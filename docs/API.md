@@ -1,11 +1,10 @@
 * `/login`
 * `/reset-password`
-* `/logout`
 * `/roles`
 * `/users`
-* `/properties`
+* `/data`
 
-Uses JWT authentication
-
+1. Uses JWT authentication
 # TODO:
+* Add caching for DB details
 * Tool to generate bcrypt passwords for testing

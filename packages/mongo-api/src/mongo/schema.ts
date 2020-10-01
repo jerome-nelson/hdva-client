@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
     modifiedOn: Date,
     name: String,
     role: Number,
-    userId: Number,
+    userId: String,
 });
 
 const PropertiesSchema = new mongoose.Schema({

@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 import { passport, passportStrategy } from "./services/passport";
 import { mongoInstance } from "./services/mongoose";
@@ -65,6 +66,8 @@ async function getData(conn: mongoose.Connection) {
 export async function start() {
     const conn = await mongoInstance();
     const data = await getData(conn);
+    const User = models(conn).users;
+
     passportStrategy(conn);
 
     server(app => {
@@ -87,8 +90,47 @@ export async function start() {
                 });
             }
         });
+        app.post("/register", async (req, res, next) => {
+            
+            const user = await User.findOne({ email: req.body.email.toLowerCase() });
+
+            if (user) {
+                return res.json({
+                    message: "Account already exists"
+                })
+            }
+
+            bcrypt.genSalt(10, function(err, salt) {
+                bcrypt.hash(req.body.password, salt, async function(err, hash) {
+                    const newUser = new User({
+                        createdOn: new Date(),
+                        modifiedOn: new Date(),
+                        group: req.body.group,
+                        name: req.body.name,
+                        userId: uuidv4(),
+                        role: req.body.role,
+                        email: req.body.email,
+                        password: hash
+                    });
+        
+                    try {
+                        await newUser.save();
+                        return res.json({
+                            message: "registered successfully"
+                        })
+                    } catch(error) {
+                        res.status(400).json({
+                            message: "Error Occurred",
+                            error
+                        })
+                    }
+                });
+            });
+
+
+         
+        });
         app.post("/login", async (req, res, next) => {
-            const User = models(conn).users;
 
             try {
                 const user = await User.findOne({ email: req.body.username.toLowerCase() });
@@ -107,11 +149,11 @@ export async function start() {
                 const token = jwt.sign(userMap, jwtToken, {
                     algorithm: "HS256",
                     expiresIn: "1d"
-                    
+
                 });
-                return res.json({ 
-                    ...userMap, 
-                    token: `Bearer ${token}` 
+                return res.json({
+                    ...userMap,
+                    token: `Bearer ${token}`
                 });
             } catch (e) {
                 // TODO: Map Error Msgs to Error ID
