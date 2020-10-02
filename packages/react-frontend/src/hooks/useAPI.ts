@@ -2,6 +2,7 @@ import { useState, useEffect, SetStateAction, Dispatch, useCallback } from "reac
 import axios from "axios";
 import querystring from "querystring";
 
+// TODO: Error boundary of some kind here
 export const useAPI = <T>(endpoint: string, prevent: boolean = false, initialDataType: any = []): [{ data: T[], isLoading: boolean, isError: boolean }, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
   const [data, setData] = useState(initialDataType);
   const [url, setUrl] = useState(

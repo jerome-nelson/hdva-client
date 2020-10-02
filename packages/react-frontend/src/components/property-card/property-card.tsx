@@ -12,7 +12,16 @@ interface PropertyCardProps {
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
+            backgroundColor: "#fff",
+            marginRight: "1%",
             width: '30%',
+        },
+        title: {
+            textAlign: "center",
+            "& a": {
+                color: "#000",
+                textDecoration: "none"
+            }
         },
         media: {
             height: 0,
@@ -25,13 +34,13 @@ export const PropertyCard: React.SFC<PropertyCardProps> = ({ name, propertyId })
     const classes = useStyles();
 
     return (
-        <Card className={classes.root}>
-            <CardMedia
+        <Card square={true} elevation={0} raised={false} className={classes.root}>
+            {/* <CardMedia
                 className={classes.media}
                 image="https://via.placeholder.com/170x72"
                 title="Paella dish"
-            />
-            <CardContent>
+            /> */}
+            <CardContent className={classes.title}>
                 <Link to={`/properties/${propertyId}`}>
                 {name}
                 </Link>

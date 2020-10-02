@@ -41,7 +41,7 @@ export const ForgottenEmailPage = () => {
 
     return (
         <Grid container justify="center">
-            <AppBar>
+            <AppBar color="transparent" elevation={0}>
                 <Toolbar>
                     <Grid container alignContent="center" justify="center">
                         <Grid item>
@@ -50,7 +50,7 @@ export const ForgottenEmailPage = () => {
                     </Grid>
                 </Toolbar>
             </AppBar>
-            <Grid md={4} xs={12} item>
+            <Grid md={4} xs={10} item>
                 <Grid container alignContent="flex-start">
                     <Typography className={classes.title} variant="h6">
                         {messages["forgotten-password.title"]}

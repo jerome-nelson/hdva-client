@@ -2,7 +2,7 @@ import { useState, useEffect, useReducer } from "react";
 
 import { useAPI } from "./useAPI";
 
-const Roles = {
+export const Roles = {
     super: "Super",
     admin: "Administrator",
     owner: "{{Group Name}} Leader",

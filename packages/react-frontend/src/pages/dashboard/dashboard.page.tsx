@@ -28,9 +28,9 @@ export const DashboardPage = () => {
     if (!user) {
         history.push("/login");
     }
-
+    const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const classes = useDashboardStyles();
-    const [properties,] = useAPI<Properties>(`http://localhost:3001/properties/${user.group}`);
+    const [properties,] = useAPI<Properties>(`http://localhost:3001/properties${propertiesSuffix}`);
     const [users,] = useAPI<Record<string, any>>(`http://localhost:3001/users`);
     const [currentRole] = useRoles(user);
 

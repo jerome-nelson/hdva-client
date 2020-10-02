@@ -1,15 +1,8 @@
-import React from "react";
-import { makeStyles, Theme, createStyles, List, ListSubheader, ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import PersonIcon from '@material-ui/icons/Person';
-import GroupIcon from '@material-ui/icons/Group';
-import FaceIcon from '@material-ui/icons/Face';
-import EditIcon from '@material-ui/icons/Edit';
-import AddBoxIcon from '@material-ui/icons/AddBox';
+import React, { useState, useEffect } from "react";
+import { makeStyles, Theme, createStyles, List, ListSubheader, ListItem, ListItemText } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { logout } from "../../services/auth.service";
+import { logout, getCurrentUser } from "../../services/auth.service";
+import { useRoles, Roles } from "hooks/useRoles";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,6 +33,15 @@ export const Settings = () => {
 
     const classes = useStyles();
     const history = useHistory();
+    const [currentUser, setCurrentUser] = useState(getCurrentUser());
+    const [currentRole] = useRoles(currentUser);
+
+    useEffect(() => {
+        const user = getCurrentUser();
+        if (user) {
+            setCurrentUser(user);
+        }
+    }, []);
 
     return (
         <React.Fragment>
@@ -62,7 +64,7 @@ export const Settings = () => {
                     />
                 </ListItem>
             </List>
-            <List
+        {[Roles.super, Roles.admin, Roles.owner].includes(currentRole) &&  <List
                 component="nav"
                 aria-labelledby="nested-list-subheader"
                 subheader={
@@ -91,7 +93,7 @@ export const Settings = () => {
                         }}
                         primary="Group Managment" />
                 </ListItem>
-            </List>
+            </List>}
             <List
                 component="nav"
                 aria-labelledby="nested-list-subheader"
