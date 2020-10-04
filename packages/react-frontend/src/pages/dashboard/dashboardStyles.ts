@@ -6,6 +6,14 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             width: "80%",
             margin: `0 auto`
         },
+        linkStyle: {
+            width: "100%"
+        },
+        actionBtn: {
+            padding: `${theme.spacing(1.5)}px ${theme.spacing(1)}px`,
+            marginTop: `${theme.spacing(3)}px`,
+            borderRadius: `${theme.spacing(3)}px`
+        },
         table: {
             width: "40%"
         },

@@ -1,6 +1,7 @@
 import { useState, useEffect, useReducer } from "react";
 
 import { useAPI } from "./useAPI";
+import { getCurrentUser } from "services/auth.service";
 
 export const Roles = {
     super: "Super",
@@ -12,8 +13,18 @@ export const Roles = {
 
 //  TODO: Add Role Typing
 
-export const useRoles = (user: any, context: any = []): [string, boolean] => {
-    const [roles,] = useAPI<Record<string, string>>(`http://localhost:3001/roles`);
+export const useRoles = (context: any = []): [string, boolean, boolean] => {
+    const user = getCurrentUser();
+    const options = user && user.token ? {
+        extraHeaders: {
+            'Authorization': user.token
+        }
+    } : {};
+
+    const [roles,,setURL] = useAPI<Record<string, string>>(``, {
+        ...options,
+        prevent: true
+    });
     const [currentRole, setRole] = useState<string>("");
     const [canAccess, dispatch] = useReducer((state: any, action: any) => {
         if (action.allowed.length <= 0) {
@@ -25,6 +36,11 @@ export const useRoles = (user: any, context: any = []): [string, boolean] => {
                     .rolename.toLowerCase()).length
     }, true);
 
+    useEffect(() => {
+        if (!!user && user.token) {
+            setURL(`http://localhost:3001/roles`);
+        }    
+    }, [user]);
 
     // TODO: Examine other hooks in React and review current conditionals
     useEffect(() => {
@@ -42,5 +58,5 @@ export const useRoles = (user: any, context: any = []): [string, boolean] => {
         }
     }, [roles, user, context]);
 
-    return [currentRole, canAccess];
+    return [currentRole, canAccess, roles.isError];
 }

@@ -3,12 +3,11 @@ const logout = () => {
 };
 
 const setUser = (data: any) => {
-  if (!data || !data.user || !data.token) {
+  if (!data || !data.token) {
     return;
   }
 
-  localStorage.setItem("user", JSON.stringify(data.user));
-  localStorage.setItem("token", JSON.stringify(data.token));
+  localStorage.setItem("user", JSON.stringify(data));
 }
 
 const getCurrentUser = () => {

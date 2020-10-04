@@ -26,7 +26,7 @@ export const PrivateRoute = ({ auth, fullWidth, component, ...rest }: RouterProp
   }, []);
 
   const location = useLocation();
-  const [, canAccess] = useRoles(currentUser, permissions);
+  const [, canAccess, isError] = useRoles(permissions);
 
   const DynamicComponent = component;
   //  TODO Fix redirects
@@ -40,6 +40,11 @@ export const PrivateRoute = ({ auth, fullWidth, component, ...rest }: RouterProp
   }
 
   // TODO: Show modal instead to explain no access allowed
+  // TODO: Show modal instead of error occurred
+  if (isError) {
+    return <div>Error Occurred</div>
+  }
+
   return !canAccess ? <div>You are not allowed to access this page</div> : (
     <React.Fragment>
       <Hidden mdDown>

@@ -64,7 +64,11 @@ export const PropertiesOverviewPage = () => {
 
     const classes = useStyles();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;    
-    const [properties,] = useAPI<Record<string, any>>(`http://localhost:3001/properties${propertiesSuffix}`);
+    const [properties,] = useAPI<Record<string, any>>(`http://localhost:3001/properties${propertiesSuffix}`, {
+        extraHeaders: {
+            'Authorization': user.token
+        }
+    });
 
     return (
         <React.Fragment>

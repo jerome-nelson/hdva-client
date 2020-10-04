@@ -34,7 +34,7 @@ export const Settings = () => {
     const classes = useStyles();
     const history = useHistory();
     const [currentUser, setCurrentUser] = useState(getCurrentUser());
-    const [currentRole] = useRoles(currentUser);
+    const [currentRole] = useRoles();
 
     useEffect(() => {
         const user = getCurrentUser();

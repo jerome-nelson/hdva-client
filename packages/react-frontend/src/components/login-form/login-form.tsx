@@ -37,7 +37,7 @@ export const LoginForm = (props: any) => {
     const classes = useStyles();
     const history = useHistory();
 
-    const [user, setData, setUrl, callAPI] = useAPI("http://localhost:3001/login", true, {});
+    const [user, setData, setUrl, callAPI] = useAPI("http://localhost:3001/login", { initialDataType: {}, prevent: true });
     const [isLoading, setIsLoading] = React.useState(false);
     const [values, setValues] = React.useState<LoginState>({
         username: '',
@@ -48,7 +48,7 @@ export const LoginForm = (props: any) => {
 
     useEffect(() => {
         // TODO: Fix data typing of API hook
-        if (!!(user.data as any).user) {
+        if (Object.keys(user.data as any).length > 0) {
             setUser(user.data);
             history.push("/");
         }

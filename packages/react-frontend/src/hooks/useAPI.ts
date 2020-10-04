@@ -2,9 +2,22 @@ import { useState, useEffect, SetStateAction, Dispatch, useCallback } from "reac
 import axios from "axios";
 import querystring from "querystring";
 
+interface ApiOptions {
+    prevent?: boolean, 
+    initialDataType?: any, 
+    extraHeaders?: Record<string, string> 
+}
+
 // TODO: Error boundary of some kind here
-export const useAPI = <T>(endpoint: string, prevent: boolean = false, initialDataType: any = []): [{ data: T[], isLoading: boolean, isError: boolean }, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
-  const [data, setData] = useState(initialDataType);
+export const useAPI = <T>(endpoint: string, defaults?: ApiOptions): [{ data: T[], isLoading: boolean, isError: boolean }, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
+  const options = {
+    extraHeaders: {},
+    prevent: false,
+    initialDataType: [],
+    ...defaults
+  };
+  
+  const [data, setData] = useState(options.initialDataType);
   const [url, setUrl] = useState(
     endpoint
   );
@@ -13,7 +26,7 @@ export const useAPI = <T>(endpoint: string, prevent: boolean = false, initialDat
 
   useEffect(() => {
     const fetchData = async () => {
-      if (prevent) {
+      if (options.prevent) {
         return;
       }
 
@@ -21,7 +34,9 @@ export const useAPI = <T>(endpoint: string, prevent: boolean = false, initialDat
       setIsLoading(true);
 
       try {
-        const result = await axios(url);
+        const result = await axios(url, {
+          headers: options.extraHeaders
+        });
         setData(result.data);
       } catch (error) {
         setIsError(true);
@@ -38,7 +53,8 @@ export const useAPI = <T>(endpoint: string, prevent: boolean = false, initialDat
     axios.post(url, querystring.stringify(payload),
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
+          ...options.extraHeaders,
         },
       }).then(res => {
       setData(res.data);

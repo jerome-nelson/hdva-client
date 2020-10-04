@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardMedia, makeStyles, createStyles, Theme, CardContent } from "@material-ui/core";
+import { Card, CardMedia, makeStyles, createStyles, Theme, CardContent, Typography } from "@material-ui/core";
 import CancelIcon from '@material-ui/icons/Cancel';
 import { Link } from "react-router-dom";
 
@@ -29,22 +29,24 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }));
 
-export const PropertyCard: React.SFC<PropertyCardProps> = ({ name, propertyId }) => {
+export const PropertyCard: React.SFC<PropertyCardProps> = ({ modifiedOn, name, propertyId }) => {
 
     const classes = useStyles();
 
     return (
+
         <Card square={true} elevation={0} raised={false} className={classes.root}>
-            {/* <CardMedia
+            <Link to={`/properties/${propertyId}`}>
+                <CardMedia
                 className={classes.media}
                 image="https://via.placeholder.com/170x72"
                 title="Paella dish"
-            /> */}
-            <CardContent className={classes.title}>
-                <Link to={`/properties/${propertyId}`}>
-                {name}
-                </Link>
-            </CardContent>
+            />
+                <CardContent className={classes.title}>
+                    <Typography variant="h6">{name}</Typography>
+                    <sub>Modified On {new Date(modifiedOn).toDateString()}</sub>
+                </CardContent>
+            </Link>
         </Card>
     );
 }
