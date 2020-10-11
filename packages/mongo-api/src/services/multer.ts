@@ -4,33 +4,50 @@ import { promisify } from "util";
 import { config } from "./config";
 import { Request } from "express";
 
+interface RequestModified extends Request {
+  user?: {
+    createdOn: string;
+    email: string;
+    group: number;
+    modifiedOn: string;
+    name: string;
+    role: number,
+    userId: string,
+  }
+}
+// Create mongo permissions handler for role management
+const UPLOAD_ROLES = [1, 2, 4];
 const storage = new GridFsStorage({
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   url: config.mongoUrl,
-  file: (req: Request, file) => {
+  file: (req: RequestModified, file) => {
     const match = ["image/png", "image/jpeg"];
     const body = { ...req.body };
 
-    if(!body.pid) {
-      return;
+    if (req.user && req.user.group && !UPLOAD_ROLES.includes(req.user.group)) {
+      throw new Error(`Not allowed`);
     }
-    
+
+    if (!body.pid || !body.type) {
+      throw new Error(`Type and PropertyID must be specified`);
+    }
+
     if (match.indexOf(file.mimetype) === -1) {
       const filename = `${Date.now()}-${body.pid}-${file.originalname}`;
       return filename;
     }
-    
+
     return {
-      files: {
-        metadata: {
-          pid: body.pid
-        }
+      metadata: {
+        type: body.type,
+        pid: body.pid
       },
       bucketName: "files",
-      filename: `${Date.now()}-${body.pid}-${file.originalname}`
+      filename: `${file.originalname}-${Date.now()}`
     };
   }
 });
-const upload = multer({ storage }).single("file");
-const uploadFilesMiddleware = promisify(upload);
-export { uploadFilesMiddleware };
+const multerMiddleware = multer({ storage }).array("file");
+
+// const uploadFilesMiddleware = promisify(upload);
+export { multerMiddleware };

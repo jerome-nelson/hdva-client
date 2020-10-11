@@ -5,10 +5,20 @@ import { v4 as uuidv4 } from "uuid";
 
 import { passport, passportStrategy } from "./services/passport";
 import { mongoInstance } from "./services/mongoose";
-import { uploadFilesMiddleware } from "./services/multer";
+import { multerMiddleware } from "./services/multer";
 import { server } from "./services/api";
 import { config } from "./services/config";
 import { models } from "./mongo/schema";
+
+const SUPER_ROLE = 1;
+
+
+// TODO: Split everything into smaller services
+//  * Images
+//      * Get/Delete/Resize Images
+// * Login/Authentication
+// * Send Mails to Users
+// * Property Data
 
 async function getData(conn: mongoose.Connection) {
     const data: Record<string, any> = {
@@ -22,7 +32,7 @@ async function getData(conn: mongoose.Connection) {
     const connection = models(conn);
     await connection.roles.find((err, roles) => {
         if (err) {
-            console.log(err);
+            // Can this be caught by middleware?
             throw new Error(err);
         }
         data.roles = JSON.parse(JSON.stringify(roles));
@@ -30,7 +40,6 @@ async function getData(conn: mongoose.Connection) {
 
     await connection.users.find((err, users) => {
         if (err) {
-            console.log(err);
             throw new Error(err);
         }
         data.users = JSON.parse(JSON.stringify(users));
@@ -38,7 +47,6 @@ async function getData(conn: mongoose.Connection) {
 
     await connection.properties.find((err, properties) => {
         if (err) {
-            console.log(err);
             throw new Error(err);
         }
         data.properties = JSON.parse(JSON.stringify(properties));
@@ -46,7 +54,6 @@ async function getData(conn: mongoose.Connection) {
 
     await connection.groups.find((err, groups) => {
         if (err) {
-            console.log(err);
             throw new Error(err);
         }
         data.groups = JSON.parse(JSON.stringify(groups));
@@ -54,7 +61,6 @@ async function getData(conn: mongoose.Connection) {
 
     await connection.uploads.find((err, uploads) => {
         if (err) {
-            console.log(err);
             throw new Error(err);
         }
         data.uploads = JSON.parse(JSON.stringify(uploads));
@@ -65,43 +71,139 @@ async function getData(conn: mongoose.Connection) {
 
 export async function start() {
     const conn = await mongoInstance();
+    const gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: "files"
+    })
     const data = await getData(conn);
     const User = models(conn).users;
+    const Properties = models(conn).properties;
 
     passportStrategy(conn);
 
+    // TODO: Add User to Passport Typing withj correct schema
     server(app => {
-        app.post("/upload", async (req, res) => {
-            try {
-                await uploadFilesMiddleware(req, res);
-                if (!req.body.pid) {
-                    return res.send(`Property ID must be provided`);
-                }
-                if (req.file == undefined) {
-                    return res.send(`You must select a file.`);
+
+        app.get("/image/:filename", async (req, res, next) => {
+            if (!req.params.filename) {
+                next(new Error("filename must be specified"));
+            }
+
+            const fileStream = gfs.openDownloadStreamByName(req.params.filename);
+            fileStream.on("error", error => {
+                next(error);
+            })
+            fileStream.pipe(res);
+        });
+
+        app.get("/files/:pid/:type?", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+
+            if (!req.params.pid) {
+                next(new Error("Property ID must be specified"))
+            }
+
+            const type = req.params.type ? { "metadata.type": req.params.type } : {};
+            gfs.find({ "metadata.pid": req.params.pid, ...type }).toArray((error: Error, files: any[]) => {
+                if (error) {
+                    next(error);
                 }
 
-                return res.send(`File has been uploaded.`);
-            } catch (error) {
-                console.log(error);
-                return res.status(400).json({
-                    message: `Error when trying upload image: ${error.message}`,
-                    error
+                res.json({
+                    files: files.map(elem => elem.filename),
+                    success: true
                 });
+            });
+        });
+
+        app.post("/upload", passport.authenticate('jwt', { session: false }), multerMiddleware, async (_, res) => {
+            return res.json({
+                success: true
+            });
+        });
+
+        app.get('/delete/:id', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+            if (!req.params.id) {
+                next(new Error("ID of image not specified"));
+            }
+
+            // TODO: To understand and remove try catchs from express routing - create handler instead
+            try {
+                const id = mongoose.Types.ObjectId(req.params.id);
+                gfs.delete(id, (error, result) => {
+                    if (error) {
+                        next(error);
+                    }
+                    res.json({
+                        info: result,
+                        success: true
+                    })
+                })
+            } catch (topLevel) {
+                next(topLevel);
             }
         });
-        app.post("/register", async (req, res, next) => {
-            
-            const user = await User.findOne({ email: req.body.email.toLowerCase() });
 
-            if (user) {
-                return res.json({
-                    message: "Account already exists"
+        app.post("/properties/delete", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+            // TODO: Type User Object and fix roles
+                if (req.user && ![1, 2, 4].includes((req.user as any).role)) {
+                    next(new Error("User Role not allowed"));
+                }
+                if (!req.body.ids) {
+                    next(new Error("Property IDs must be set"));
+                }
+
+                if (!Array.isArray(req.body.ids)) {
+                    next(new Error("Property IDs must be sent as array"));
+                }
+
+                let fileCount = 0;
+                const fileErrors: string[] = [];
+                const getProperties = await Properties.find({ propertyId: { $in: req.body.ids }});
+                const existingProperties: string[] = JSON.parse(JSON.stringify(getProperties))
+                    .map(({ propertyId }: { propertyId: string }) => propertyId);
+                    
+                if (existingProperties.length <= 0) {
+                    next(new Error("No properties to delete"));
+                }
+
+                for (const pid of existingProperties) {
+                    gfs.find({ "metadata.pid": String(pid) }).toArray((error: Error, files: any[]) => {
+                        if (error) {
+                           fileErrors.push(error.message);
+                        }
+                        for (const file of files) {
+                            gfs.delete(mongoose.Types.ObjectId(file._id), (error) => {
+                                if (error) {
+                                    fileErrors.push(error.message);
+                                }
+                            })
+                            fileCount += 1;
+                        }
+                    });    
+                }
+
+
+                await Properties.deleteMany({
+                    propertyId: {
+                            $in: existingProperties
+                        }
+                    });
+                    
+                res.json({
+                    errors: fileErrors,
+                    messages: `${existingProperties.length} Properties have been deleted, and ${fileCount} files have been deleted`,
+                    success: true
                 })
+                    
+            })
+
+        app.post("/register", async (req, res, next) => {
+            const user = await User.findOne({ email: req.body.email.toLowerCase() });
+            if (user) {
+                next(new Error("Account already exists"));
             }
 
-            bcrypt.genSalt(10, function(err, salt) {
-                bcrypt.hash(req.body.password, salt, async function(err, hash) {
+            bcrypt.genSalt(10, function (err, salt) {
+                bcrypt.hash(req.body.password, salt, async function (err, hash) {
                     const newUser = new User({
                         createdOn: new Date(),
                         modifiedOn: new Date(),
@@ -112,24 +214,25 @@ export async function start() {
                         email: req.body.email,
                         password: hash
                     });
-        
+
                     try {
                         await newUser.save();
                         return res.json({
-                            message: "registered successfully"
+                            success: true
                         })
-                    } catch(error) {
-                        res.status(400).json({
-                            message: "Error Occurred",
-                            error
-                        })
+                    } catch (error) {
+                        next(error);
                     }
                 });
             });
-
-
-         
         });
+
+        app.get("/session-expired", passport.authenticate('jwt', { session: false }), async (_, res) => {
+            res.json({
+                success: true
+            })
+        });
+
         app.post("/login", async (req, res, next) => {
 
             try {
@@ -153,14 +256,12 @@ export async function start() {
                 });
                 return res.json({
                     ...userMap,
+                    success: true,
                     token: `Bearer ${token}`
                 });
             } catch (e) {
                 // TODO: Map Error Msgs to Error ID
-                return res.status(400).json({
-                    message: `Error Occurred - ${e.message}`,
-                    error: e
-                });
+                next(e);
             }
         });
 
@@ -178,13 +279,10 @@ export async function start() {
             const result = !req.params.id ? data.groups : data.groups.filter((elem: any) => elem.groupId === req.params.id);
             res.send(result)
         });
-        app.get(["/properties", "/properties/:gid"], passport.authenticate('jwt', { session: false }), (req, res) => {
-            const result = !req.params.gid ? data.properties : data.properties.filter((elem: any) => elem.groupId === Number(req.params.gid));
-            res.send(result)
-        });
-        app.get("/data/:gid/:pid", passport.authenticate('jwt', { session: false }), (req, res) => {
-            const result = data.uploads.filter((elem: any) => elem.groupId === Number(req.params.gid) && elem.propertyId === Number(req.params.pid));
-            res.send(result)
+        app.get(["/properties", "/properties/:gid/:pid"], passport.authenticate('jwt', { session: false }), (req, res) => {
+            let result = !req.params.gid || Number(req.params.gid) === SUPER_ROLE ? data.properties : data.properties.filter((elem: any) => elem.groupId === Number(req.params.gid));
+            result = !req.params.pid ? result : result.filter((elem: any) => elem.propertyId === Number(req.params.pid));
+            res.send(result);
         });
     })
 }
