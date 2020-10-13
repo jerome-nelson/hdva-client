@@ -9,7 +9,7 @@
     },
     "scripts": {
         "build": "tsc",
-        "dev": "ts-node-dev ./src/"
+        "dev": "nodemon ./src/index.ts"
     },
     "devDependencies": {
         "@types/bcryptjs": "^2.4.2",
@@ -24,7 +24,8 @@
         "@types/passport-jwt": "^3.0.3",
         "@types/passport-local": "^1.0.33",
         "@types/uuid": "^8.3.0",
-        "ts-node-dev": "^1.0.0-pre.60",
+        "nodemon": "^2.0.5",
+        "ts-node": "^9.0.0",
         "typescript": "^3.9.7"
     },
     "dependencies": {

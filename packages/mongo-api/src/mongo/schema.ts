@@ -1,5 +1,6 @@
 import mongoose, { Connection } from "mongoose";
 
+//  TODO: Look into merging Schema declaration and Typescript models
 const RoleSchema = new mongoose.Schema({
     createdOn: Date,
     id: Number,
@@ -33,21 +34,10 @@ const GroupSchema = new mongoose.Schema({
     groupId: Number
 });
 
-const UploadSchema = new mongoose.Schema({
-    createdOn: Date,
-    id: Number,
-    imagename: String,
-    name: String,
-    url: String,
-    propertyId: Number,
-    type: String
-});
-
 
 export const models = (activeCon: Connection) => ({
     roles: activeCon.model("Roles", RoleSchema),
     users: activeCon.model("Users", UserSchema),
-    uploads: activeCon.model("Upload", UploadSchema),
     groups: activeCon.model("Groups", GroupSchema),
     properties: activeCon.model("Properties", PropertiesSchema),
 });

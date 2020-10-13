@@ -1,26 +1,15 @@
 import multer from "multer";
 import GridFsStorage from "multer-gridfs-storage";
-import { promisify } from "util";
-import { config } from "./config";
-import { Request } from "express";
 
-interface RequestModified extends Request {
-  user?: {
-    createdOn: string;
-    email: string;
-    group: number;
-    modifiedOn: string;
-    name: string;
-    role: number,
-    userId: string,
-  }
-}
+import { config } from "./config";
+
+// TODO: Fix request  ANY typinfg
 // Create mongo permissions handler for role management
 const UPLOAD_ROLES = [1, 2, 4];
 const storage = new GridFsStorage({
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   url: config.mongoUrl,
-  file: (req: RequestModified, file) => {
+  file: (req: any, file) => {
     const match = ["image/png", "image/jpeg"];
     const body = { ...req.body };
 
