@@ -1,5 +1,17 @@
-version: '3.7'
+version: '3.8'
 services:
+  frontend:
+    stdin_open: true
+    command: sh -c "npm i && npm start"
+    environment:
+      - PORT=${SITE_PORT}
+    image: node:latest
+    restart: unless-stopped
+    working_dir: "/app"
+    volumes:
+    - "./packages/react-frontend:/app"
+    ports:
+      - "${SITE_PORT}:${SITE_PORT}"
   api:
     command: sh -c "npm i && npm run dev"
     env_file: .env
