@@ -1,42 +1,30 @@
 import React from "react";
-import { Card, CardMedia, makeStyles, createStyles, Theme, CardContent, Typography } from "@material-ui/core";
-import CancelIcon from '@material-ui/icons/Cancel';
 import { Link } from "react-router-dom";
+import { Card, CardMedia, CardContent, Typography } from "@material-ui/core";
+import CancelIcon from '@material-ui/icons/Cancel';
+
+import { usePropertyCardStyles } from "./property-card.style";
 
 interface PropertyCardProps {
-    createdOn: number;
-    modifiedOn: number;
+    createdOn: Date;
+    modifiedOn: Date;
     name: string;
     propertyId: number;
 }
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            backgroundColor: "#fff",
-            marginRight: "1%",
-            width: '30%',
-        },
-        title: {
-            textAlign: "center",
-            "& a": {
-                color: "#000",
-                textDecoration: "none"
-            }
-        },
-        media: {
-            height: 0,
-            paddingTop: '56.25%', // 16:9
-        },
-    }));
 
 export const PropertyCard: React.SFC<PropertyCardProps> = ({ modifiedOn, name, propertyId }) => {
 
-    const classes = useStyles();
+    const classes = usePropertyCardStyles();
 
     return (
 
         <Card square={true} elevation={0} raised={false} className={classes.root}>
-            <Link to={`/properties/${propertyId}`}>
+            <Link to={{
+                pathname: encodeURI(`/properties/${encodeURIComponent(String(name).replace(" ", "-").toLowerCase())}`),
+                state: {
+                    propertyId
+                }
+            }}>
                 <CardMedia
                 className={classes.media}
                 image="https://via.placeholder.com/170x72"

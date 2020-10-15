@@ -1,37 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles, Theme, createStyles, List, ListSubheader, ListItem, ListItemText } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+
 import { logout, getCurrentUser } from "../../services/auth.service";
 import { useRoles, Roles } from "hooks/useRoles";
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            width: '100%',
-            maxWidth: 360,
-            backgroundColor: theme.palette.background.paper,
-        },
-        listItem: {
-            "& span": {
-                fontSize: '1.1rem',
-            }
-        },
-        listHeader: {
-            fontSize: '12px',
-            fontWeight: 400,
-            lineHeight: '12px',
-            marginTop: '20px',
-            marginBottom: '10px'
-        },
-        nested: {
-            paddingLeft: theme.spacing(4),
-        },
-    }),
-);
+import { useSettingsStyles } from "./settings.style";
 
 export const Settings = () => {
 
-    const classes = useStyles();
+    const classes = useSettingsStyles();
     const history = useHistory();
     const [currentUser, setCurrentUser] = useState(getCurrentUser());
     const [currentRole] = useRoles();

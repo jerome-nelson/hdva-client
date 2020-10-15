@@ -1,7 +1,8 @@
-import { useState, useEffect, SetStateAction, Dispatch, useCallback } from "react";
+import { useState, useEffect, SetStateAction, Dispatch, useCallback, useContext } from "react";
 import axios from "axios";
 import querystring from "querystring";
 
+import { ModalContext } from "../components/modal/modal.context";
 interface ApiOptions {
     prevent?: boolean, 
     initialDataType?: any, 
@@ -17,6 +18,7 @@ export const useAPI = <T>(endpoint: string, defaults?: ApiOptions): [{ data: T[]
     ...defaults
   };
   
+  const modalSettings = useContext(ModalContext);
   const [data, setData] = useState(options.initialDataType);
   const [url, setUrl] = useState(
     endpoint
@@ -39,6 +41,9 @@ export const useAPI = <T>(endpoint: string, defaults?: ApiOptions): [{ data: T[]
         });
         setData(result.data);
       } catch (error) {
+        modalSettings.updateMessage("Unable to connect to API");
+        modalSettings.setModal(true);
+        modalSettings.shouldDismiss(false);
         setIsError(true);
       } finally {
         setIsLoading(false);

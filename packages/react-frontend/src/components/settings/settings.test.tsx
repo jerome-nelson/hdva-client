@@ -1,13 +1,14 @@
 import React from "react";
 
-import { render } from '@testing-library/react';
-import { SignUpPage } from "./sign-up.page";
+import { render } from '@testing-library/react'
+import { Settings } from "./settings";
 
-describe("Sign Up Page", () => {
+describe("Settings Component", () => {
     it("should match snapshot", () => {
         const result = render(
-                <SignUpPage />
+                <Settings />
         );
         expect(result).toMatchSnapshot();
     });
+
 });

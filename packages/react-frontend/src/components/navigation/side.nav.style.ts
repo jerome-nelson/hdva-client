@@ -1,6 +1,6 @@
 import { makeStyles, createStyles, Theme,  } from "@material-ui/core"
 
-export const sideNavStyles = makeStyles((theme: Theme) =>
+export const useSidenavStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             width: `${theme.spacing(25)}px`,

@@ -5,22 +5,16 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import { makeStyles, createStyles, BottomNavigationAction, BottomNavigation, AppBar, Theme } from "@material-ui/core";
 
-import { getCurrentUser, logout } from "../../services/auth.service";
 import { useLocation, useHistory } from "react-router-dom";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        appBar: {
-            top: 'auto',
-            bottom: 0,
-        },
-    }),
-);
+import { getCurrentUser, logout } from "../../services/auth.service";
+import { useBottomNavStyles } from "./bottom.nav.style";
+
 
 
 export const BottomNav = () => {
 
-    const classes = useStyles();
+    const classes = useBottomNavStyles();
     const history = useHistory();
     const [currentUser, setCurrentUser] = useState(getCurrentUser());
 

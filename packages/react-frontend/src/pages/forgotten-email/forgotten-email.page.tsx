@@ -1,42 +1,17 @@
 import React, { useState } from "react";
-import { HeaderTitle } from "../../components/header/header";
+import { Link } from "react-router-dom";
 import { TextField, Fab, IconButton, Grid, createStyles, makeStyles, Theme, OutlinedInput, Button, CircularProgress, AppBar, Typography, Toolbar } from "@material-ui/core";
 import { ArrowForward } from "@material-ui/icons";
 
-import { messages } from "../../languages/en";
 import { useAPI } from "hooks/useAPI";
-import { Link } from "react-router-dom";
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-    emailForm: {
-        width: "100%"
-    },
-    userField: {
-        borderRadius: `${theme.spacing(3)}px`,
-        marginTop: `${theme.spacing(3)}px`,
-    },
-    submitBtn: {
-        padding: `${theme.spacing(1.5)}px ${theme.spacing(1)}px`,
-        marginTop: `${theme.spacing(3)}px`,
-        borderRadius: `${theme.spacing(3)}px`
-    },
-    mdUpMargin: {
-        marginLeft: `auto`,
-        marginTop: `${theme.spacing(2)}px`
-    },
-    title: {
-        marginTop: `${theme.spacing(10)}px`,
-        padding: `${theme.spacing(1)}px 0`,
-    },
-    description: {
-        margin: 0
-    }
-}));
+import { HeaderTitle } from "../../components/header/header";
+import { messages } from "../../languages/en";
+import { useForgottenStyles } from "./forgotten-email.page.style";
 
 export const ForgottenEmailPage = () => {
     const [email, setEmail] = useState("");
     const [data, , , callAPI] = useAPI("http://localhost:3001/forgotten-password");
-    const classes = useStyles();
+    const classes = useForgottenStyles();
     const notAllFieldsFilled = !email;
 
     return (

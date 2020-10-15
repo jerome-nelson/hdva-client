@@ -1,19 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import 'fontsource-roboto';
 
+import * as serviceWorker from './serviceWorker';
+import { App } from "./app";
 import './index.css';
 
-import * as serviceWorker from './serviceWorker';
-import { CssBaseline } from '@material-ui/core';
-import { App } from "./app";
-
-const isAuthenticated = false;
 
 ReactDOM.render(
   <React.StrictMode>
-    <CssBaseline />
-    <App />
+      <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -9,7 +9,7 @@ import { PropertyCard } from "components/property-card/property-card";
 import { HeaderTitle } from "components/header/header";
 import { getCurrentUser } from "services/auth.service";
 
-import { useDashboardStyles } from "./dashboardStyles";
+import { useDashboardStyles } from "./dashboard.page.style";
 
 interface Properties {
     createdOn: number;
@@ -24,10 +24,6 @@ interface Properties {
 export const DashboardPage = () => {
     const user = getCurrentUser();
     const history = useHistory();
-
-    if (!user) {
-        history.push("/login");
-    }
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const classes = useDashboardStyles();
     const [properties,] = useAPI<Properties>(`http://localhost:3001/properties${propertiesSuffix}`, {

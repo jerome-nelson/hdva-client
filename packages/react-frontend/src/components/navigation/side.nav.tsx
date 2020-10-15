@@ -5,11 +5,11 @@ import { Drawer, List, ListItem, ListItemText, Grid } from "@material-ui/core";
 import {ROUTES} from "../../routing";
 import { Settings } from "../../components/settings/settings";
 import { getCurrentUser } from "../../services/auth.service";
-import { sideNavStyles } from "./sidenavStyle";
+import { useSidenavStyles } from "./side.nav.style";
 
-export const SideNav = () => {
+export const SideNav: React.FC = () => {
     
-    const classes = sideNavStyles();
+    const classes = useSidenavStyles();
     const history = useHistory();
     const [currentUser,] = useState(getCurrentUser());
 

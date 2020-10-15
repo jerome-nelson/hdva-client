@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { RouteProps, Redirect, useLocation } from "react-router-dom";
-import { BottomNav } from "../components/navigation/bottom.nav";
-import { getCurrentUser } from "../services/auth.service";
 import { Hidden, makeStyles, createStyles, Theme, Grid } from "@material-ui/core";
-import { SideNav } from "components/navigation/side.nav";
-import { useRoles } from "hooks/useRoles";
+
+import { BottomNav } from "../components/navigation/bottom.nav";
+import { SideNav } from "../components/navigation/side.nav";
+import { ModalContext } from "../components/modal/modal.context";
+import { useRoles } from "../hooks/useRoles";
+import { getCurrentUser } from "../services/auth.service";
 
 export interface RouterProps extends RouteProps {
   fullWidth?: boolean;
   auth?: boolean;
   allowed?: string[];
-  component: any; // TODO: Type correctly
+  toRender: any; // TODO: Type correctly
 }
 
-export const PrivateRoute = ({ auth, fullWidth, component, ...rest }: RouterProps) => {
+export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps) => {
 
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const modalSettings = useContext(ModalContext);
   const permissions = rest && rest.allowed;
 
   useEffect(() => {
@@ -25,10 +28,11 @@ export const PrivateRoute = ({ auth, fullWidth, component, ...rest }: RouterProp
     }
   }, []);
 
+  
   const location = useLocation();
   const [, canAccess, isError] = useRoles(permissions);
 
-  const DynamicComponent = component;
+  const DynamicComponent = toRender;
   //  TODO Fix redirects
   if (auth && !currentUser) {
     return <Redirect
@@ -41,11 +45,20 @@ export const PrivateRoute = ({ auth, fullWidth, component, ...rest }: RouterProp
 
   // TODO: Show modal instead to explain no access allowed
   // TODO: Show modal instead of error occurred
+
   if (isError) {
-    return <div>Error Occurred</div>
+    modalSettings.updateMessage("Error Occurred");
+    modalSettings.setModal(true);
+    return null;
   }
 
-  return !canAccess ? <div>You are not allowed to access this page</div> : (
+  if (!canAccess) {
+    modalSettings.updateMessage("You are not allowed to access this page");
+    modalSettings.setModal(true);
+    return null;
+  }
+
+  return (
     <React.Fragment>
       <Hidden mdDown>
         <Grid container>

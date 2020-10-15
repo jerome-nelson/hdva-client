@@ -1,12 +1,12 @@
 import React from "react";
 
 import { render } from '@testing-library/react'
-import { SettingsPage } from "./settings.page";
+import { PropertiesOverviewPage } from "./property-overview.page";
 
-describe("Settings Page Component", () => {
+describe("Properties Overview Component", () => {
     it("should match snapshot", () => {
         const result = render(
-                <SettingsPage />
+                <PropertiesOverviewPage />
         );
         expect(result).toMatchSnapshot();
     });

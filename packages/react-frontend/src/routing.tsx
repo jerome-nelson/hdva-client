@@ -2,7 +2,6 @@ import { DashboardPage } from "./pages/dashboard/dashboard.page";
 import { ForgottenEmailPage } from "./pages/forgotten-email/forgotten-email.page";
 import { LoginPage } from "./pages/login/login.page";
 import { SettingsPage } from "./pages/settings/settings.page";
-import { SignUpPage } from "./pages/sign-up/sign-up.page";
 import { PropertiesPage } from "./pages/properties/properties.page";
 import { PropertiesOverviewPage } from "./pages/property-overview/property-overview.page";
 
@@ -30,14 +29,7 @@ export const ROUTES = [
             path: '/forgotten-password',
         },
         component: ForgottenEmailPage
-    }, 
-    {
-        auth: false,
-        props: {
-            path: '/sign-up',
-        },
-        component: SignUpPage
-    },   
+    },  
     {
         auth: true,
         props: {

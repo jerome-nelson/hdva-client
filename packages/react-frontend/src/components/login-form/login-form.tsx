@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 
-import { Button, IconButton, InputAdornment, OutlinedInput, makeStyles, Theme, createStyles, CircularProgress, Box, Grid, Hidden } from "@material-ui/core";
+import { Button, IconButton, InputAdornment, OutlinedInput, CircularProgress, Grid, Hidden } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
+import { ErrorPopup } from "../error-popup/error-popup";
 import { setUser } from "../../services/auth.service";
 import { useAPI } from "../../hooks/useAPI";
 import { messages } from "../../languages/en";
+
+import { useLoginStyles } from "./login-form.style";
 
 interface LoginState {
     username: string;
@@ -16,25 +19,8 @@ interface LoginState {
     showPassword: boolean;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        userFields: {
-            borderRadius: `${theme.spacing(3)}px`,
-            marginTop: `${theme.spacing(3)}px`,
-        },
-        submitBtn: {
-            padding: `${theme.spacing(1.5)}px ${theme.spacing(1)}px`,
-            marginTop: `${theme.spacing(3)}px`,
-            borderRadius: `${theme.spacing(3)}px`
-        },
-        mdUpMargin: {
-            marginTop: `${theme.spacing(2)}px`
-        }
-    }),
-);
-
 export const LoginForm = (props: any) => {
-    const classes = useStyles();
+    const classes = useLoginStyles();
     const history = useHistory();
 
     const [user, setData, setUrl, callAPI] = useAPI("http://localhost:3001/login", { initialDataType: {}, prevent: true });
@@ -69,13 +55,13 @@ export const LoginForm = (props: any) => {
     const notAllFieldsFilled = [values.username, values.password].filter(elem => !!elem).length < 2;
     return (
         <React.Fragment>
-            {user.isError && (
-                <Link to="/forgotten-password">
-                    <Box bgcolor="secondary.main" color="secondary.contrastText" p={2} role="alert">
-                        {messages["login.forgotten-password"]}
-                    </Box>
-                </Link>)
-            }
+            <ErrorPopup
+                message={{
+                    text: messages["login.forgotten-password"],
+                    link: "/forgotten-password"
+                }}
+                show={user.isError}
+            />
             <form
                 onSubmit={event => {
                     event.preventDefault();
@@ -85,11 +71,11 @@ export const LoginForm = (props: any) => {
                     // UX Change - delayed on purpose
                     setTimeout(() => {
                         callAPI({
-                        username: values.username,
-                        password: values.password
-                    })
-                    setIsLoading(false);
-                }, 3000);
+                            username: values.username,
+                            password: values.password
+                        })
+                        setIsLoading(false);
+                    }, 3000);
                 }}
                 autoComplete="off"
             >
