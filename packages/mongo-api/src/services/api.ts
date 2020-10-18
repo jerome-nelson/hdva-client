@@ -1,29 +1,35 @@
 import bodyParser from "body-parser";
+import cors from "cors";
+import compression from "compression";
 import express, { Application, Request, Response } from "express";
+import mongoSanitize from "express-mongo-sanitize";
+import helmet from "helmet";
 import passport from "passport";
 
-import { config } from "./config";
+import { config } from "../config/config";
+import { errorsHandler, noPostBody } from "./error";
+import routes from "../config/routes";
+import { jwtStrategy } from "../config/passport";
 
-const errorMiddleware = (error: Error, req: Request, res: Response, next: (err: Error) => void) => {
-  res.status(500).json({
-    error,
-    message: `Error Occurred: ${error.message}`,
-    success: false
-  })
-}
+export async function server() {
 
-export function server<T>(routes: (app: Application) => void) {
-    const app = express();
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-    app.use((req, res, next) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-      next();
-    });
-    routes(app);
-    app.use(passport.initialize());
-    app.use(errorMiddleware);
-    const callback = () => console.log(`Server is Running on ${config.url}:${config.serverPort}`);
-    app.listen(config.serverPort, callback);
+  const app = express();
+
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(compression());
+  app.use(cors());
+  app.options('*', cors());
+  app.use(mongoSanitize());
+  app.use(helmet());
+
+  app.use(passport.initialize());
+  passport.use('jwt', jwtStrategy);
+
+  app.use("/v1/", routes);
+
+  // Must be placed last
+  app.use(noPostBody());
+  app.use(errorsHandler());
+  return app.listen(config.serverPort, () => console.log(`Server is Running on ${config.url}:${config.serverPort}`));
 }

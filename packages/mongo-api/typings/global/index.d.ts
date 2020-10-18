@@ -1,4 +1,3 @@
-
 declare namespace Express {
     export interface User {
         createdOn: Date;
@@ -12,3 +11,4 @@ declare namespace Express {
         _id: string;
     }
 }
+declare module '@meanie/mongoose-to-json';

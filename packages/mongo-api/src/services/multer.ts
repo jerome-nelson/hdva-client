@@ -1,7 +1,7 @@
 import multer from "multer";
 import GridFsStorage from "multer-gridfs-storage";
 
-import { config } from "./config";
+import { config } from "../config/config";
 
 // TODO: Fix request  ANY typinfg
 // Create mongo permissions handler for role management

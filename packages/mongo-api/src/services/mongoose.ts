@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
+import toJson  from "@meanie/mongoose-to-json";
 
-import { config } from "./config";
+import { config } from "../config/config";
 
-export const connectMongoDB = async (url: string, options = {}) => {
-    await mongoose.connect(url, options);
-}
-
-export const mongoInstance = async () => {
-    await connectMongoDB(config.mongoUrl, {
+export const startMongoConn = async () => {
+    mongoose.plugin(toJson);
+    await mongoose.connect(config.mongoUrl, {
         useNewUrlParser: true,
+        useCreateIndex: true,
         useUnifiedTopology: true,
         ssl: false
     });

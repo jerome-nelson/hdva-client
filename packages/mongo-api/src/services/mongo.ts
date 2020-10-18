@@ -35,9 +35,9 @@ const GroupSchema = new mongoose.Schema({
 });
 
 
-export const models = (activeCon: Connection) => ({
-    roles: activeCon.model("Roles", RoleSchema),
-    users: activeCon.model("Users", UserSchema),
-    groups: activeCon.model("Groups", GroupSchema),
-    properties: activeCon.model("Properties", PropertiesSchema),
-});
+export const models = {
+    roles: mongoose.model("Roles", RoleSchema),
+    users: mongoose.model("Users", UserSchema),
+    groups: mongoose.model("Groups", GroupSchema),
+    properties: mongoose.model("Properties", PropertiesSchema),
+};
