@@ -10,7 +10,7 @@ import { useForgottenStyles } from "./forgotten-email.page.style";
 
 export const ForgottenEmailPage = () => {
     const [email, setEmail] = useState("");
-    const [data, , , callAPI] = useAPI("http://localhost:3001/forgotten-password");
+    const [data, , , callAPI] = useAPI("/forgotten-password");
     const classes = useForgottenStyles();
     const notAllFieldsFilled = !email;
 

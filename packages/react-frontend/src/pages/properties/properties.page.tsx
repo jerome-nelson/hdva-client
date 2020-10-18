@@ -60,13 +60,13 @@ export const PropertiesPage: React.SFC<PropertyProps> = ({ propertyName }) => {
     const location = useLocation();
     // TODO: Map API to use names as well (no more state) - or instead add as custom headers
     // TODO: Add localstorage caching for textual data
-    const [properties,] = useAPI<Record<string, any>>(`//localhost:3001/properties/${user.group}/${(location.state as any).propertyId}`, {
+    const [properties,] = useAPI<Record<string, any>>(`/properties/${user.group}/${(location.state as any).propertyId}`, {
         extraHeaders: {
             'Authorization': user.token
         }
     });
 
-    const [images,] = useAPI(`//localhost:3001/files/${(location.state as any).propertyId}`, {
+    const [images,] = useAPI(`/files/${(location.state as any).propertyId}`, {
         extraHeaders: {
             'Authorization': user.token
         }

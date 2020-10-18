@@ -11,7 +11,7 @@ export const PropertiesOverviewPage = () => {
     const user = getCurrentUser();
     const history = useHistory();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
-    const [properties,] = useAPI<Record<string, any>>(`//localhost:3001/properties${propertiesSuffix}`, {
+    const [properties,] = useAPI<Record<string, any>>(`/properties${propertiesSuffix}`, {
         extraHeaders: {
             'Authorization': user.token
         }

@@ -38,7 +38,7 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
 
     useEffect(() => {
         if (!!user && user.token) {
-            setURL(`http://localhost:3001/roles`);
+            setURL(`http://localhost:3001/v1/roles`);
         }    
     }, [user]);
 

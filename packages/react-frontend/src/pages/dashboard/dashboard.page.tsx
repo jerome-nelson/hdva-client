@@ -26,12 +26,12 @@ export const DashboardPage = () => {
     const history = useHistory();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const classes = useDashboardStyles();
-    const [properties,] = useAPI<Properties>(`http://localhost:3001/properties${propertiesSuffix}`, {
+    const [properties,] = useAPI<Properties>(`/properties${propertiesSuffix}`, {
         extraHeaders: {
             'Authorization': user.token
         }
     });
-    const [users,] = useAPI<Record<string, any>>(`http://localhost:3001/users`, {
+    const [users,] = useAPI<Record<string, any>>(`/users`, {
         extraHeaders: {
             'Authorization': user.token
         }
