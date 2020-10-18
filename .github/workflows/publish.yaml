@@ -24,6 +24,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://npm.pkg.github.com'
         scope: '@jerome-nelson'
+    - name: Setup Git Identity
+      uses: actions-cyborg/gha-git-credentials@v1
+      with:
+        name: 'Actions Cyborg'
+        email: 'actions-cyborg@gmail.com'
+        actor: 'actions-cyborg'
+        token: '${{ secrets.GITHUB_TOKEN }}'  
     - name: Install Dependencies
       run: |
         npm config set //npm.pkg.github.com/:_authToken ${NPM_AUTH_TOKEN}

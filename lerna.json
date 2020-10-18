@@ -1,6 +1,32 @@
 {
-  "packages": [
-    "packages/*"
-  ],
-  "version": "independent"
+	"packages": [
+		"packages/*"
+	],
+	"version": "independent",
+	"command": {
+		"publish": {
+			"yes": true,
+			"message": "chore: publish new versions",
+			"registry": "https://npm.pkg.github.com/",
+			"conventionalCommits": true,
+			"ignoreChanges": [
+				"*.md",
+				"*.spec.ts"
+			]
+		},
+		"bootstrap": {
+			"scope": [
+				"@jerome-nelson/*"
+			],
+			"hoist": true
+		},
+		"exec": {
+			"scope": [
+				"@jerome-nelson/*"
+			]
+		},
+		"clean": {
+			"yes": true
+		}
+	}
 }
