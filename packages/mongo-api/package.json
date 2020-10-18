@@ -2,7 +2,7 @@
     "name": "@jerome-nelson/mongo-api",
     "author": "Jerome Nelson <jerome.nelson@hdvirtualart.com>",
     "description": "API Layer used to communicate with MongoDB and add data",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "repository": {
         "type": "git",
         "url": "ssh://git@github.com/jerome-nelson/hdva-client.git",
