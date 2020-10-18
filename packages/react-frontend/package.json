@@ -1,5 +1,11 @@
 {
   "name": "@jerome-nelson/react-frontend",
+  "author": "Jerome Nelson <jerome.nelson@hdvirtualart.com>",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/jerome-nelson/hdva-client.git",
+    "directory": "packages/react-frontend"
+},
   "version": "0.1.0",
   "private": true,
   "dependencies": {
