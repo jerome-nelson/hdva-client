@@ -4,6 +4,8 @@ import validator from "validator";
 import { v4 as uuidv4 } from "uuid";
 
 import { ERROR_MSGS } from "../config/errors";
+import { BadRequest } from "../services/error";
+import { jwtSign } from "../config/passport";
 
 export interface MongoUser extends mongoose.Document {
     createdOn: Date;
@@ -70,8 +72,15 @@ UserSchema.statics.userExists = async function (email: string) {
     return !!user;
 }
 
-UserSchema.statics.comparePass = async function (password: string) {
-    const isPasswordTheSame = await bcrypt.compare(password, this.password);
+UserSchema.statics.comparePass = async function (email: string, password: string) {
+    const user = await this.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+        return false;
+    }
+
+    const userMap = JSON.parse(JSON.stringify(user));
+    const isPasswordTheSame = await bcrypt.compare(password, userMap.password);
     return !!isPasswordTheSame;
 }
 
@@ -79,27 +88,39 @@ UserSchema.pre<MongoUser>('save', async function (next) {
 
     const user: any = this;
     // TODO: Generate uuid here as well
-    if(!user.isModified("userId")) {
+    if (!user.isModified("userId")) {
         user.userId = uuidv4();
     }
 
     if (user.isModified('password')) {
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);     
+        user.password = await bcrypt.hash(user.password, salt);
         next();
     }
 });
 
-// Handler **must** take 3 parameters: the error that occurred, the document
-// in question, and the `next()` function
-UserSchema.post('save', function(error: any, doc: any, next: any) {
-    console.log("CALLLLEEDDD IT", error);
-    if (error.name === 'MongoError' && error.code === 11000) {
-      next(new Error('There was a duplicate key error'));
-    } else {
-      next();
-    }
-  });
+
 
 // TODO: Fix Typing of statics
 export const User: any = mongoose.model('User', UserSchema);
+
+// Services
+export const loginUserWithPassword = async (username: string, password: string) => {
+    if (!username || !password) {
+        throw new BadRequest(ERROR_MSGS.NO_POST_BODY);
+    }
+
+    const email = username.toLowerCase();
+    if (await !User.comparePass(email, password)) {
+        throw new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL);
+    }
+
+    const user = await User.findOne({ email: email });
+    const token = jwtSign(user);
+    return {
+        ...user,
+        success: true,
+        token: `Bearer ${token}`
+    };
+
+}

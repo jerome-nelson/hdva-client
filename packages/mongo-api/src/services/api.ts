@@ -27,6 +27,11 @@ export async function server() {
   passport.use('jwt', jwtStrategy);
 
   app.use("/v1/", routes);
+  app.use("*", (req, res) => {
+    res.status(404).json({
+      message: "Nothing here"
+    })
+  });
 
   // Must be placed last
   app.use(noPostBody());

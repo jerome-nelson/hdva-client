@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { Mongoose } from "mongoose";
-import jwt from "jsonwebtoken";
 
-import { User } from "../models/user.model";
+
+import { User, loginUserWithPassword } from "../models/user.model";
 import { AlreadyExists, BadRequest } from "../services/error";
 import { ERROR_MSGS } from "./errors";
 import { config } from "./config";
+import { jwtSign } from "./passport";
 
 // const conn = async () => await mongoInstance();
 // const GridFS = new Mongoose.mongo.GridFSBucket(conn.db, {
@@ -151,27 +152,11 @@ router.post("/register", async (req, res, next) => {
 // });
 
 router.post("/login", async (req, res, next) => {
-    
-    if (!User.comparePass(req.body.password)) {
-        next(new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL));
-    }
-    
-    const user = await User.findOne({ email: req.body.username.toLowerCase() });
-    const { jwtToken } = config;
-    if (!jwtToken) {
-        next(new BadRequest(ERROR_MSGS.JWT_NOT_SET));
-    } else {
-        const token = jwt.sign(user, jwtToken, {
-            algorithm: "HS256",
-            expiresIn: "1d"
-
-        });
-        return res.json({
-            ...user,
-            success: true,
-            token: `Bearer ${token}`
-        });
-
+    try {
+        const result = await loginUserWithPassword(req.body.username, req.body.password);
+        return res.json(result);
+    } catch (e) {
+        next(e);
     }
 });
 

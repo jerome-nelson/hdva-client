@@ -38,15 +38,10 @@ const errorsHandler = () => ((error: Error, req: express.Request, res: express.R
 })
 
 const noPostBody = () => ((req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.log(req.header("content-type"));
-  console.log(req.method.toLowerCase());
   if (
-    req.method.toLowerCase() === "post" && 
-    req.header("content-type") === "application/x-www-form-urlencoded"
+    req.method.toLowerCase() === "post" && Object.keys(req.body).length
   ) {
-    if (!Object.keys(req.body).length) {
-      new BadRequest(ERROR_MSGS.NO_POST_BODY);
-    }
+      throw new BadRequest(ERROR_MSGS.NO_POST_BODY);
   }
   next();
 });
