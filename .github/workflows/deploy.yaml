@@ -1,0 +1,39 @@
+name: Staging deployment
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    working_dir: packages/react-frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install and Buuild Application
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/upload-artifact@master
+        with:
+          name: React Artifacts
+          path: build/
+
+  deploy:
+    name: Deploy Node.js app to AWS
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Download built artifact
+        uses: actions/download-artifact@master
+        with:
+          name: React Artifacts
+          path: build
+
+      - name: Deploy to AWS
+        uses: github/deploy-nodejs@master
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
