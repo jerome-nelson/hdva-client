@@ -2,7 +2,7 @@
     "name": "@jerome-nelson/mongo-api",
     "author": "Jerome Nelson <jerome.nelson@hdvirtualart.com>",
     "description": "API Layer used to communicate with MongoDB and add data",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "repository": {
         "type": "git",
         "url": "ssh://git@github.com/jerome-nelson/hdva-client.git",
@@ -12,6 +12,10 @@
         "build": "tsc",
         "dev": "nodemon -L --watch ./src/ ./src/index.ts"
     },
+    "main": "dist/index.js",
+    "files": [
+        "dist"
+    ],
     "devDependencies": {
         "@types/bcryptjs": "^2.4.2",
         "@types/compression": "^1.7.0",
@@ -51,5 +55,6 @@
         "passport-local": "^1.0.0",
         "uuid": "^8.3.0",
         "validator": "^13.1.17"
-    }
+    },
+    "gitHead": "9b38c3d8fa71049965207f2cc360b61778eedbf3"
 }
