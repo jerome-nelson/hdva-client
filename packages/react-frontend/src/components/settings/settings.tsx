@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { makeStyles, Theme, createStyles, List, ListSubheader, ListItem, ListItemText } from "@material-ui/core";
+import { List, ListItem, ListItemText, ListSubheader } from "@material-ui/core";
+import { Roles, useRoles } from "hooks/useRoles";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-
-import { logout, getCurrentUser } from "../../services/auth.service";
-import { useRoles, Roles } from "hooks/useRoles";
+import { getCurrentUser, logout } from "../../services/auth.service";
 import { useSettingsStyles } from "./settings.style";
+
 
 export const Settings = () => {
 
     const classes = useSettingsStyles();
     const history = useHistory();
-    const [currentUser, setCurrentUser] = useState(getCurrentUser());
+    const [, setCurrentUser] = useState(getCurrentUser());
     const [currentRole] = useRoles();
 
     useEffect(() => {

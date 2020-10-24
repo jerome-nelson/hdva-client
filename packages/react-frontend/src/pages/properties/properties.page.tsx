@@ -1,51 +1,11 @@
-import React from "react";
-import { Typography, Breadcrumbs, CircularProgress } from "@material-ui/core";
+import { Breadcrumbs, CircularProgress } from "@material-ui/core";
 import Link from '@material-ui/core/Link';
-import { useLocation, useHistory } from "react-router-dom";
-import { getCurrentUser } from "services/auth.service";
-import { useAPI } from "hooks/useAPI";
-import { usePropertyStyles } from "./properties.page.style";
 import { CustomTable } from "components/table/custom-table";
-// import HelpIcon from '@material-ui/icons/Help';
-// import SettingsIcon from '@material-ui/icons/Settings';
-// import { HeaderTitle } from "../../components/header/header";
-// import { Tabs, Tab, Button } from "@material-ui/core";
-
-// import Typography from '@material-ui/core/Typography';
-// import Box from '@material-ui/core/Box';
-
-// interface TabPanelProps {
-//     children?: React.ReactNode;
-//     index: any;
-//     value: any;
-// }
-
-// function TabPanel(props: TabPanelProps) {
-//     const { children, value, index, ...other } = props;
-
-//     return (
-//         <div
-//             role="tabpanel"
-//             hidden={value !== index}
-//             id={`simple-tabpanel-${index}`}
-//             aria-labelledby={`simple-tab-${index}`}
-//             {...other}
-//         >
-//             {value === index && (
-//                 <Box p={3}>
-//                     <Typography>{children}</Typography>
-//                 </Box>
-//             )}
-//         </div>
-//     );
-// }
-
-// function a11yProps(index: any) {
-//     return {
-//         id: `simple-tab-${index}`,
-//         'aria-controls': `simple-tabpanel-${index}`,
-//     };
-// }
+import { useAPI } from "hooks/useAPI";
+import React from "react";
+import { useLocation } from "react-router-dom";
+import { getCurrentUser } from "services/auth.service";
+import { usePropertyStyles } from "./properties.page.style";
 
 type Property = Record<string, string>;
 
@@ -53,9 +13,8 @@ interface PropertyProps {
     propertyName: string;
 }
 
-export const PropertiesPage: React.SFC<PropertyProps> = ({ propertyName }) => {
+export const PropertiesPage: React.SFC<PropertyProps> = () => {
     const user = getCurrentUser();
-    const history = useHistory();
     const classes = usePropertyStyles();
     const location = useLocation();
     // TODO: Map API to use names as well (no more state) - or instead add as custom headers
@@ -105,7 +64,7 @@ export const PropertiesPage: React.SFC<PropertyProps> = ({ propertyName }) => {
             </Breadcrumbs>
 
             <CustomTable user={user} headers={headCells} data={(images.data as any).files.map((image: any) => ({
-                image: <img src={`//localhost:3001/image/${image.filename}`} width="40" height="40" />,
+                image: <img alt="" src={`//localhost:3001/image/${image.filename}`} width="40" height="40" />,
                 name: image.filename,
                 modifiedOn: image.uploadDate,
                 options: ""

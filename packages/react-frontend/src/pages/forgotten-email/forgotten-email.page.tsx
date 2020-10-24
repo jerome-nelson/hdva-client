@@ -1,12 +1,10 @@
+import { AppBar, Button, CircularProgress, Grid, OutlinedInput, Toolbar, Typography } from "@material-ui/core";
+import { useAPI } from "hooks/useAPI";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { TextField, Fab, IconButton, Grid, createStyles, makeStyles, Theme, OutlinedInput, Button, CircularProgress, AppBar, Typography, Toolbar } from "@material-ui/core";
-import { ArrowForward } from "@material-ui/icons";
-
-import { useAPI } from "hooks/useAPI";
-import { HeaderTitle } from "../../components/header/header";
 import { messages } from "../../languages/en";
 import { useForgottenStyles } from "./forgotten-email.page.style";
+
 
 export const ForgottenEmailPage = () => {
     const [email, setEmail] = useState("");
@@ -61,20 +59,6 @@ export const ForgottenEmailPage = () => {
                     <Link to={"/login"}>Go back to login</Link>
                 </Grid>
             </Grid>
-            {/* <HeaderTitle title="Forgot Your Password?" />
-            <img src="https://via.placeholder.com/150" alt="Forgotten Password Icon" title="Forgot Password Icon" />
-            <p>Enter your email to recieve a reset link</p>
-
-            <form>
-                <TextField fullWidth id="standard-basic" label="Enter email" />
-                <div>
-                <IconButton aria-label="Submit Form" >
-                    <Fab color="primary">
-                        <ArrowForward />
-                    </Fab>
-                </IconButton>
-                </div>
-            </form> */}
         </Grid>
     );
 };

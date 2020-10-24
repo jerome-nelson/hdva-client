@@ -1,15 +1,15 @@
-import React from "react";
-import { Link, useHistory } from "react-router-dom";
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Button, Box, Grid, Card, CardActionArea, CardMedia, Typography, CardContent } from "@material-ui/core";
-
+import { Box, Button, CircularProgress, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
+import { HeaderTitle } from "components/header/header";
+import { PropertyCard } from "components/property-card/property-card";
 import { useAPI } from "hooks/useAPI";
 import { Roles, useRoles } from "hooks/useRoles";
 import { messages } from "languages/en";
-import { PropertyCard } from "components/property-card/property-card";
-import { HeaderTitle } from "components/header/header";
+import React from "react";
+import { Link } from "react-router-dom";
 import { getCurrentUser } from "services/auth.service";
-
 import { useDashboardStyles } from "./dashboard.page.style";
+
+
 
 interface Properties {
     createdOn: number;
@@ -23,7 +23,6 @@ interface Properties {
 
 export const DashboardPage = () => {
     const user = getCurrentUser();
-    const history = useHistory();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const classes = useDashboardStyles();
     const [properties,] = useAPI<Properties>(`/properties${propertiesSuffix}`, {

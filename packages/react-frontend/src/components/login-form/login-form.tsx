@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
-import { useHistory, Link } from "react-router-dom";
-
-import { Button, IconButton, InputAdornment, OutlinedInput, CircularProgress, Grid, Hidden } from "@material-ui/core";
+import { Button, CircularProgress, Grid, Hidden, IconButton, InputAdornment, OutlinedInput } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-
-import { ErrorPopup } from "../error-popup/error-popup";
-import { setUser } from "../../services/auth.service";
+import React, { useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import { useAPI } from "../../hooks/useAPI";
 import { messages } from "../../languages/en";
-
+import { setUser } from "../../services/auth.service";
+import { ErrorPopup } from "../error-popup/error-popup";
 import { useLoginStyles } from "./login-form.style";
+
+
+
 
 interface LoginState {
     username: string;
@@ -23,7 +23,7 @@ export const LoginForm = (props: any) => {
     const classes = useLoginStyles();
     const history = useHistory();
 
-    const [user, setData, setUrl, callAPI] = useAPI("/login", { initialDataType: {}, prevent: true });
+    const [user,,, callAPI] = useAPI("/login", { initialDataType: {}, prevent: true });
     const [isLoading, setIsLoading] = React.useState(false);
     const [values, setValues] = React.useState<LoginState>({
         username: '',
@@ -38,6 +38,7 @@ export const LoginForm = (props: any) => {
             setUser(user.data);
             history.push("/");
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const handleChange = (prop: keyof LoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {

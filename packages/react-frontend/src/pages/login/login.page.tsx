@@ -1,11 +1,11 @@
-import React from "react";
-import { Grid, makeStyles, Theme, createStyles, AppBar, Button, Hidden } from "@material-ui/core";
-import { Link } from "react-router-dom";
-
+import { AppBar, Button, Grid, Hidden } from "@material-ui/core";
 import { HeaderTitle } from "components/header/header";
 import { LoginForm } from "components/login-form/login-form";
+import React from "react";
+import { Link } from "react-router-dom";
 import { messages } from "../../languages/en";
 import { useLoginPageStyles } from "./login.page.style";
+
 
 export const LoginPage = () => {
     const classes = useLoginPageStyles();

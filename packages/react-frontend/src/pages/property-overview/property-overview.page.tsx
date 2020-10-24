@@ -1,15 +1,13 @@
-import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { CircularProgress, Button, IconButton, useTheme, Hidden, MenuItem, Menu, Checkbox, Box } from "@material-ui/core";
-import { useAPI } from "../../hooks/useAPI";
-
+import { CircularProgress, Hidden } from "@material-ui/core";
+import React from "react";
 import { HeaderTitle } from "../../components/header/header";
 import { CustomTable } from "../../components/table/custom-table";
+import { useAPI } from "../../hooks/useAPI";
 import { getCurrentUser } from "../../services/auth.service";
+
 
 export const PropertiesOverviewPage = () => {
     const user = getCurrentUser();
-    const history = useHistory();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const [properties,] = useAPI<Record<string, any>>(`/properties${propertiesSuffix}`, {
         extraHeaders: {

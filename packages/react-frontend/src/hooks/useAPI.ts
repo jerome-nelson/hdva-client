@@ -1,8 +1,8 @@
-import { useState, useEffect, SetStateAction, Dispatch, useCallback, useContext } from "react";
 import axios from "axios";
 import querystring from "querystring";
-
+import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 import { ModalContext } from "../components/modal/modal.context";
+
 interface ApiOptions {
     prevent?: boolean, 
     initialDataType?: any, 
@@ -21,7 +21,7 @@ export const useAPI = <T>(endpoint: string, defaults?: ApiOptions): [{ data: T[]
   const modalSettings = useContext(ModalContext);
   const [data, setData] = useState(options.initialDataType);
   const [url, setUrl] = useState(
-    endpoint
+    `http://localhost:3001/v1/${endpoint}`
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -51,7 +51,7 @@ export const useAPI = <T>(endpoint: string, defaults?: ApiOptions): [{ data: T[]
 
     };
     fetchData();
-  }, [url]);
+  }, [modalSettings, options.extraHeaders, options.prevent, url]);
 
   const callAPI = useCallback(payload => {
     setIsLoading(true);
@@ -69,7 +69,7 @@ export const useAPI = <T>(endpoint: string, defaults?: ApiOptions): [{ data: T[]
       setIsError(true);
       setIsLoading(false);
     })
-  }, [url])
+  }, [options.extraHeaders, url])
 
   return [{ data, isLoading, isError }, setData, setUrl, callAPI];
 }

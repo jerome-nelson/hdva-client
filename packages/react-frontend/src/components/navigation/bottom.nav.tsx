@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { AppBar, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import SettingsIcon from '@material-ui/icons/Settings';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
-import { makeStyles, createStyles, BottomNavigationAction, BottomNavigation, AppBar, Theme } from "@material-ui/core";
-
-import { useLocation, useHistory } from "react-router-dom";
-
+import SettingsIcon from '@material-ui/icons/Settings';
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { getCurrentUser, logout } from "../../services/auth.service";
 import { useBottomNavStyles } from "./bottom.nav.style";
+
+
 
 
 

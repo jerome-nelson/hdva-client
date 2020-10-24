@@ -1,9 +1,8 @@
+import { Card, CardContent, CardMedia, Typography } from "@material-ui/core";
 import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardMedia, CardContent, Typography } from "@material-ui/core";
-import CancelIcon from '@material-ui/icons/Cancel';
-
 import { usePropertyCardStyles } from "./property-card.style";
+
 
 interface PropertyCardProps {
     createdOn: Date;

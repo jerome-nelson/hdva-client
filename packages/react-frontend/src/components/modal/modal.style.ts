@@ -1,4 +1,4 @@
-import { makeStyles, createStyles, Theme } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
 export const useModalProviderStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -20,7 +20,7 @@ export const useModalProviderStyles = makeStyles((theme: Theme) =>
         },
         closeIcon: {
             cursor: "pointer",
-            ["&:hover"]: {
+            "&:hover": {
                 opacity: "0.5",
             }
         },

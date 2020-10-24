@@ -1,7 +1,7 @@
-import { useState, useEffect, useReducer } from "react";
-
-import { useAPI } from "./useAPI";
+import { useEffect, useReducer, useState } from "react";
 import { getCurrentUser } from "services/auth.service";
+import { useAPI } from "./useAPI";
+
 
 export const Roles = {
     super: "Super",
@@ -40,6 +40,7 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
         if (!!user && user.token) {
             setURL(`http://localhost:3001/v1/roles`);
         }    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     // TODO: Examine other hooks in React and review current conditionals

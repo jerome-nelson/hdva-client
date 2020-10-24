@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Checkbox, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PermMediaTwoToneIcon from '@material-ui/icons/PermMediaTwoTone';
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, TableFooter, TablePagination, IconButton,  MenuItem, Menu, Checkbox, Box, TableSortLabel } from "@material-ui/core";
-
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useCustomTableStyles } from "./custom-table.styles";
+
 
 type Order = 'asc' | 'desc';
 

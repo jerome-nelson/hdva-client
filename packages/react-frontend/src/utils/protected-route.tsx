@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import { RouteProps, Redirect, useLocation } from "react-router-dom";
-import { Hidden, makeStyles, createStyles, Theme, Grid } from "@material-ui/core";
-
+import { Grid, Hidden } from "@material-ui/core";
+import React, { useContext, useEffect, useState } from "react";
+import { Redirect, RouteProps, useLocation } from "react-router-dom";
+import { ModalContext } from "../components/modal/modal.context";
 import { BottomNav } from "../components/navigation/bottom.nav";
 import { SideNav } from "../components/navigation/side.nav";
-import { ModalContext } from "../components/modal/modal.context";
 import { useRoles } from "../hooks/useRoles";
 import { getCurrentUser } from "../services/auth.service";
+
 
 export interface RouterProps extends RouteProps {
   fullWidth?: boolean;
