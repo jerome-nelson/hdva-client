@@ -3,6 +3,9 @@ services:
   frontend:
     stdin_open: true
     command: sh -c "npm i && npm start"
+    depends_on:
+      - api
+      - db
     environment:
       - PORT=${SITE_PORT}
     image: node:latest
@@ -14,6 +17,8 @@ services:
       - "${SITE_PORT}:${SITE_PORT}"
   api:
     command: sh -c "npm i && npm run dev"
+    depends_on:
+      - db
     env_file: .env
     environment:
       - DB_HOST=db  
