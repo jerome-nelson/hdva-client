@@ -40,9 +40,5 @@
     "lerna": "^3.22.1",
     "ts-node-dev": "^1.0.0-pre.60",
     "typescript": "^3.9.7"
-  },
-  "dependencies": {
-    "@jerome-nelson/mongo-api": "file:packages\\mongo-api",
-    "@jerome-nelson/react-frontend": "file:packages\\react-frontend"
   }
 }
