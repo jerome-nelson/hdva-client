@@ -9,7 +9,7 @@ import passport from "passport";
 import { config } from "../config/config";
 import { errorsHandler, noPostBody } from "./error";
 import routes from "../config/routes";
-import { jwtStrategy } from "../config/passport";
+import { jwtStrategy } from "../config/auth";
 
 export async function server() {
 

@@ -46,11 +46,5 @@ const noPostBody = () => ((req: express.Request, res: express.Response, next: ex
   next();
 });
 
-export {
-    errorsHandler,
-    noPostBody,
-    AlreadyExists,
-    BadRequest,
-    GeneralError,
-    NotFound
-}
+export { errorsHandler, noPostBody, AlreadyExists, BadRequest, GeneralError, NotFound };
+

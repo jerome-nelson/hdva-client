@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Model } from "mongoose";
-import validator from "validator";
 import { v4 as uuidv4 } from "uuid";
-
+import validator from "validator";
+import { jwtSign } from "../config/auth";
 import { ERROR_MSGS } from "../config/errors";
-import { BadRequest } from "../services/error";
-import { jwtSign } from "../config/passport";
+import { AlreadyExists, BadRequest } from "../services/error";
+
 
 export interface MongoUser extends mongoose.Document {
     createdOn: Date;
@@ -68,11 +68,12 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.statics.userExists = async function (email: string) {
-    const user = this.findOne({ email: email.toLowerCase() });
+    const user = this.findOne({ email });
     return !!user;
 }
 
 UserSchema.statics.comparePass = async function (email: string, password: string) {
+
     const user = await this.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -115,7 +116,7 @@ export const loginUserWithPassword = async (username: string, password: string) 
         throw new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL);
     }
 
-    const user = await User.findOne({ email: email });
+    const user = JSON.parse(JSON.stringify(await User.findOne({ email: email })));
     const token = jwtSign(user);
     return {
         ...user,
@@ -123,4 +124,25 @@ export const loginUserWithPassword = async (username: string, password: string) 
         token: `Bearer ${token}`
     };
 
+}
+
+export const createNewUser = async (user: Record<string, any>) => {
+    try {
+        if (await User.userExists(user.email)) {
+           throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
+        }
+        const newUser = await new User({
+            createdOn: new Date(),
+            modifiedOn: new Date(),
+            ...user
+
+        }).save();
+
+        return {
+            success: true
+        }
+
+    } catch (e) {
+        throw e;
+    }
 }

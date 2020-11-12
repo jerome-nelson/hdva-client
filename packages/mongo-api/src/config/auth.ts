@@ -1,11 +1,12 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 import { ExtractJwt, Strategy, VerifiedCallback } from "passport-jwt";
-
+import { hasPermission } from "../models/roles.model";
+import { User } from "../models/user.model";
+import { BadRequest, NotFound } from "../services/error";
 import { config } from "./config";
 import { ERROR_MSGS } from "./errors";
-import { models } from "../services/mongo";
-import { NotFound, BadRequest } from "../services/error";
+
 
 export const tokenConfig = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -17,12 +18,16 @@ export const tokenConfig = {
     }
 }
 
-const jwtVerify = async (req: Request, jwt_payload: any, done: VerifiedCallback) => {
+const jwtVerify = async (req: Request, jwt_payload: Express.User, done: VerifiedCallback) => {
     try {
-        const user = await models.users.findOne({ email: jwt_payload.email.toLowerCase() });
-        if (!user) {
+        if (!await User.userExists(jwt_payload.email.toLowerCase())) {
             throw new NotFound(ERROR_MSGS.USER_NOT_FOUND);
         }
+        
+        if (!await hasPermission({roleId: jwt_payload.role })) {
+            throw new NotFound(ERROR_MSGS.USER_ROLE_NOT_ALLOWED);
+        }
+
         done(false, jwt_payload, req);
     } catch (e) {
         done(e, false);

@@ -1,0 +1,605 @@
+{
+	"info": {
+		"_postman_id": "a67ce886-8090-426e-883c-fcb1beecadb1",
+		"name": "HDVA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "HDVA Upload Test",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true,
+					"user-agent": true,
+					"accept": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjM2NjU4ZjhlODM1Zjc5YTA2ODJkOWYiLCJjcmVhdGVkT24iOiIxOTcwLTA5LTI1VDE1OjA1OjIzLjIzMloiLCJtb2RpZmllZE9uIjoiMTk3MC0wMS0wMlQxMDoxNToyNC4yMzRaIiwidXNlcklkIjoiMSIsIm5hbWUiOiJKZXJvbWUgTmVsc29uIiwiZW1haWwiOiJqZXJvbWUubmVsc29uQHNrZWxpYS5jb20iLCJyb2xlIjoxLCJncm91cCI6MSwicGFzc3dvcmQiOiIkMmIkMTAkYTl2Y1hKRmV0aEVzQ2MwaTNaWXQ0TzFFVDFWOE0wbS5ISm9xRkJQY25RYWpEZVRoTUwzcjYiLCJpYXQiOjE2MDI0Mjk4MjMsImV4cCI6MTYwMjUxNjIyM30.D51Bz-5dTuuk0u34QrbpJ1nW2sEjJ00YpWRXsPgt_OE",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "type",
+							"value": "photo",
+							"type": "text"
+						},
+						{
+							"key": "pid",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": [
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200704141550.jpg",
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200718104754.jpg",
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200718105228.jpg",
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200718112510.jpg",
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200718125543.jpg",
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200718133943.jpg",
+								"/C:/Users/j.nelson/Desktop/pics/IMG20200718145817.jpg"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register a user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "jerome.nelso6n@skelia.com",
+							"type": "text"
+						}
+					],
+					"options": {
+						"urlencoded": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Media",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjM2NjU4ZjhlODM1Zjc5YTA2ODJkOWYiLCJjcmVhdGVkT24iOiIxOTcwLTA5LTI1VDE1OjA1OjIzLjIzMloiLCJtb2RpZmllZE9uIjoiMTk3MC0wMS0wMlQxMDoxNToyNC4yMzRaIiwidXNlcklkIjoiMSIsIm5hbWUiOiJKZXJvbWUgTmVsc29uIiwiZW1haWwiOiJqZXJvbWUubmVsc29uQHNrZWxpYS5jb20iLCJyb2xlIjoxLCJncm91cCI6MSwicGFzc3dvcmQiOiIkMmIkMTAkYTl2Y1hKRmV0aEVzQ2MwaTNaWXQ0TzFFVDFWOE0wbS5ISm9xRkJQY25RYWpEZVRoTUwzcjYiLCJpYXQiOjE2MDI0Mjk4MjMsImV4cCI6MTYwMjUxNjIyM30.D51Bz-5dTuuk0u34QrbpJ1nW2sEjJ00YpWRXsPgt_OE",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3001/files/1/photo",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"files",
+						"1",
+						"photo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a fie",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjM2NjU4ZjhlODM1Zjc5YTA2ODJkOWYiLCJjcmVhdGVkT24iOiIxOTcwLTA5LTI1VDE1OjA1OjIzLjIzMloiLCJtb2RpZmllZE9uIjoiMTk3MC0wMS0wMlQxMDoxNToyNC4yMzRaIiwidXNlcklkIjoiMSIsIm5hbWUiOiJKZXJvbWUgTmVsc29uIiwiZW1haWwiOiJqZXJvbWUubmVsc29uQHNrZWxpYS5jb20iLCJyb2xlIjoxLCJncm91cCI6MSwicGFzc3dvcmQiOiIkMmIkMTAkYTl2Y1hKRmV0aEVzQ2MwaTNaWXQ0TzFFVDFWOE0wbS5ISm9xRkJQY25RYWpEZVRoTUwzcjYiLCJpYXQiOjE2MDI0Mjk4MjMsImV4cCI6MTYwMjUxNjIyM30.D51Bz-5dTuuk0u34QrbpJ1nW2sEjJ00YpWRXsPgt_OE",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "ids",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "ids",
+							"value": "7",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/properties/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"properties",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a Property",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjM2NjU4ZjhlODM1Zjc5YTA2ODJkOWYiLCJjcmVhdGVkT24iOiIxOTcwLTA5LTI1VDE1OjA1OjIzLjIzMloiLCJtb2RpZmllZE9uIjoiMTk3MC0wMS0wMlQxMDoxNToyNC4yMzRaIiwidXNlcklkIjoiMSIsIm5hbWUiOiJKZXJvbWUgTmVsc29uIiwiZW1haWwiOiJqZXJvbWUubmVsc29uQHNrZWxpYS5jb20iLCJyb2xlIjoxLCJncm91cCI6MSwicGFzc3dvcmQiOiIkMmIkMTAkYTl2Y1hKRmV0aEVzQ2MwaTNaWXQ0TzFFVDFWOE0wbS5ISm9xRkJQY25RYWpEZVRoTUwzcjYiLCJpYXQiOjE2MDI0Mjk4MjMsImV4cCI6MTYwMjUxNjIyM30.D51Bz-5dTuuk0u34QrbpJ1nW2sEjJ00YpWRXsPgt_OE",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "ids",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "ids",
+							"value": "7",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/properties/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"properties",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register a user",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjM2NjU4ZjhlODM1Zjc5YTA2ODJkOWYiLCJjcmVhdGVkT24iOiIxOTcwLTA5LTI1VDE1OjA1OjIzLjIzMloiLCJtb2RpZmllZE9uIjoiMTk3MC0wMS0wMlQxMDoxNToyNC4yMzRaIiwidXNlcklkIjoxLCJuYW1lIjoiSmVyb21lIE5lbHNvbiIsImVtYWlsIjoiamVyb21lLm5lbHNvbkBza2VsaWEuY29tIiwicm9sZSI6MSwiZ3JvdXAiOjEsInBhc3N3b3JkIjoiJDJiJDEwJGE5dmNYSkZldGhFc0NjMGkzWll0NE8xRVQxVjhNMG0uSEpvcUZCUGNuUWFqRGVUaE1MM3I2IiwiaWF0IjoxNjAxNTYyODAxLCJleHAiOjE2MDE2NDkyMDF9.YTxjDzTOhX4h_jP88K7RFx9LIAOqeVUpyGp53vV8kY8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/j.nelson/Desktop/pics/IMG20200704141550.jpg"
+						},
+						{
+							"key": "pid",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "dfsf",
+							"value": "ewrwerwewrdsff",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "jerome.nelson@skelia.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123456",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Roles",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/v1/roles",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(POST) Get Properties",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "pids",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "pids",
+							"value": "2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/properties",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"properties"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a Property",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\r\n    \"name\": \"property test6\",\r\n    \"propertyId\": 9,\r\n    \"groupId\": 1\r\n},\r\n{\r\n    \"name\": \"property test5\",\r\n    \"propertyId\": 10,\r\n    \"groupId\": 1\r\n},\r\n{\r\n    \"name\": \"property test4\",\r\n    \"propertyId\": 22,\r\n    \"groupId\": 1\r\n}]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/properties/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"properties",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Properties",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "pids",
+							"value": "22",
+							"type": "text"
+						},
+						{
+							"key": "pids",
+							"value": "2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/properties/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"properties",
+						"delete"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "22",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Groups",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\r\n    \"name\": \"test\",\r\n    \"description\": \"This is a test description\",\r\n    \"groupId\": 4\r\n}]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/groups/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"groups",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Groups",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "gid",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "group",
+							"value": "{\n\"name\": \"test group 10\",\n\"groupId\": 5,\n\"description\": \"This group will be transferred to\"\n}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/v1/groups/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"v1",
+						"groups",
+						"update"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"id": "94885de2-bb30-4aa6-9351-82c96d264e74",
+			"key": "auth_token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoxLCJncm91cCI6MSwiX2lkIjoiNWYzNjY1OGY4ZTgzNWY3OWEwNjgyZDlmIiwiY3JlYXRlZE9uIjoiMTk3MC0wOS0yNVQxNTowNToyMy4yMzJaIiwibW9kaWZpZWRPbiI6IjE5NzAtMDEtMDJUMTA6MTU6MjQuMjM0WiIsInVzZXJJZCI6IjEiLCJuYW1lIjoiSmVyb21lIE5lbHNvbiIsImVtYWlsIjoiamVyb21lLm5lbHNvbkBza2VsaWEuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkYTl2Y1hKRmV0aEVzQ2MwaTNaWXQ0TzFFVDFWOE0wbS5ISm9xRkJQY25RYWpEZVRoTUwzcjYiLCJpYXQiOjE2MDM2MTUxMjAsImV4cCI6MTYwMzcwMTUyMH0.4g8BvuCOeHCdNrrgqwUlam-hhGl1Tgn0SE1b4mYuWWk"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

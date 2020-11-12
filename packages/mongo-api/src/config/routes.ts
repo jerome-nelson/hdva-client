@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { Mongoose } from "mongoose";
-
-
-import { User, loginUserWithPassword } from "../models/user.model";
-import { AlreadyExists, BadRequest } from "../services/error";
+import passport from "passport";
+import { addGroup, deleteGroups, getGroups, updateGroup } from "../models/groups.model";
+import { addProperties, deleteProperties, getProperties } from "../models/properties.model";
+import { Roles } from "../models/roles.model";
+import { createNewUser, loginUserWithPassword } from "../models/user.model";
 import { ERROR_MSGS } from "./errors";
-import { config } from "./config";
-import { jwtSign } from "./passport";
+
+
+
+// TODO: Implement Swagger for API documentation
 
 // const conn = async () => await mongoInstance();
 // const GridFS = new Mongoose.mongo.GridFSBucket(conn.db, {
@@ -123,23 +125,14 @@ const router = Router();
 // })
 router.post("/register", async (req, res, next) => {
     try {
-        if (await User.userExists(req.body.email)) {
-            next(new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS));
-        }
-        const newUser = await new User({
-            createdOn: new Date(),
-            modifiedOn: new Date(),
+        const result = await createNewUser({
             group: req.body.group,
             name: req.body.name,
             role: req.body.role,
             email: req.body.email,
             password: req.body.password
-        }).save();
-        return res.json({
-            success: true
-        })
-
-
+        });
+        return res.json(result);
     } catch (e) {
         next(e);
     }
@@ -164,15 +157,15 @@ router.post("/login", async (req, res, next) => {
 //     // Should be a seperate package
 // });
 
-// router.get("/roles", passport.authenticate('jwt', { session: false }), (_, res, next) => {
-//     Roles.find().lean((error: Error, roles: Record<string, string>) => {
-//         if (error) {
-//             next(error);
-//         }
+router.get("/roles", passport.authenticate('jwt', { session: false }), (_, res, next) => {
+    Roles.find((error: Error, roles: Record<string, string>) => {
+        if (error) {
+            next(error);
+        }
 
-//         res.json({ roles: JSON.stringify(roles) });
-//     })
-// });
+        res.json({ roles });
+    })
+});
 // router.get("/users", passport.authenticate('jwt', { session: false }), (_, res, next) => {
 //     Users.find().lean((error: Error, users: Record<any, any>) => {
 //         if (error) {
@@ -199,27 +192,129 @@ router.post("/login", async (req, res, next) => {
 //         });
 //     });
 // });
-// router.get(["/properties", "/properties/:gid/:pid"], passport.authenticate('jwt', { session: false }), (req, res, next) => {
-//     const filter = {
-//         groupId: {
-//             $in: [Number(req.params.id)]
-//         },
-//         propertyId: {
-//             $in: [Number(req.params.pid)]
-//         }
-//     };
+router.get(["/properties", "/properties/:gid/:pid"], passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    const { gid, pid } = req.params;
 
-//     console.log("asdasdasdProperties:", req.params);
 
-//     Properties.find().lean((error: Error, properties: Record<any, any>) => {
-//         if (error) {
-//             next(error);
-//         }
-//         console.log(properties);
-//         res.json({
-//             properties: JSON.stringify(properties)
-//         });
-//     });
-// });
+    try {
+        if (!gid && !pid) {
+            throw new Error(ERROR_MSGS.NO_ID);
+        }
+        const result = await getProperties({
+            gid: Number(gid),
+            pids: [Number(pid)]
+        });
+
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.post("/properties/add", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    try {
+        if (!req.body || !req.body.length) {
+            throw new Error(ERROR_MSGS.NO_PROPERTIES_PAYLOAD);
+         }
+         
+        const result = await addProperties(req.body);
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+
+router.post("/properties", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    const { gid, pids } = req.body;
+
+    try {
+        if (!gid && (!pids || !pids.length)) {
+            throw new Error(ERROR_MSGS.NO_ID);
+         }
+        const result = await getProperties({
+            gid: gid && Number(gid) || undefined,
+            pids: Array.isArray(pids) ? pids.map((pid: string) => Number(pid)) : [Number(pids)]
+        });
+
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.post("/properties/delete", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    const { pids } = req.body;
+
+    try {
+        if (!pids || !pids.length) {
+            throw new Error(ERROR_MSGS.NO_ID);
+         }
+        const result = await deleteProperties({
+            pids: Array.isArray(pids) ? pids.map((pid: string) => Number(pid)) : [Number(pids)]
+        });
+
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+
+router.post("/groups/add", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    try {
+        if (!req.body || !req.body.length) {
+            throw new Error(ERROR_MSGS.NO_GROUPS);
+         }
+         
+        const result = await addGroup(req.body);
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.get(["/groups","/groups/:gid"], passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    const { gid } = req.params;
+
+    try {
+        const result = await getGroups(Number(gid) || undefined);
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.post("/groups/update", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    const { gid, group } = req.body;
+
+    try {
+        if (!gid || !group) {
+            throw new Error(ERROR_MSGS.NO_GROUPS);
+        }
+        const result = await updateGroup({ from: Number(gid), to: JSON.parse(group) });
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.post("/groups/delete", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    const { gids } = req.body;
+
+    try {
+        if (!gids || !gids.length) {
+            throw new Error(ERROR_MSGS.NO_ID);
+         }
+        const result = await deleteGroups({
+            gids: Array.isArray(gids) ? gids.map((gid: string) => Number(gid)) : [Number(gids)]
+        });
+
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
 
 export default router;
