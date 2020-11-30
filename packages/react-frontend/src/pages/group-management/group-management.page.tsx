@@ -49,7 +49,7 @@ export const GroupPage: React.FC = () => {
                         <React.Fragment>
                             <Grid container alignItems="center">
                                 <Box>
-                                    <h3>Add a new Group</h3>
+                                    <h3>{messages["group-management.group.add.header"]}</h3>
                                 </Box>
 
                                 <Grid item xs={12}>
@@ -87,7 +87,7 @@ export const GroupPage: React.FC = () => {
                                                 type="text"
                                             />
                                             <Button type="submit" className={genericClasses.actionButton} fullWidth size="large" variant="outlined" color="primary">
-                                                Add Group
+                                                {messages["button.group.add"]}
                                                </Button>
                                         </form>
                                     </Paper>
@@ -113,8 +113,8 @@ export const GroupPage: React.FC = () => {
                                                             disabled={!hasSelected || (hasSelected && hasSelected.length <= 0)}
                                                             size="large" variant="outlined" color="primary"
                                                         >
-                                                            Delete Selected
-                        </Button>
+                                                            {messages["button.delete"]}
+                                                        </Button>
                                                     </Hidden>
                                                     <Hidden only={["xs", "sm"]}>
                                                         <Grid container xs={10} spacing={1}>
@@ -126,8 +126,8 @@ export const GroupPage: React.FC = () => {
                                                                     disabled={!hasSelected || (hasSelected && hasSelected.length <= 0)}
                                                                     size="medium" variant="outlined" color="primary"
                                                                 >
-                                                                    Delete Selected
-                                        </Button>
+                                                                    {messages["button.delete"]}
+                                                                </Button>
                                                             </Grid>
                                                         </Grid>
                                                     </Hidden>

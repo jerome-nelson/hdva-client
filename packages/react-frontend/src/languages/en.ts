@@ -1,5 +1,8 @@
 export const messages = {
+    "button.delete": "Delete Selected",
+    "button.group.add": "Add Group",
     "group.form.title": "Group Title",
+    "group-management.group.add.header": "Add a new Group",
     "group.form.description": "Group Description",
     "groups-management.list": "List of Existing Groups",
     "placeholder.properties.title": "No properties",
