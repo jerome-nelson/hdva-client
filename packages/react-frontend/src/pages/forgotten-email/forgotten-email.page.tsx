@@ -6,7 +6,7 @@ import { messages } from "../../languages/en";
 import { useForgottenStyles } from "./forgotten-email.page.style";
 
 
-export const ForgottenEmailPage = () => {
+export const ForgottenEmailPage: React.FC = () => {
     const [email, setEmail] = useState("");
     const [data, , , callAPI] = useAPI("/forgotten-password");
     const classes = useForgottenStyles();

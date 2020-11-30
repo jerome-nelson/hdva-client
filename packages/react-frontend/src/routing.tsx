@@ -1,9 +1,10 @@
 import { DashboardPage } from "./pages/dashboard/dashboard.page";
 import { ForgottenEmailPage } from "./pages/forgotten-email/forgotten-email.page";
+import { GroupPage } from "./pages/group-management/group-management.page";
 import { LoginPage } from "./pages/login/login.page";
-import { SettingsPage } from "./pages/settings/settings.page";
 import { PropertiesPage } from "./pages/properties/properties.page";
 import { PropertiesOverviewPage } from "./pages/property-overview/property-overview.page";
+import { SettingsPage } from "./pages/settings/settings.page";
 
 export const ROUTES = [
     {
@@ -73,5 +74,13 @@ export const ROUTES = [
             allowed: ["super", "admin", "owner"]
         },
         component: () => "User Management"
+    },
+    {
+        auth: true,
+        props: {
+            path: "/group-management",
+            allowed: ["super", "admin", "owner"]
+        },
+        component: GroupPage
     }
 ];

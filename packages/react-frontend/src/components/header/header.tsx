@@ -1,8 +1,8 @@
+import { AppBar, Toolbar, Typography } from "@material-ui/core";
 import React from "react";
-import { Typography, AppBar, Toolbar } from "@material-ui/core";
-
 import { BackButton } from "../back-button/back-button";
 import { useHeaderStyles } from "./header.style";
+
 
 export interface HeaderProps {
     alignText?: 'center' | 'left' | 'right';
@@ -11,7 +11,7 @@ export interface HeaderProps {
     title: string;
 }
 
-export const HeaderTitle = ({ alignText, disableGutters, disableBack, title }: HeaderProps) => {
+export const HeaderTitle: React.SFC<HeaderProps> = ({ alignText, disableGutters, disableBack, title }) => {
     const classes = useHeaderStyles({ title, alignText });
     return (
         <React.Fragment>

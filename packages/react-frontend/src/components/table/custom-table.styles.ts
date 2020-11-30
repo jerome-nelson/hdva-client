@@ -4,6 +4,24 @@ export const useCustomTableStyles = makeStyles((theme: Theme) =>
     createStyles({
         table: {
             width: "90%",
+
+            [theme.breakpoints.down('md')]: {
+                width: "100%",
+
+                "& th:last-child": {
+                    textAlign: "right"
+                },
+                "& tbody td": {
+                    wordBreak: "break-word",
+                },
+                "& tbody td:first-child": {
+                    paddingLeft: `${theme.spacing(2)}px`
+                },
+                "& tbody td:last-child": {
+                    paddingRight: `${theme.spacing(2)}px`,
+                    textAlign: "right"
+                }
+            }
         },
         tableCell: {
             padding: "8px 4px",
@@ -43,6 +61,6 @@ export const useCustomTableStyles = makeStyles((theme: Theme) =>
         },
         tableRow: {
             cursor: "pointer"
-        }
+        },
     })
 );

@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Checkbox, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from "@material-ui/core";
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { Box, Checkbox, Collapse, Hidden, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useTheme } from "@material-ui/core";
+// TODO: Style better for no images
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import PermMediaTwoToneIcon from '@material-ui/icons/PermMediaTwoTone';
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getCurrentUser } from "services/auth.service";
 import { useCustomTableStyles } from "./custom-table.styles";
 
 
@@ -39,25 +42,128 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 }
 
 interface CustomTableProps {
-    children?: React.ReactNode;
-    headers:  Record<string, any>[];
+    ariaList?: Record<string, unknown>;
+    headers: Record<string, any>[];
     data: Record<string, any>[];
     user: Record<string, any>;
 }
 
-export const CustomTable: React.FC<CustomTableProps> = ({ children, headers, data, user }) => {
- 
+const SetRow: React.FC<{ isChecked: boolean; onSelect: any; row: any }> = ({ isChecked, row, onSelect }) => {
+    const [selected, setSelected] = useState(isChecked);
+
+    useEffect(() => {
+        onSelect(selected);
+    }, [selected]);
+
+    const ChildC = row.collapsedTab;
+    return (
+        <CustomRow checked={selected} setChecked={setSelected} row={row}>
+            <Hidden only={["md", "lg", "xl"]}>
+                <ChildC checked={selected} setChecked={setSelected} pid={row.propertyId} link={encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`)} />
+            </Hidden>
+        </CustomRow>
+    )
+}
+
+const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setChecked: Dispatch<SetStateAction<any>>; }> = ({ checked, children, setChecked, row }) => {
+    const [collapsed, setCollapsed] = React.useState(false);
+    const user = getCurrentUser();
+    const classes = useCustomTableStyles();
+
+    return (
+        <React.Fragment>
+            <TableRow
+                className={classes.tableRow}
+                role="checkbox"
+                tabIndex={-1}
+                key={row.name}
+                hover>
+                <Hidden only={["xs", "sm"]}>
+                    <TableCell padding="checkbox" onClick={() => setChecked(!checked)} className={`${classes.tableCell} ${classes.tableCellFirst}`}>
+                        <Checkbox checked={checked} />
+                    </TableCell>
+                </Hidden>
+                <TableCell className={`${classes.folder} ${classes.tableCell}`}>
+                    {row.image ? row.image : <PermMediaTwoToneIcon fontSize="large" color="action" />}
+                </TableCell>
+                <Hidden only={["md", "lg", "xl"]}>
+                    <TableCell colSpan={children ? 1 : 2} className={`${classes.name} ${classes.tableCell}`} component="td" scope="row">
+                        {row.name}
+                    </TableCell>
+                </Hidden>
+                <Hidden only={["xs", "sm"]}>
+                    <TableCell className={`${classes.name} ${classes.tableCell}`} component="td" scope="row">
+                        <Link
+                            className={classes.txtLink}
+                            to={{
+                                state: {
+                                    lastUpdated: new Date(row.modifiedOn).toDateString(),
+                                    propertyName: row.name,
+                                    propertyId: row.propertyId,
+                                    groupId: user.group
+                                },
+                                pathname: encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`)
+                            }}
+                        >
+                            {row.name}
+                        </Link>
+                    </TableCell>
+                    <TableCell className={classes.tableCell} component="td" scope="row">
+                        {new Date(row.modifiedOn).toDateString()}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                        Test
+                        </TableCell>
+                    <TableCell className={`${classes.tableCell} ${classes.tableCellEnd}`}>
+                        ww
+                                    <Menu
+                            open={false}
+                            id="long-menu"
+                            keepMounted
+                        >
+                            {["Download all items"].map((option) => (<MenuItem key={option}>{option}</MenuItem>))}
+                        </Menu>
+                    </TableCell>
+                </Hidden>
+                {children && (
+                    <Hidden only={["md", "lg", "xl"]}>
+                        <TableCell className={`${classes.tableCell} ${classes.tableCellEnd}`}>
+                            <IconButton aria-label="expand row" size="small" onClick={() => setCollapsed(!collapsed)}>
+                                {collapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            </IconButton>
+                        </TableCell>
+                    </Hidden>
+                )}
+
+            </TableRow>
+            {children && (
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                        <Collapse in={collapsed} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                                {children}
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+            )}
+        </React.Fragment>
+    );
+}
+
+export const CustomTable: React.FC<CustomTableProps> = ({ ariaList, children, headers, data, user }) => {
+
+    const theme = useTheme();
     const [rowCount, setRowCount] = useState(0);
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [page, setPage] = React.useState(0);
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<string>('name');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const classes = useCustomTableStyles();
-
- 
     const open = Boolean(anchorEl);
+    const [selectedRows, setSelectedRows] = useState<any[]>([]);
+    const isSelected = (name: string) => selectedRows.indexOf(name) !== -1;
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -66,7 +172,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({ children, headers, dat
         setAnchorEl(null);
     };
 
-    const isSelected = (name: string) => selectedRows.indexOf(name) !== -1;
+
     const onSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked && data.length > 0) {
             const newSelecteds = data.map((n) => n.name);
@@ -107,135 +213,69 @@ export const CustomTable: React.FC<CustomTableProps> = ({ children, headers, dat
     };
 
     return (
-        <TableContainer>
-        <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-                <TableRow>
-                    <TableCell
-                        className={`${classes.tableCell} ${classes.tableCellFirst}`}
-                        component="th"
-                        padding="checkbox"
-
-                    >
-                        <Checkbox
-                            checked={selectedRows.length > 0}
-                            onChange={onSelectAllClick}
-                            inputProps={{ 'aria-label': 'select all properties' }}
-                        />
-                    </TableCell>
-                    {headers.map((headCell) => {
-                        return (
+        <React.Fragment>
+            <Table className={classes.table} {...ariaList}>
+                <TableHead>
+                    <TableRow>
+                        <Hidden only={["xs", "sm"]}>
                             <TableCell
-                                key={headCell.id}
-                                className={`${classes.tableCell} ${headCell.extraClasses}`}
-                                align={headCell.numeric ? 'right' : 'left'}
-                                padding={headCell.disablePadding ? 'none' : 'default'}
-                                sortDirection={orderBy === headCell.id ? order : false}
+                                className={`${classes.tableCell} ${classes.tableCellFirst}`}
+                                component="th"
+                                padding="checkbox"
+
                             >
-                                <TableSortLabel
-                                    active={orderBy === headCell.id}
-                                    direction={orderBy === headCell.id ? order : 'asc'}
-                                    onClick={createSortHandler(headCell.id)}
-                                >
-                                    {headCell.label}
-                                    {orderBy === headCell.id ? (
-                                        <span className={classes.visuallyHidden}>
-                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                        </span>
-                                    ) : null}
-                                </TableSortLabel>
+                                <Checkbox
+                                    checked={selectedRows.length > 0}
+                                    onChange={onSelectAllClick}
+                                    inputProps={{ 'aria-label': 'select all properties' }}
+                                />
                             </TableCell>
-                        );
-                    })}
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {stableSort(data, getComparator(order, orderBy))
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row: any, index) => {
-                        const isItemSelected = isSelected(row.name);
-                        const labelId = `enhanced-table-checkbox-${index}`;
-                        return (
-                            <TableRow
-                                className={classes.tableRow}
-                                onClick={(event) => handleRowClick(event, row.name)}
-                                role="checkbox"
-                                aria-checked={isItemSelected}
-                                tabIndex={-1}
-                                key={row.name}
-                                selected={isItemSelected}
-                                hover>
-                                <TableCell padding="checkbox" className={`${classes.tableCell} ${classes.tableCellFirst}`}>
-                                    <Checkbox
-                                        checked={isItemSelected}
-                                        inputProps={{ 'aria-labelledby': labelId }}
-                                    />
-                                </TableCell>
-                                <TableCell className={`${classes.folder} ${classes.tableCell}`}>
-                                    <Link
-                                        to={{
-                                            state: {
-                                                lastUpdated: new Date(row.modifiedOn).toDateString(),
-                                                propertyName: row.name,
-                                                propertyId: row.propertyId,
-                                                groupId: user.group
-                                            },
-                                            pathname: encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`)
-                                        }}
+                        </Hidden>
+                        {headers.map((headCell) => (
+                            <Hidden only={headCell.hideOn}>
+                                <TableCell
+                                    key={headCell.id}
+                                    className={`${classes.tableCell} ${headCell.extraClasses}`}
+                                    align={headCell.numeric ? 'right' : 'left'}
+                                    padding={headCell.disablePadding ? 'none' : 'default'}
+                                    sortDirection={orderBy === headCell.id ? order : false}
+                                >
+                                    <TableSortLabel
+                                        active={orderBy === headCell.id}
+                                        direction={orderBy === headCell.id ? order : 'asc'}
+                                        onClick={createSortHandler(headCell.id)}
                                     >
-                                        { row.image ? row.image : <PermMediaTwoToneIcon fontSize="large" color="action" />}
-                                    </Link>
+                                        {headCell.label}
+                                        {orderBy === headCell.id ? (
+                                            <span className={classes.visuallyHidden}>
+                                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                            </span>
+                                        ) : null}
+                                    </TableSortLabel>
                                 </TableCell>
-                                <TableCell className={`${classes.name} ${classes.tableCell}`} component="td" scope="row">
-                                    <Link
-                                        className={classes.txtLink}
-                                        to={{
-                                            state: {
-                                                lastUpdated: new Date(row.modifiedOn).toDateString(),
-                                                propertyName: row.name,
-                                                propertyId: row.propertyId,
-                                                groupId: user.group
-                                            },
-                                            pathname: encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`)
-                                        }}
-                                    >
-                                        {row.name}
-                                    </Link>
-                                </TableCell>
-                                <TableCell className={classes.tableCell} component="td" scope="row">
-                                    {new Date(row.modifiedOn).toDateString()}
-                                </TableCell>
-                                <TableCell className={classes.tableCell}>
-                                    Test
-                        </TableCell>
-                                <TableCell className={`${classes.tableCell} ${classes.tableCellEnd}`}>
-                                    <IconButton
-                                        aria-label="more"
-                                        aria-controls="long-menu"
-                                        aria-haspopup="true"
-                                        onClick={handleClick}
-                                    >
-                                        <MoreVertIcon />
-                                    </IconButton>
-                                    <Menu
-                                        id="long-menu"
-                                        anchorEl={anchorEl}
-                                        keepMounted
-                                        open={open}
-                                        onClose={handleClose}
-                                    >
-                                        {["Download all items"].map((option) => (
-                                            <MenuItem key={option} onClick={handleClose}>
-                                                {option}
-                                            </MenuItem>
-                                        ))}
-                                    </Menu>
-                                </TableCell>
-                            </TableRow>);
-                    })}
-            </TableBody>
-        </Table>
-        {children}
-    </TableContainer>
+                            </Hidden>
+                        ))}
+
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {stableSort(data, getComparator(order, orderBy))
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((row: any) => {
+                            return (
+                                <SetRow
+                                    onSelect={(select: boolean) => {
+                                        let newRow = select ? [...selectedRows, row.propertyId] : selectedRows.filter(pid => pid != row.propertyId)
+                                        setSelectedRows(newRow)
+                                    }}
+                                    row={row}
+                                    isChecked={selectedRows.includes(row.propertyId)}
+                                />
+                            );
+                        })}
+                </TableBody>
+            </Table>
+            {children && children(selectedRows)}
+        </React.Fragment>
     )
 }

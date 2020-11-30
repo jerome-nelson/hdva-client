@@ -1,4 +1,6 @@
 import { Box, Button, CircularProgress, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
+import GroupIcon from '@material-ui/icons/Group';
+import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import { HeaderTitle } from "components/header/header";
 import { PropertyCard } from "components/property-card/property-card";
 import { useAPI } from "hooks/useAPI";
@@ -7,16 +9,17 @@ import { messages } from "languages/en";
 import React from "react";
 import { Link } from "react-router-dom";
 import { getCurrentUser } from "services/auth.service";
+import { useGenericStyle } from "utils/generic.style";
+import { CarouselContainer } from "../../components/carousel/carousel";
+import { Placeholder } from "../../components/placeholder/placeholder";
 import { useDashboardStyles } from "./dashboard.page.style";
 
-
-
 interface Properties {
-    createdOn: number;
-    modifiedOn: number;
-    name: string;
-    propertyId: number;
-    groupId: number;
+        createdOn: number;
+        modifiedOn: number;
+        name: string;
+        propertyId: number;
+        groupId: number;
 }
 
 
@@ -25,6 +28,7 @@ export const DashboardPage = () => {
     const user = getCurrentUser();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const classes = useDashboardStyles();
+    const genericStyles = useGenericStyle();
     const [properties,] = useAPI<Properties>(`/properties${propertiesSuffix}`, {
         extraHeaders: {
             'Authorization': user.token
@@ -35,11 +39,13 @@ export const DashboardPage = () => {
             'Authorization': user.token
         }
     });
+
+    const { data: propertyData } = properties;
+    const { data: userData, noData: noUsers } = users;
     const [currentRole] = useRoles();
 
     return (
         <Box className={classes.container}>
-            {currentRole}
             <HeaderTitle disableBack alignText="left" title="Dashboard" disableGutters />
             <Grid container className={classes.title} alignItems="center">
                 <Box className={classes.subtitle}>
@@ -48,18 +54,33 @@ export const DashboardPage = () => {
             </Grid>
 
             <Grid container>
-                {properties.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : properties.data.slice(0, 3).sort((a, b) => a.modifiedOn - b.modifiedOn).map((row: any) => {
-                    return <PropertyCard {...row} />
-                })}
-                <Link to={"/properties"} className={classes.linkStyle}>
-                    <Button className={classes.actionBtn} fullWidth size="large" variant="outlined" color="primary">
-                        More Properties
-                 </Button>
-                </Link>
+                {properties.noData ? (
+                    <Placeholder
+                        subtitle={messages["placeholder.properties.subtitle"]}
+                        title={messages["placeholder.properties.title"]}
+                    >
+                        <HomeWorkIcon />
+                    </Placeholder>
+                ) : properties.isLoading ?
+                    <CircularProgress size="1.5rem" color="secondary" /> : (
+                        <React.Fragment>
+                            <CarouselContainer>
+                                {propertyData
+                                    .slice(0, 3)
+                                    .sort((a, b) => a.modifiedOn - b.modifiedOn)
+                                    .map((row: any) => <PropertyCard {...row} />)}
+                            </CarouselContainer>
+                            <Link to={"/properties"} className={classes.linkStyle}>
+                                <Button className={genericStyles.actionButton} fullWidth size="large" variant="outlined" color="primary">
+                                    More Properties
+                                </Button>
+                            </Link>
+                        </React.Fragment>
+                )}
             </Grid>
 
-            <h2>Group Users</h2>
-            <TableContainer component={Paper}>
+            <h3>Group Users</h3>
+            {!noUsers && (<TableContainer component={Paper}>
                 <Table aria-label="simple table">
                     <TableHead>
                         <TableRow>
@@ -72,7 +93,7 @@ export const DashboardPage = () => {
                     <TableBody>
                         {users.isLoading && <CircularProgress size="1.5rem" color="secondary" />}
                         {/* TODO: Remove user from array */}
-                        {!users.isLoading && users.data.map((row: any) => (
+                        {userData.map((row: any) => (
                             <TableRow key={row.name}>
                                 <TableCell component="td" scope="row">{row.name}</TableCell>
                                 <TableCell component="td" scope="row">{row.email}</TableCell>
@@ -85,10 +106,18 @@ export const DashboardPage = () => {
 
                     </TableBody>
                 </Table>
-            </TableContainer>
+            </TableContainer>)}
+            {noUsers && (
+                <Placeholder
+                    subtitle={messages["placeholder.users.subtitle"]}
+                    title={messages["placeholder.users.title"]}
+                >
+                    <GroupIcon />
+                </Placeholder>
+            )}
             {(Roles.viewer !== currentRole) &&
-                <Link to={"/properties"} className={classes.linkStyle}>
-                    <Button className={classes.actionBtn} fullWidth size="large" variant="outlined" color="primary">
+                <Link to={"/user-management"} className={classes.linkStyle}>
+                    <Button className={genericStyles.actionButton} fullWidth size="large" variant="outlined" color="primary">
                         Add a new user
                     </Button>
                 </Link>

@@ -1,17 +1,18 @@
 import { List, ListItem, ListItemText, ListSubheader } from "@material-ui/core";
 import { Roles, useRoles } from "hooks/useRoles";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { getCurrentUser, logout } from "../../services/auth.service";
 import { useSettingsStyles } from "./settings.style";
 
-
+// TODO: Replace hardcode with ROUTE file
 export const Settings = () => {
 
     const classes = useSettingsStyles();
     const history = useHistory();
     const [, setCurrentUser] = useState(getCurrentUser());
     const [currentRole] = useRoles();
+    const location = useLocation();
 
     useEffect(() => {
         const user = getCurrentUser();
@@ -29,6 +30,7 @@ export const Settings = () => {
             >
                 <ListItem
                     button
+                    disabled={location.pathname === "/properties"} 
                     onClick={() => {
                         history.push("/properties")
                     }}
@@ -53,6 +55,7 @@ export const Settings = () => {
             >
                 <ListItem
                     button
+                    disabled={location.pathname === "/user-management"} 
                     onClick={() => {
                         history.push("/user-management")
                     }}
@@ -63,7 +66,12 @@ export const Settings = () => {
                         }}
                         primary="User Management" />
                 </ListItem>
-                <ListItem button>
+                <ListItem 
+                    button
+                    disabled={location.pathname === "/group-management"} 
+                    onClick={() => {
+                        history.push("/group-management")
+                    }}>
                     <ListItemText
                         classes={{
                             root: classes.listItem
@@ -81,7 +89,10 @@ export const Settings = () => {
                 }
                 className={classes.root}
             >
-                <ListItem button>
+                <ListItem 
+                disabled 
+                button
+                >
                     <ListItemText
                         classes={{
                             root: classes.listItem

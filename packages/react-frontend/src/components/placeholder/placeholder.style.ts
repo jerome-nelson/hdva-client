@@ -1,15 +1,21 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
-export const useCarouselStyles = makeStyles((theme: Theme) =>
+export const usePlaceholderStyles = makeStyles((theme: Theme) =>
     createStyles({
-        arrowIcon: {
+        root: {
+            margin: `${theme.spacing(2)}px auto`,
+            textAlign: "center",
+            width: "100%"
+        },
+        icon: {
             background: "#b4d0e7",
             borderRadius: "50%",
-            height: "5em",
-            width: "5em",
+            height: "10em",
+            width: "10em",
             position: "relative",
             margin: "0 auto",
-            "& *": {
+
+            "& span": {
                 position: "absolute",
                 top: "50%",
                 left: "50%",

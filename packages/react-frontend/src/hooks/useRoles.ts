@@ -12,6 +12,13 @@ export const Roles = {
 }
 
 //  TODO: Add Role Typing
+export interface Roles {
+    createdOn: Date;
+    modifiedOn: Date;
+    rolename: number;
+    id: number;
+    _id: string;
+}
 
 export const useRoles = (context: any = []): [string, boolean, boolean] => {
     const user = getCurrentUser();
@@ -21,38 +28,35 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
         }
     } : {};
 
-    const [roles,,setURL] = useAPI<Record<string, string>>(``, {
-        ...options,
-        prevent: true
+    const [roles,,setURL] = useAPI<Roles>(``, {
+        ...options
     });
+    const {data: roleData, noData} = roles;
     const [currentRole, setRole] = useState<string>("");
     const [canAccess, dispatch] = useReducer((state: any, action: any) => {
-        if (action.allowed.length <= 0) {
+        if (action.allowed.length <= 0 || noData) {
             return state;
         }
         return action.allowed
             .filter((name: string) =>
-                name.toLowerCase() === roles.data.filter(role => user.role === role.id)[0]
-                    .rolename.toLowerCase()).length
+                name.toLowerCase() === String(roleData.filter(role => user.role === role.id)[0].rolename).toLowerCase()).length
     }, true);
 
     useEffect(() => {
         if (!!user && user.token) {
-            setURL(`http://localhost:3001/v1/roles`);
+            setURL(`/roles`);
         }    
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     // TODO: Examine other hooks in React and review current conditionals
     useEffect(() => {
-        if (!roles || roles.data.length <= 0 || !user) {
+        if (noData || !user) {
             return;
         }
-
-        const specificRole = roles.data.filter(role => user.role === role.id);
-        // TODO: Fix typing
-        if (specificRole.length > 0) {
-            setRole((Roles as any)[specificRole[0].rolename]);
+        const specificRole = roleData.filter(role => user.role === role.id);
+        if (specificRole && specificRole.length > 0) {
+            setRole((Roles)[specificRole[0].rolename]);
             dispatch({
                 allowed: context
             })

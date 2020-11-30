@@ -1,6 +1,6 @@
 import { Grid, Hidden } from "@material-ui/core";
 import React, { useContext, useEffect, useState } from "react";
-import { Redirect, RouteProps, useLocation } from "react-router-dom";
+import { Redirect, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ModalContext } from "../components/modal/modal.context";
 import { BottomNav } from "../components/navigation/bottom.nav";
 import { SideNav } from "../components/navigation/side.nav";
@@ -18,6 +18,7 @@ export interface RouterProps extends RouteProps {
 export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps) => {
 
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const history = useHistory();
   const modalSettings = useContext(ModalContext);
   const permissions = rest && rest.allowed;
 
@@ -49,7 +50,10 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
   if (isError) {
     modalSettings.updateMessage("Error Occurred");
     modalSettings.setModal(true);
-    return null;
+    if (!canAccess) {
+      history.goBack();
+    }
+    // return null;
   }
 
   if (!canAccess) {

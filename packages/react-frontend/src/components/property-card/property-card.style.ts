@@ -1,11 +1,12 @@
-import { makeStyles, createStyles, Theme,  } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
 export const usePropertyCardStyles = makeStyles((theme: Theme) =>
 createStyles({
     root: {
         backgroundColor: "#fff",
         marginRight: "1%",
-        width: '30%',
+        width: '80%', 
+        // TODO: REMOVE ITEM WIDTH!!
     },
     title: {
         textAlign: "center",

@@ -1,3 +1,15 @@
+export interface User {
+  createdOn: Date;
+  email: string;
+  group: number;
+  modifiedOn: Date;
+  name: string;
+  password: string;
+  role: number;
+  userId: string;
+  _id: string;
+}
+
 const logout = () => {
   localStorage.removeItem("user");
 };
@@ -20,8 +32,4 @@ const getCurrentUser = () => {
   return JSON.parse(item);
 };
 
-export {
-  logout,
-  setUser,
-  getCurrentUser,
-};
+export { logout, setUser, getCurrentUser, };

@@ -1,4 +1,11 @@
 export const messages = {
+    "group.form.title": "Group Title",
+    "group.form.description": "Group Description",
+    "groups-management.list": "List of Existing Groups",
+    "placeholder.properties.title": "No properties",
+    "placeholder.properties.subtitle": "There are no properties to show currently",
+    "placeholder.users.title": "No users yet!",
+    "placeholder.users.subtitle": "There are no users added to your group yet!",
     "dashboard.added-properties": `Recently Added Properties`,
     "login.title": "Sign In",
     "login.no-account": "Don't have an account?",

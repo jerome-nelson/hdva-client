@@ -3,13 +3,13 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import React, { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
+import { User } from "services/auth.service";
+import { useGenericStyle } from "utils/generic.style";
 import { useAPI } from "../../hooks/useAPI";
 import { messages } from "../../languages/en";
 import { setUser } from "../../services/auth.service";
 import { ErrorPopup } from "../error-popup/error-popup";
 import { useLoginStyles } from "./login-form.style";
-
-
 
 
 interface LoginState {
@@ -21,9 +21,10 @@ interface LoginState {
 
 export const LoginForm = (props: any) => {
     const classes = useLoginStyles();
+    const genericClasses = useGenericStyle();
     const history = useHistory();
 
-    const [user,,, callAPI] = useAPI("/login", { initialDataType: {}, prevent: true });
+    const [user,,, callAPI] = useAPI<User>("/login", { prevent: true });
     const [isLoading, setIsLoading] = React.useState(false);
     const [values, setValues] = React.useState<LoginState>({
         username: '',
@@ -33,9 +34,10 @@ export const LoginForm = (props: any) => {
     });
 
     useEffect(() => {
-        // TODO: Fix data typing of API hook
-        if (Object.keys(user.data as any).length > 0) {
-            setUser(user.data);
+        const details = user.data;
+        if (details.length > 0) {
+            const [loggedIn] =  details;
+            setUser(loggedIn);
             history.push("/");
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,7 +83,7 @@ export const LoginForm = (props: any) => {
                 autoComplete="off"
             >
                 <OutlinedInput
-                    className={classes.userFields}
+                    className={genericClasses.userFields}
                     fullWidth={true}
                     placeholder={messages["login.form.username"]}
                     id="username"
@@ -90,7 +92,7 @@ export const LoginForm = (props: any) => {
                     onChange={handleChange('username')}
                 />
                 <OutlinedInput
-                    className={classes.userFields}
+                    className={genericClasses.userFields}
                     fullWidth={true}
                     id="standard-adornment-password"
                     type={values.showPassword ? 'text' : 'password'}
