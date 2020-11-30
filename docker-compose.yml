@@ -41,6 +41,6 @@ services:
       - DB_NAME=${DB_NAME}
     volumes:
       - "./scripts/mongo:/docker-entrypoint-initdb.d/"
-      - "./mock:/mock"
+      - "./mock/mongo:/mock"
     ports:
       - "${DB_PORT}:${DB_PORT}"
