@@ -2,9 +2,9 @@ import bcrypt from "bcryptjs";
 import mongoose, { Model } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import validator from "validator";
-import { jwtSign } from "../config/auth";
-import { ERROR_MSGS } from "../config/errors";
-import { AlreadyExists, BadRequest } from "../services/error";
+import { jwtSign } from "../auth";
+import { AlreadyExists, BadRequest } from "../error";
+import { ERROR_MSGS } from "../messages";
 
 
 export interface MongoUser extends mongoose.Document {
@@ -73,15 +73,16 @@ UserSchema.statics.userExists = async function (email: string) {
 }
 
 UserSchema.statics.comparePass = async function (email: string, password: string) {
-    
+
     const user = await this.findOne({ email: email.toLowerCase() });
+
     if (!user) {
         return false;
     }
 
     const userMap = JSON.parse(JSON.stringify(user));
     const isPasswordTheSame = await bcrypt.compare(password, userMap.password);
-    return isPasswordTheSame;
+    return !!isPasswordTheSame;
 }
 
 UserSchema.pre<MongoUser>('save', async function (next) {
@@ -111,22 +112,20 @@ export const loginUserWithPassword = async (username: string, password: string) 
     }
 
     const email = username.toLowerCase();
-    const result = await User.comparePass(email, password);
-
-    if (!result) {
+    if (await !User.comparePass(email, password)) {
         throw new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL);
     }
 
     const user = JSON.parse(JSON.stringify(await User.findOne({ email: email })));
     const token = jwtSign(user);
-    return {
-        data: [{
+    return  {
+        statusCode: 200,
+        body: JSON.stringify({
             ...user,
+            success: true,
             token: `Bearer ${token}`
-        }],
-        success: true,
-    };
-
+        }, null, 2),
+      }
 }
 
 export const createNewUser = async (user: Record<string, any>) => {
@@ -134,35 +133,19 @@ export const createNewUser = async (user: Record<string, any>) => {
         if (await User.userExists(user.email)) {
            throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
         }
-        const newUser = await new User({
+       await new User({
             createdOn: new Date(),
             modifiedOn: new Date(),
             ...user
 
         }).save();
-
         return {
-            data: [newUser],
-            success: true
+            statusCode: 200,
+            body: JSON.stringify({
+                success: true
+            }, null, 2),
         }
-
     } catch (e) {
-        throw e;
-    }
-}
-
-export const findUsers = async (groupId?: number) => {
-    const params = groupId ? {
-        group: {
-            $in: groupId
-        }
-    } : {};
-    try {
-        return {
-            success: true,
-            data: await User.find(params)
-        }
-    } catch(e) {
         throw e;
     }
 }

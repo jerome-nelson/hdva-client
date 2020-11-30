@@ -48,12 +48,8 @@ export const Groups: any = mongoose.model('Groups', GroupsSchema);
 // Services
 export const addGroup = async (groups: Omit<Groups, "_id" | "createdOn" | "modifiedOn">[]) => {
     const currentTime = new Date().toDateString();
-    const lastGroup =  await Groups.findOne().sort({$natural:-1});
-    console.log(lastGroup);
-    const nextId = !!lastGroup.groupId ? lastGroup.groupId + 1 : 1; 
-    const groupsToAdd = groups.map((group, index) => ({
+    const groupsToAdd = groups.map(group => ({
         ...group,
-        groupId: nextId + index,
         createdOn: currentTime,
         modifiedOn: currentTime
     }));
@@ -72,11 +68,11 @@ export const addGroup = async (groups: Omit<Groups, "_id" | "createdOn" | "modif
 export const getGroups = async (gid?: number) => {
     let result: Record<string, any> = {
         success: false,
-        data: []
+        groups: []
     };
 
     if (gid) {
-        result.data = await Groups.find({
+        result.groups = await Groups.find({
             groupId: gid
         });
         result.success = true;
@@ -84,7 +80,7 @@ export const getGroups = async (gid?: number) => {
         return result;
     }
 
-    result.data = await Groups.find();
+    result.groups = await Groups.find();
     result.success = true;
 
     return result;
@@ -101,10 +97,8 @@ export const updateGroup = async ({ from, to }: { from: number, to: Omit<Groups,
 
 
         return {
-            data: [{
-                group: addNewGroup,
-                properties: updateProperties.nModified,
-            }],
+            group: addNewGroup,
+            properties: updateProperties.nModified,
             success: true
         }
     } catch (e) {
@@ -126,10 +120,10 @@ export const deleteGroups = async ({ gids }: { gids: number[] }) => {
             }
         });
         return {
-            data: [{
-                groups: [groups.deletedCount],
+            deleted: {
+                groups: groups.deletedCount,
                 properties: properties.deletedCount
-            }],
+            },
             success: true
         }
     } catch (e) {

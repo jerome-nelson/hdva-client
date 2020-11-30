@@ -26,7 +26,7 @@ const PropertiesSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    modifiedOn:  {
+    modifiedOn: {
         type: Date,
         required: false,
         trim: true,
@@ -42,8 +42,8 @@ const PropertiesSchema = new mongoose.Schema({
 
 PropertiesSchema.statics.doPropertiesExist = async function (ids: number[]): Promise<Record<number, boolean>> {
     const propertyList: Record<number, boolean> = ids.reduce((list, id) => ({
-     ...list,
-     [id]: false   
+        ...list,
+        [id]: false
     }), {});
     for (let id of ids) {
         const exists = await this.findOne({ propertyId: id });
@@ -51,7 +51,7 @@ PropertiesSchema.statics.doPropertiesExist = async function (ids: number[]): Pro
     }
 
     return propertyList;
-} 
+}
 
 export const Properties: any = mongoose.model('Properties', PropertiesSchema);
 
@@ -67,7 +67,7 @@ export const addProperties = async (properties: Omit<Properties, "_id" | "create
     try {
         const result = await Properties.insertMany(propertiesToAdd);
         return {
-            data: result,
+            properties: result,
             success: true
         }
     } catch (e) {
@@ -79,40 +79,49 @@ export const addProperties = async (properties: Omit<Properties, "_id" | "create
 export const getProperties = async ({ pids, gid }: { pids?: number[], gid?: number }) => {
     let result: Record<string, any> = {
         success: false,
-        data: []
+        properties: []
     };
 
     if (!gid && !pids) {
-        result.data = await Properties.find();
-        result.success = true;
-
-        return result;
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result, null, 2),
+        };
     }
-    
+
     if (gid) {
-        result.data = await Properties.find({
+        result.properties = await Properties.find({
             groupId: gid
         });
         result.success = true;
 
-        return result;
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result, null, 2),
+        }
     }
 
     const check = await Properties.doPropertiesExist(pids);
     const hasProperties = pids && pids.reduce((result, property) => result = result ? result : check[property], false);
 
-    if(!hasProperties) {
-        return result;
+    if (!hasProperties) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result, null, 2),
+        }
     }
 
-    result.data = await Properties.find({
+    result.properties = await Properties.find({
         propertyId: {
             $in: pids
         }
     });
     result.success = true;
 
-    return result;
+    return {
+        statusCode: 200,
+        body: JSON.stringify(result, null, 2),
+    }
 };
 
 export const deleteProperties = async ({ pids }: { pids: number[] }) => {
@@ -123,7 +132,7 @@ export const deleteProperties = async ({ pids }: { pids: number[] }) => {
             }
         });
         return {
-            data: [result.deletedCount],
+            deleted: result.deletedCount,
             success: true
         }
     } catch (e) {

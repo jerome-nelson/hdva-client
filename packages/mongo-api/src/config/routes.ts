@@ -1,14 +1,40 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
+import multer from "multer";
 import passport from "passport";
 import { addGroup, deleteGroups, getGroups, updateGroup } from "../models/groups.model";
 import { addProperties, deleteProperties, getProperties } from "../models/properties.model";
 import { Roles } from "../models/roles.model";
-import { createNewUser, loginUserWithPassword } from "../models/user.model";
+import { createNewUser, findUsers, loginUserWithPassword } from "../models/user.model";
+import { sendToS3 } from "./aws";
 import { ERROR_MSGS } from "./errors";
 
-
-
 // TODO: Implement Swagger for API documentation
+async function propertiesRoute(req: Request, res: Response, next: NextFunction) {
+    const { gid: postGID, pid: postPID } = req.params;
+    const { gid, pid } = req.body;
+    
+    const groupID = gid || postGID;
+    const postID = postPID || pid;
+
+    try {
+        let result = {};
+    
+        if (req.user && req.user.role > 1) {
+            if (!groupID && !postID) {
+                throw new Error(ERROR_MSGS.NO_ID);
+            }
+            result = await getProperties({
+                gid: Number(groupID),
+                pids: [Number(postID)]
+            });
+        }
+
+        result = await getProperties({});
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+};
 
 // const conn = async () => await mongoInstance();
 // const GridFS = new Mongoose.mongo.GridFSBucket(conn.db, {
@@ -157,14 +183,16 @@ router.post("/login", async (req, res, next) => {
 //     // Should be a seperate package
 // });
 
-router.get("/roles", passport.authenticate('jwt', { session: false }), (_, res, next) => {
-    Roles.find((error: Error, roles: Record<string, string>) => {
-        if (error) {
-            next(error);
-        }
-
-        res.json({ roles });
-    })
+router.get("/roles", passport.authenticate('jwt', { session: false }), async (_, res, next) => {
+    try {
+        const roles = await Roles.find();
+        res.json({ 
+            success: true,
+            data: roles
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 // router.get("/users", passport.authenticate('jwt', { session: false }), (_, res, next) => {
 //     Users.find().lean((error: Error, users: Record<any, any>) => {
@@ -192,24 +220,9 @@ router.get("/roles", passport.authenticate('jwt', { session: false }), (_, res, 
 //         });
 //     });
 // });
-router.get(["/properties", "/properties/:gid/:pid"], passport.authenticate('jwt', { session: false }), async (req, res, next) => {
-    const { gid, pid } = req.params;
-
-
-    try {
-        if (!gid && !pid) {
-            throw new Error(ERROR_MSGS.NO_ID);
-        }
-        const result = await getProperties({
-            gid: Number(gid),
-            pids: [Number(pid)]
-        });
-
-        return res.json(result);
-    } catch (e) {
-        next(e);
-    }
-});
+router
+    .get(["/properties", "/properties/:gid?/:pid?"], passport.authenticate('jwt', { session: false }), propertiesRoute)
+    .post(["/properties"], passport.authenticate('jwt', { session: false }), propertiesRoute);
 
 router.post("/properties/add", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
     try {
@@ -277,6 +290,11 @@ router.post("/groups/add", passport.authenticate('jwt', { session: false }), asy
 router.get(["/groups","/groups/:gid"], passport.authenticate('jwt', { session: false }), async (req, res, next) => {
     const { gid } = req.params;
 
+
+    if (!gid && req.user && req.user.role !== 1) {
+        throw new Error(ERROR_MSGS.CREDENTIALS_FAIL);
+    }
+
     try {
         const result = await getGroups(Number(gid) || undefined);
         return res.json(result);
@@ -293,6 +311,17 @@ router.post("/groups/update", passport.authenticate('jwt', { session: false }), 
             throw new Error(ERROR_MSGS.NO_GROUPS);
         }
         const result = await updateGroup({ from: Number(gid), to: JSON.parse(group) });
+        return res.json(result);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.get("/users", passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next) => { 
+    try {
+        const params = req.user && req.user.role === 1 ? undefined : req.user && req.user.group; 
+        const result = await findUsers(params);
+
         return res.json(result);
     } catch (e) {
         next(e);
@@ -316,5 +345,13 @@ router.post("/groups/delete", passport.authenticate('jwt', { session: false }), 
     }
 });
 
+router
+  .post(
+    '/aws-test',
+    multer({ dest: 'temp/', limits: { fieldSize: 8 * 1024 * 1024 } }).single(
+      'avatar'
+    ),
+    sendToS3
+  );
 
 export default router;
