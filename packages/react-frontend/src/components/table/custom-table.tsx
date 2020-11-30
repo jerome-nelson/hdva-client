@@ -42,6 +42,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 }
 
 interface CustomTableProps {
+    children: any;
     ariaList?: Record<string, unknown>;
     headers: Record<string, any>[];
     data: Record<string, any>[];

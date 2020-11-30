@@ -3,7 +3,7 @@ import { getCurrentUser } from "services/auth.service";
 import { useAPI } from "./useAPI";
 
 
-export const Roles = {
+export const Roles: Record<string, string> = {
     super: "Super",
     admin: "Administrator",
     owner: "{{Group Name}} Leader",
@@ -15,7 +15,7 @@ export const Roles = {
 export interface Roles {
     createdOn: Date;
     modifiedOn: Date;
-    rolename: number;
+    rolename: string;
     id: number;
     _id: string;
 }
@@ -56,7 +56,7 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
         }
         const specificRole = roleData.filter(role => user.role === role.id);
         if (specificRole && specificRole.length > 0) {
-            setRole((Roles)[specificRole[0].rolename]);
+            setRole((Roles[specificRole[0].rolename]));
             dispatch({
                 allowed: context
             })

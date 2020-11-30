@@ -1,7 +1,6 @@
 import { Box, Button, CircularProgress, Grid, Hidden, OutlinedInput, Paper } from "@material-ui/core";
 import { CustomTable } from "components/table/custom-table";
 import { useAPI } from "hooks/useAPI";
-import { useRoles } from "hooks/useRoles";
 import { messages } from "languages/en";
 import React from "react";
 import { getCurrentUser } from "services/auth.service";
@@ -20,7 +19,7 @@ interface Groups {
 }
 
 export const GroupPage: React.FC = () => {
-    const [currentRole] = useRoles();
+    // const [currentRole] = useRoles();
     const user = getCurrentUser();
     // const gid = [Roles.admin, Roles.super].includes(currentRole) ? `` : `/${user.group}`;
     // TODO: Limit user groups
@@ -32,7 +31,7 @@ export const GroupPage: React.FC = () => {
     const classes = useGroupStyle();
     const genericClasses = useGenericStyle();
 
-    const { data, noData } = groups;
+    const { data } = groups;
 
     const headCells: Record<string, unknown>[] = [
         { id: 'icon', label: 'Name' },
@@ -111,7 +110,7 @@ export const GroupPage: React.FC = () => {
                                                             onClick={() => alert(`Should delete selected:  ${hasSelected && hasSelected.join(",")}`)}
                                                             fullWidth
                                                             className={genericClasses.actionButton}
-                                                            disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
+                                                            disabled={!hasSelected || (hasSelected && hasSelected.length <= 0)}
                                                             size="large" variant="outlined" color="primary"
                                                         >
                                                             Delete Selected
@@ -124,7 +123,7 @@ export const GroupPage: React.FC = () => {
                                                                     onClick={() => alert(`Should delete properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
                                                                     fullWidth
                                                                     className={genericClasses.actionButton}
-                                                                    disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
+                                                                    disabled={!hasSelected || (hasSelected && hasSelected.length <= 0)}
                                                                     size="medium" variant="outlined" color="primary"
                                                                 >
                                                                     Delete Selected
