@@ -10,7 +10,7 @@ interface ApiOptions {
 }
 
 interface APIResponse<T> {
-  data: {
+  body: {
     data: T[];
   }
 }
@@ -80,7 +80,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
         ...status,
         fatal: [500, 401, 404].includes(result.status)
       });
-      addPayload(result.data.data);
+      addPayload(result.data.body.data);
     } catch (error) {
       modal.updateMessage("Unable to connect to API");
       modal.setModal(true);
@@ -110,13 +110,13 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
       loading: true
     });
 
-    axios.post(`${process.env.REACT_APP_API}${url}`, querystring.stringify(payload), {
+    axios.post<APIResponse<T>>(`${process.env.REACT_APP_API}${url}`, querystring.stringify(payload), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         ...settings.extraHeaders,
       },
-    }).then((res: APIResponse<T>) => {
-      addPayload(res.data.data);
+    }).then(res => {
+      addPayload(res.data.body.data);
       setStatus({
         ...status,
         done: true,

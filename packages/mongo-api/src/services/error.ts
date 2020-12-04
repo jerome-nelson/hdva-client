@@ -26,14 +26,20 @@ class AlreadyExists extends GeneralError { }
 const errorsHandler = () => ((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
         if (error instanceof GeneralError) {
           return res.status(error.getCode()).json({
-            message: `Error Occurred: ${error.message}`,
-            success: false
+            statusCode: error.getCode(),
+            body: {
+              message: `Error Occurred: ${error.message}`,
+              success: false
+            }
           });
         }
       
         return res.status(500).json({
-            message: `Error Occurred: ${error.message}`,
-            success: false
+          statusCode: 500,  
+          body: {
+              message: `Error Occurred: ${error.message}`,
+              success: false
+            }
         });
 })
 

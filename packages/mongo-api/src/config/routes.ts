@@ -30,7 +30,10 @@ async function propertiesRoute(req: Request, res: Response, next: NextFunction) 
         }
 
         result = await getProperties({});
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -158,7 +161,10 @@ router.post("/register", async (req, res, next) => {
             email: req.body.email,
             password: req.body.password
         });
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -173,7 +179,10 @@ router.post("/register", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
     try {
         const result = await loginUserWithPassword(req.body.username, req.body.password);
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -187,8 +196,11 @@ router.get("/roles", passport.authenticate('jwt', { session: false }), async (_,
     try {
         const roles = await Roles.find();
         res.json({ 
-            success: true,
-            data: roles
+            statusCode: 200,
+            body: {
+                success: true,
+                data: roles
+            }
         });
     } catch (error) {
         next(error);
@@ -231,7 +243,10 @@ router.post("/properties/add", passport.authenticate('jwt', { session: false }),
          }
          
         const result = await addProperties(req.body);
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -250,7 +265,11 @@ router.post("/properties", passport.authenticate('jwt', { session: false }), asy
             pids: Array.isArray(pids) ? pids.map((pid: string) => Number(pid)) : [Number(pids)]
         });
 
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+
+        });
     } catch (e) {
         next(e);
     }
@@ -267,7 +286,10 @@ router.post("/properties/delete", passport.authenticate('jwt', { session: false 
             pids: Array.isArray(pids) ? pids.map((pid: string) => Number(pid)) : [Number(pids)]
         });
 
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -281,7 +303,10 @@ router.post("/groups/add", passport.authenticate('jwt', { session: false }), asy
          }
          
         const result = await addGroup(req.body);
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -297,7 +322,10 @@ router.get(["/groups","/groups/:gid"], passport.authenticate('jwt', { session: f
 
     try {
         const result = await getGroups(Number(gid) || undefined);
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -311,7 +339,10 @@ router.post("/groups/update", passport.authenticate('jwt', { session: false }), 
             throw new Error(ERROR_MSGS.NO_GROUPS);
         }
         const result = await updateGroup({ from: Number(gid), to: JSON.parse(group) });
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -322,7 +353,10 @@ router.get("/users", passport.authenticate('jwt', { session: false }), async (re
         const params = req.user && req.user.role === 1 ? undefined : req.user && req.user.group; 
         const result = await findUsers(params);
 
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
@@ -339,7 +373,10 @@ router.post("/groups/delete", passport.authenticate('jwt', { session: false }), 
             gids: Array.isArray(gids) ? gids.map((gid: string) => Number(gid)) : [Number(gids)]
         });
 
-        return res.json(result);
+        return res.json({
+            statusCode: 200,
+            body: result
+        });
     } catch (e) {
         next(e);
     }
