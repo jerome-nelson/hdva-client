@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import querystring from "querystring";
 import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 import { ModalContext } from "../components/modal/modal.context";
@@ -10,9 +10,7 @@ interface ApiOptions {
 }
 
 interface APIResponse<T> {
-  body: {
     data: T[];
-  }
 }
 
 const DEFAULT_OPTIONS = {
@@ -46,10 +44,11 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
   });
 
   useEffect(() => {
+    const empty = !payload.length;
     setStatus({
       ...status,
-      empty: payload.length === 0
-    })
+      empty
+    });
   }, [payload])
 
   const enoughTries = Boolean(status.attempts === 3);
@@ -80,7 +79,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
         ...status,
         fatal: [500, 401, 404].includes(result.status)
       });
-      addPayload(result.data.body.data);
+      addPayload(result.data.data);
     } catch (error) {
       modal.updateMessage("Unable to connect to API");
       modal.setModal(true);
@@ -109,14 +108,16 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
       ...status,
       loading: true
     });
-
-    axios.post<APIResponse<T>>(`${process.env.REACT_APP_API}${url}`, querystring.stringify(payload), {
+    axios({
+      method: 'post',
+      url: `${process.env.REACT_APP_API}${url}`, 
+      data: querystring.stringify(payload),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         ...settings.extraHeaders,
       },
-    }).then(res => {
-      addPayload(res.data.body.data);
+    }).then((res: AxiosResponse<APIResponse<T>>) => {
+      addPayload(res.data.data);
       setStatus({
         ...status,
         done: true,
