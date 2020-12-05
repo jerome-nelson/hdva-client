@@ -44,7 +44,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
   });
 
   useEffect(() => {
-    const empty = !payload.length;
+    const empty = !payload || !payload.length;
     setStatus({
       ...status,
       empty
