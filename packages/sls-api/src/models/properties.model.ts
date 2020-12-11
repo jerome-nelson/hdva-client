@@ -1,12 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 
-export interface Properties extends mongoose.Document {
+interface PropertiesModel {
     createdOn: Date;
     modifiedOn: Date;
     name: number;
     propertyId: number;
     groupId: number;
     _id: string;
+}
+
+type MongoPropertiesDocument = mongoose.Document & PropertiesModel;
+interface MongoPropertiesModel extends Model<MongoPropertiesDocument> {
+    doPropertiesExist(ids: number[]): Promise<Record<number, boolean>>;
 }
 
 const PropertiesSchema = new mongoose.Schema({
@@ -53,10 +58,8 @@ PropertiesSchema.statics.doPropertiesExist = async function (ids: number[]): Pro
     return propertyList;
 }
 
-export const Properties: any = mongoose.model('Properties', PropertiesSchema);
-
-// Services
-export const addProperties = async (properties: Omit<Properties, "_id" | "createdOn" | "modifiedOn">[]) => {
+export const Properties: MongoPropertiesModel = mongoose.model<MongoPropertiesDocument, MongoPropertiesModel>('Properties', PropertiesSchema);
+export const addProperties = async (properties: Omit<PropertiesModel, "_id" | "createdOn" | "modifiedOn">[]) => {
     const currentTime = new Date().toDateString();
     const propertiesToAdd = properties.map(property => ({
         ...property,
@@ -66,10 +69,7 @@ export const addProperties = async (properties: Omit<Properties, "_id" | "create
 
     try {
         const result = await Properties.insertMany(propertiesToAdd);
-        return {
-            properties: result,
-            success: true
-        }
+        return result;
     } catch (e) {
         throw e;
     }
@@ -77,51 +77,34 @@ export const addProperties = async (properties: Omit<Properties, "_id" | "create
 
 
 export const getProperties = async ({ pids, gid }: { pids?: number[], gid?: number }) => {
-    let result: Record<string, any> = {
-        success: false,
-        properties: []
-    };
-
+    // TODO: Add Admin Check
     if (!gid && !pids) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(result, null, 2),
-        };
+        return await Properties.find();
     }
 
     if (gid) {
-        result.properties = await Properties.find({
+        return await Properties.find({
             groupId: gid
         });
-        result.success = true;
+    }
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(result, null, 2),
-        }
+    if (!pids) {
+        return [];
     }
 
     const check = await Properties.doPropertiesExist(pids);
-    const hasProperties = pids && pids.reduce((result, property) => result = result ? result : check[property], false);
+    const hasProperties = pids && pids
+        .reduce((result, property) => result = result ? result : check[property], false);
 
     if (!hasProperties) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(result, null, 2),
-        }
+        return [];
     }
 
-    result.properties = await Properties.find({
+    return await Properties.find({
         propertyId: {
             $in: pids
         }
     });
-    result.success = true;
-
-    return {
-        statusCode: 200,
-        body: JSON.stringify(result, null, 2),
-    }
 };
 
 export const deleteProperties = async ({ pids }: { pids: number[] }) => {
@@ -131,10 +114,7 @@ export const deleteProperties = async ({ pids }: { pids: number[] }) => {
                 $in: pids
             }
         });
-        return {
-            deleted: result.deletedCount,
-            success: true
-        }
+        return { deleted: result }
     } catch (e) {
         throw e;
     }

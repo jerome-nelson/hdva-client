@@ -1,0 +1,1 @@
+export const ALLOWED_IMAGES = ["image/jpeg", "image/png"];

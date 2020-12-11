@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { Properties } from "./properties.model";
 
-export interface Groups extends mongoose.Document {
+export interface GroupsModel {
     createdOn: Date;
     description?: string;
     modifiedOn: Date;
@@ -10,6 +10,7 @@ export interface Groups extends mongoose.Document {
     _id: string;
 }
 
+type MongoGroupsDocument = mongoose.Document & GroupsModel;
 const GroupsSchema = new mongoose.Schema({
     createdOn: {
         type: Date,
@@ -43,10 +44,8 @@ const GroupsSchema = new mongoose.Schema({
 
 
 
-export const Groups: any = mongoose.model('Groups', GroupsSchema);
-
-// Services
-export const addGroup = async (groups: Omit<Groups, "_id" | "createdOn" | "modifiedOn">[]) => {
+export const Groups: Model<MongoGroupsDocument> = mongoose.model<MongoGroupsDocument, Model<MongoGroupsDocument>>('Groups', GroupsSchema);
+export const addGroup = async (groups: Omit<GroupsModel, "_id" | "createdOn" | "modifiedOn">[]) => {
     const currentTime = new Date().toDateString();
     const groupsToAdd = groups.map(group => ({
         ...group,
@@ -55,10 +54,7 @@ export const addGroup = async (groups: Omit<Groups, "_id" | "createdOn" | "modif
     }));
     try {
         const result = await Groups.insertMany(groupsToAdd);
-        return {
-            groups: result,
-            success: true
-        }
+        return result;
     } catch (e) {
         throw e;
     }
@@ -66,27 +62,16 @@ export const addGroup = async (groups: Omit<Groups, "_id" | "createdOn" | "modif
 
 
 export const getGroups = async (gid?: number) => {
-    let result: Record<string, any> = {
-        success: false,
-        groups: []
-    };
-
     if (gid) {
-        result.groups = await Groups.find({
+        return await Groups.find({
             groupId: gid
         });
-        result.success = true;
-
-        return result;
     }
 
-    result.groups = await Groups.find();
-    result.success = true;
-
-    return result;
+    return await Groups.find();
 };
 
-export const updateGroup = async ({ from, to }: { from: number, to: Omit<Groups, "_id" | "createdOn" | "modifiedOn"> }) => {
+export const updateGroup = async ({ from, to }: { from: number, to: Omit<GroupsModel, "_id" | "createdOn" | "modifiedOn"> }) => {
     try {
         const addNewGroup = await addGroup([to]);
         const updateProperties = await Properties.updateMany({
@@ -98,8 +83,7 @@ export const updateGroup = async ({ from, to }: { from: number, to: Omit<Groups,
 
         return {
             group: addNewGroup,
-            properties: updateProperties.nModified,
-            success: true
+            properties: updateProperties.nModified
         }
     } catch (e) {
         throw e;
@@ -120,12 +104,9 @@ export const deleteGroups = async ({ gids }: { gids: number[] }) => {
             }
         });
         return {
-            deleted: {
-                groups: groups.deletedCount,
-                properties: properties.deletedCount
-            },
-            success: true
-        }
+            groups: groups.deletedCount,
+            properties: properties.deletedCount
+        };
     } catch (e) {
         throw e;
     }

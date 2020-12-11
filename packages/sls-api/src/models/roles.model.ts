@@ -1,11 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 
-export interface Roles extends mongoose.Document {
+export interface Roles {
     createdOn: Date;
     modifiedOn: Date;
     rolename: number;
     id: number;
     _id: string;
+}
+
+type MongoRolesDocument = Roles & mongoose.Document;
+
+export interface MongoRolesModel extends Model<MongoRolesDocument> {
+    rolesExists(roleId: string): Promise<boolean>;
 }
 
 const RoleSchema = new mongoose.Schema({
@@ -39,15 +45,4 @@ RoleSchema.statics.rolesExists = async function (roleId: number) {
     return !!hasRole;
 } 
 
-export const Roles: any = mongoose.model('Roles', RoleSchema);
-
-// Services
-export const hasPermission = async ({ roleId }: { roleId: number}) => {
-    if(!await Roles.rolesExists(roleId)) {
-        return false;
-    }
-    return true;
-};
-
-// TODO: Extend roles into data
-// TODO: Update, Delete, Add Roles (needs permissions)
+export const Roles: MongoRolesModel = mongoose.model<MongoRolesDocument, MongoRolesModel>('Roles', RoleSchema);

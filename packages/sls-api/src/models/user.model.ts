@@ -1,13 +1,12 @@
 import bcrypt from "bcryptjs";
-import mongoose, { Model } from "mongoose";
+import mongoose, { HookNextFunction, Model } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import validator from "validator";
-import { jwtSign } from "../auth";
-import { AlreadyExists, BadRequest } from "../error";
-import { ERROR_MSGS } from "../messages";
+import { ERROR_MSGS } from "../config/messages";
+import { jwtSign } from "../utils/auth";
+import { AlreadyExists, BadRequest } from "../utils/error";
 
-
-export interface MongoUser extends mongoose.Document {
+export interface UserModel {
     createdOn: Date;
     email: string;
     group: number;
@@ -19,9 +18,13 @@ export interface MongoUser extends mongoose.Document {
     _id: string;
 }
 
-interface MongoUserModel extends Model<MongoUser> {
+type MongoUserDocument = UserModel & mongoose.Document;
+
+export interface MongoUserModel extends Model<MongoUserDocument> {
     userExists(email: string): Promise<boolean>;
+    comparePass(email: string, password: string): Promise<boolean>;
 }
+
 // TODO: Look into User Validation Rules TRY CATCH/Global try catch for express routes as well
 // TODO: Add Password Validation Rules
 const UserSchema = new mongoose.Schema({
@@ -75,19 +78,17 @@ UserSchema.statics.userExists = async function (email: string) {
 UserSchema.statics.comparePass = async function (email: string, password: string) {
 
     const user = await this.findOne({ email: email.toLowerCase() });
-
     if (!user) {
         return false;
     }
 
     const userMap = JSON.parse(JSON.stringify(user));
-    const isPasswordTheSame = await bcrypt.compare(password, userMap.password);
-    return !!isPasswordTheSame;
+    return !!await bcrypt.compare(password, userMap.password);
 }
 
-UserSchema.pre<MongoUser>('save', async function (next) {
+UserSchema.pre<MongoUserDocument>('save', async function (next: HookNextFunction) {
 
-    const user: any = this;
+    const user: MongoUserDocument = this;
     // TODO: Generate uuid here as well
     if (!user.isModified("userId")) {
         user.userId = uuidv4();
@@ -100,12 +101,8 @@ UserSchema.pre<MongoUser>('save', async function (next) {
     }
 });
 
+export const User: MongoUserModel = mongoose.model<MongoUserDocument, MongoUserModel>('User', UserSchema);
 
-
-// TODO: Fix Typing of statics
-export const User: any = mongoose.model('User', UserSchema);
-
-// Services
 export const loginUserWithPassword = async (username: string, password: string) => {
     if (!username || !password) {
         throw new BadRequest(ERROR_MSGS.NO_POST_BODY);
@@ -113,38 +110,49 @@ export const loginUserWithPassword = async (username: string, password: string) 
 
     const email = username.toLowerCase();
     if (await !User.comparePass(email, password)) {
-        throw new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL);
+        throw new BadRequest(ERROR_MSGS.USER_CREDENTIALS_FAIL);
     }
 
-    const user = JSON.parse(JSON.stringify(await User.findOne({ email: email })));
-    const token = jwtSign(user);
-    return  {
-        statusCode: 200,
-        body: JSON.stringify({
-            ...user,
-            success: true,
-            token: `Bearer ${token}`
-        }, null, 2),
-      }
+    const item = await User.findOne({ email: email });
+    const userToken = JSON.parse(JSON.stringify(item));
+    const token = jwtSign(userToken);
+
+    if (!item) {
+        throw new Error(ERROR_MSGS.USER_NOT_FOUND);
+    }
+
+    // TODO: Fix _doc (think it's a mis-typing of mongoose schema)
+    return [{
+        ...(item as any)._doc,
+        token: `Bearer ${token}`
+    }]
 }
 
 export const createNewUser = async (user: Record<string, any>) => {
     try {
         if (await User.userExists(user.email)) {
-           throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
+            throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
         }
-       await new User({
+        const result = await new User({
             createdOn: new Date(),
             modifiedOn: new Date(),
             ...user
 
         }).save();
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                success: true
-            }, null, 2),
+        return result;
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const findUsers = async (groupId?: number) => {
+    const params = groupId ? {
+        group: {
+            $in: groupId
         }
+    } : {};
+    try {
+        return await User.find(params)
     } catch (e) {
         throw e;
     }

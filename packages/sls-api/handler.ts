@@ -1,5 +1,7 @@
 import 'source-map-support/register';
-import { login, properties, register, roles } from "./src/services";
+import { groupCRUD, groups, login, properties, propertyCRUD, register, roles, users } from "./src/services";
+import { signedURL } from "./src/uploads";
+import { jwtVerify } from "./src/utils/auth";
 
-export { login, roles, register, properties };
+export { login, roles, register, properties, jwtVerify, users, propertyCRUD, groups, groupCRUD, signedURL };
 
