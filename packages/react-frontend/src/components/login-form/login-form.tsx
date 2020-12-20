@@ -1,4 +1,4 @@
-import { Grid, Hidden, IconButton, Input, InputAdornment } from "@material-ui/core";
+import { Grid, Hidden, IconButton, Input, InputAdornment, Paper } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import React, { useEffect } from "react";
@@ -10,6 +10,7 @@ import { messages } from "../../languages/en";
 import { setUser } from "../../services/auth.service";
 import { CTAButton } from "../buttons/cta";
 import { ErrorPopup } from "../error-popup/error-popup";
+import { HeaderTitle } from "../header/header";
 import { useLoginStyles } from "./login-form.style";
 
 
@@ -20,7 +21,7 @@ interface LoginState {
     showPassword: boolean;
 }
 
-export const LoginForm = (props: any) => {
+const LoginComponent = (props: any) => {
     const classes = useLoginStyles();
     const genericClasses = useGenericStyle();
     const history = useHistory();
@@ -57,6 +58,8 @@ export const LoginForm = (props: any) => {
     };
 
     const notAllFieldsFilled = [values.username, values.password].filter(elem => !!elem).length < 2;
+    const inProgress = user.isLoading || isLoading;
+    
     return (
         <React.Fragment>
             <ErrorPopup
@@ -84,6 +87,7 @@ export const LoginForm = (props: any) => {
                 autoComplete="off"
             >
                 <Input
+                    disabled={inProgress}
                     color="secondary"
                     className={genericClasses.userFields}
                     fullWidth={true}
@@ -94,6 +98,7 @@ export const LoginForm = (props: any) => {
                     onChange={handleChange('username')}
                 />
                 <Input
+                    disabled={inProgress}
                     color="secondary"
                     className={genericClasses.userFields}
                     fullWidth={true}
@@ -119,7 +124,7 @@ export const LoginForm = (props: any) => {
                         <Grid md={5} item className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
-                                loading={user.isLoading || isLoading} type="submit" fullWidth size="large" variant="outlined" color="primary">
+                                loading={inProgress} type="submit" fullWidth size="small" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>
@@ -131,7 +136,7 @@ export const LoginForm = (props: any) => {
                         <Grid item xs={12} className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
-                                loading={user.isLoading || isLoading} type="submit" fullWidth size="small" variant="contained" color="primary">
+                                loading={inProgress} type="submit" fullWidth size="small" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>
@@ -140,4 +145,39 @@ export const LoginForm = (props: any) => {
             </form>
         </React.Fragment>
     );
+}
+
+export const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
+    const classes = useLoginStyles();
+    return (
+        <Paper className={className}>
+            <Hidden mdUp>
+                <HeaderTitle
+                    alignText="left"
+                    disableBack
+                    disableGutters
+                    title={messages["login.title"]}
+                    subtitle={messages["login.subtitle"]}
+                    variant="h2"
+                />
+            </Hidden>
+            <Grid item spacing={3}>
+                <Hidden mdDown>
+                    <HeaderTitle
+                        alignText="left"
+                        disableBack
+                        disableGutters
+                        title={messages["login.title"]}
+                        subtitle={messages["login.subtitle"]}
+                        variant="h2"
+                    />
+                </Hidden>
+                {/* <Hidden mdDown>
+                    <p>{messages["login.no-account"]} <br /> {messages["login.inactive-account"]}</p>
+                    <div className={classes.hrHeader}><span className="hr-label__text">or</span></div>
+                </Hidden> */}
+                <LoginComponent />
+            </Grid>
+        </Paper>
+    )
 }

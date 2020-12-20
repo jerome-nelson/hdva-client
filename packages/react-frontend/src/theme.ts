@@ -17,8 +17,14 @@ export const COLOR_OVERRIDES = {
     hdva_red_dark: "#b6002e"
 }
 
+const OPACITY_BASE = 0.4;
+
 export const STYLE_OVERRIDES = {
     input: {
+        disabled: {
+            opacity: OPACITY_BASE,
+            color: COLOR_OVERRIDES.hdva_black
+        },
         main: {
             padding: `8px 0 9px`
         },
@@ -28,7 +34,7 @@ export const STYLE_OVERRIDES = {
             backgroundColor: COLOR_OVERRIDES.hdva_white,
             border: `solid 1px ${COLOR_OVERRIDES.hdva_red}`,
             color: COLOR_OVERRIDES.hdva_red,
-            opacity: 0.3
+            opacity: OPACITY_BASE
         },
         main: {
             borderRadius: `8px`,
@@ -79,8 +85,8 @@ export const theme = createMuiTheme({
         MuiInput: {
             colorSecondary: {
                 color: COLOR_OVERRIDES.hdva_black,
+                "&.Mui-disabled": STYLE_OVERRIDES.input.disabled,
                 "&.MuiInput-underline::before": {
-                    // TODO: Remove important
                     borderBottom: `1px solid ${COLOR_OVERRIDES.hdva_black_light} !important`
                 },
             }

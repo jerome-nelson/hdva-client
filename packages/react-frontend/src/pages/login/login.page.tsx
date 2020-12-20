@@ -1,5 +1,4 @@
-import { AppBar, Grid, Hidden, Paper } from "@material-ui/core";
-import { HeaderTitle } from "components/header/header";
+import { AppBar, Grid, Hidden } from "@material-ui/core";
 import { LoginForm } from "components/login-form/login-form";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -19,6 +18,9 @@ export const LoginPage = () => {
                     <Grid className={classes.logo} item md={6}>
                         <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" />
                     </Grid>
+                    <Grid item md={6}>
+                        <LoginForm className={classes.formMaxWidth}/>
+                    </Grid>
                 </Hidden>
                 <Hidden mdUp>
                     <Grid className={classes.logo} item xs={12}>
@@ -29,29 +31,8 @@ export const LoginPage = () => {
             <Hidden mdUp>
                 <AppBar color="primary" className={classes.forgottenDetails} elevation={0} position="fixed">
                     <Grid container className={classes.formHeader}>
-                        <Grid item xs={12} md={6}>
-                            <Paper>
-                                <Hidden mdUp>
-                                    <HeaderTitle
-                                        alignText="left"
-                                        disableBack
-                                        disableGutters
-                                        title={messages["login.title"]}
-                                        subtitle={messages["login.subtitle"]}
-                                        variant="h2"
-                                    />
-                                </Hidden>
-                                <Grid item md={6} spacing={3}>
-                                    <Hidden mdDown>
-                                        <HeaderTitle disableBack title={messages["login.title"]} />
-                                    </Hidden>
-                                    <Hidden mdDown>
-                                        <p>{messages["login.no-account"]} <br /> {messages["login.inactive-account"]}</p>
-                                        <div className={classes.hrHeader}><span className="hr-label__text">or</span></div>
-                                    </Hidden>
-                                    <LoginForm />
-                                </Grid>
-                            </Paper>
+                        <Grid item xs={12}>
+                            <LoginForm className={classes.formMaxWidth} />
                             <Hidden mdDown>
                                 <p>Usage of this service is subject to our <Link to="/privacy-policy">Privacy Policy</Link> and <Link to="/terms-of-service">Terms of Service</Link>. By using this service you agree to our terms</p>
                             </Hidden>
