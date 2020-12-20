@@ -74,12 +74,15 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
       const result = await axios(`${process.env.REACT_APP_API}${url}`, {
         headers: settings.extraHeaders
       });
-
+      const empty = !result.data.data || !result.data.data.length;
       setStatus({
         ...status,
+        empty,
         fatal: [500, 401, 404].includes(result.status)
       });
-      addPayload(result.data.data);
+      if (!empty) {
+        addPayload(result.data.data);
+      }
     } catch (error) {
       modal.updateMessage("Unable to connect to API");
       modal.setModal(true);
@@ -141,7 +144,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
       done: status.done,
       isLoading: status.loading,
       isError: status.error || status.fatal,
-      noData: status.empty || status.fatal
+      noData: status.empty
     },
     addPayload,
     setUrl,

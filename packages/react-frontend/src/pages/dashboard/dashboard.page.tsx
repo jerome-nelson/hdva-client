@@ -54,15 +54,15 @@ export const DashboardPage = () => {
             </Grid>
 
             <Grid container>
-                {properties.noData ? (
+                {properties.isLoading && <CircularProgress size="1.5rem" color="secondary" /> }
+                {!properties.isLoading && properties.noData ? (
                     <Placeholder
                         subtitle={messages["placeholder.properties.subtitle"]}
                         title={messages["placeholder.properties.title"]}
                     >
                         <HomeWorkIcon />
                     </Placeholder>
-                ) : properties.isLoading ?
-                    <CircularProgress size="1.5rem" color="secondary" /> : (
+                ) : (
                         <React.Fragment>
                             <CarouselContainer>
                                 {propertyData

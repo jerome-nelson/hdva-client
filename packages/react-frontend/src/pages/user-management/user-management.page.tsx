@@ -1,26 +1,16 @@
-import { Box, Button, CircularProgress, Grid, Hidden, OutlinedInput, Paper } from "@material-ui/core";
-import { CustomTable } from "components/table/custom-table";
-import { useAPI } from "hooks/useAPI";
-import { messages } from "languages/en";
+import { Box, Button, CircularProgress, Grid, Hidden } from "@material-ui/core";
 import React from "react";
-import { getCurrentUser } from "services/auth.service";
-import { useGenericStyle } from "utils/generic.style";
 import { HeaderTitle } from "../../components/header/header";
-import { useGroupStyle } from "./group-management.page.style";
+import { StickyHeader } from "../../components/sticky-header/sticky-header";
+import { useAPI } from "../../hooks/useAPI";
+import { messages } from "../../languages/en";
+import { getCurrentUser, User } from "../../services/auth.service";
+import { useGenericStyle } from "../../utils/generic.style";
+import { useGroupStyle } from "./user-management.page.style";
 
-
-interface Groups {
-    createdOn: Date;
-    description?: string;
-    modifiedOn: Date;
-    name: string;
-    groupId: number;
-    _id: string;
-}
-
-export const GroupPage: React.FC = () => {
+export const UserPage: React.FC = () => {
     const user = getCurrentUser();
-    const [groups] = useAPI<Groups>(`/groups`, {
+    const [users] = useAPI<User>(`/users`, {
         extraHeaders: {
             'Authorization': user.token
         }
@@ -28,7 +18,7 @@ export const GroupPage: React.FC = () => {
     const classes = useGroupStyle();
     const genericClasses = useGenericStyle();
 
-    const { data } = groups;
+    const { data } = users;
 
     const headCells: Record<string, unknown>[] = [
         { id: 'icon', label: 'Name' },
@@ -39,64 +29,35 @@ export const GroupPage: React.FC = () => {
     return (
         <Box>
             <Hidden mdUp>
-                <HeaderTitle disableBack title={messages["group-management.title"]} />
+                <StickyHeader>
+                    <Grid container>
+                        <Grid xs={8}>
+                            <HeaderTitle disableBack alignText="left" title={messages["user.page.title"]} disableGutters />
+                        </Grid>
+                        <Grid xs={4}>
+                            <Button type="submit" className={genericClasses.actionButton} fullWidth size="large" variant="outlined" color="primary">
+                                {(user.isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : messages["user.page.add"]}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </StickyHeader>
             </Hidden>
-            <Hidden mdDown>
-                <HeaderTitle disableBack alignText="left" title={messages["group-management.title"]} disableGutters />
+            <div style={{
+                height: "1000px",
+                background: "red",
+            }} />
+            {/* <Hidden mdUp>
+                <HeaderTitle disableBack title={messages["user-management.title"]} />
             </Hidden>
             <Grid container>
                 {
-                    groups.isLoading ?
+                    users.isLoading ?
                         <CircularProgress size="1.5rem" color="secondary" /> :
                         <React.Fragment>
                             <Grid container alignItems="center">
-                                <Box>
-                                    <h3>{messages["group-management.group.add.header"]}</h3>
-                                </Box>
-
-                                <Grid item xs={12}>
-                                    <Paper>
-                                        <form
-                                            className={classes.groupForm}
-                                            onSubmit={event => {
-                                                event.preventDefault();
-                                                // setValues(values);
-                                                // setIsLoading(true);
-
-                                                // // UX Change - delayed on purpose
-                                                // setTimeout(() => {
-                                                //     callAPI({
-                                                //         name: values.username,
-                                                //         description: values.password
-                                                //     })
-                                                //     setIsLoading(false);
-                                                // }, 3000);
-                                            }}
-                                            autoComplete="off"
-                                        >
-                                            <OutlinedInput
-                                                className={genericClasses.userFields}
-                                                fullWidth={true}
-                                                placeholder={messages["group.form.title"]}
-                                                id="title"
-                                                type="text"
-                                            />
-                                            <OutlinedInput
-                                                className={genericClasses.userFields}
-                                                fullWidth={true}
-                                                placeholder={messages["group.form.description"]}
-                                                id="description"
-                                                type="text"
-                                            />
-                                            <Button type="submit" className={genericClasses.actionButton} fullWidth size="large" variant="outlined" color="primary">
-                                                {messages["button.group.add"]}
-                                               </Button>
-                                        </form>
-                                    </Paper>
-                                </Grid>
                             </Grid>
                             {(
-                                groups.noData ?
+                                users.noData ?
                                     (
                                         "no dataaa"
                                     ) :
@@ -140,7 +101,7 @@ export const GroupPage: React.FC = () => {
                             )}
                         </React.Fragment>
                 }
-            </Grid>
+            </Grid> */}
         </Box>
     );
 }

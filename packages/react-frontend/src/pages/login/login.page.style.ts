@@ -7,6 +7,9 @@ createStyles({
             marginTop: `${theme.spacing(15)}px`
         },
     },
+    footerLink: {
+        marginTop: `${theme.spacing(2)}px`
+    },
     hrHeader: {
         position: `relative`,
         marginTop: `${theme.spacing(2.5)}px`,
@@ -33,7 +36,7 @@ createStyles({
         },
     },
     logo: {
-        marginTop: `${theme.spacing(3)}px`,
+        margin: `${theme.spacing(3)}px 0`,
         textAlign: 'center',
     },
     forgottenDetails: {

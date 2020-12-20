@@ -1,15 +1,20 @@
-import { makeStyles, createStyles, Theme,  } from "@material-ui/core";
-
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { HeaderProps } from "./header";
+
 
 export const useHeaderStyles = makeStyles((theme: Theme) =>
     createStyles({
+        reset: {
+            boxShadow: "none"
+        },
+        paperReset: {
+            padding: 0,
+        },
         root: {
-            boxShadow: "none",
+            flexWrap: "wrap"
         },
         title: (props: HeaderProps) => ({
-            flexGrow: 1,
-            padding: `${theme.spacing(1)}px 0`,
+            width: props.disableBack ? "100%" : "inherit",
             textAlign: props.alignText ? props.alignText : "center"
         })
     }),

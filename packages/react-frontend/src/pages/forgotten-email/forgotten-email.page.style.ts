@@ -1,6 +1,27 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
 export const useForgottenStyles = makeStyles((theme: Theme) => createStyles({
+    [theme.breakpoints.up('md')]: {
+        formHeader: {
+            marginTop: `${theme.spacing(15)}px`
+        },
+    },
+    logo: {
+        margin: `${theme.spacing(3)}px 0`,
+        textAlign: 'center',
+    },
+    forgottenDetails: {
+        backgroundColor: 'transparent',
+        fontWeight: 'bold',
+        padding: theme.spacing(3),
+        textAlign: "center",
+        top: 'auto',
+        bottom: 0,
+
+        '& a': {
+            textDecoration: 'none'
+        }
+    },
     emailForm: {
         width: "100%"
     },

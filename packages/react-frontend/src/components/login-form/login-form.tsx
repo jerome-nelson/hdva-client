@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Grid, Hidden, IconButton, InputAdornment, OutlinedInput } from "@material-ui/core";
+import { Grid, Hidden, IconButton, Input, InputAdornment } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import React, { useEffect } from "react";
@@ -8,6 +8,7 @@ import { useGenericStyle } from "utils/generic.style";
 import { useAPI } from "../../hooks/useAPI";
 import { messages } from "../../languages/en";
 import { setUser } from "../../services/auth.service";
+import { CTAButton } from "../buttons/cta";
 import { ErrorPopup } from "../error-popup/error-popup";
 import { useLoginStyles } from "./login-form.style";
 
@@ -24,7 +25,7 @@ export const LoginForm = (props: any) => {
     const genericClasses = useGenericStyle();
     const history = useHistory();
 
-    const [user,,, callAPI] = useAPI<User>("/login", { prevent: true });
+    const [user, , , callAPI] = useAPI<User>("/login", { prevent: true });
     const [isLoading, setIsLoading] = React.useState(false);
     const [values, setValues] = React.useState<LoginState>({
         username: '',
@@ -36,11 +37,11 @@ export const LoginForm = (props: any) => {
     useEffect(() => {
         const details = user.data;
         if (details.length > 0) {
-            const [loggedIn] =  details;
+            const [loggedIn] = details;
             setUser(loggedIn);
             history.push("/");
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const handleChange = (prop: keyof LoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +83,8 @@ export const LoginForm = (props: any) => {
                 }}
                 autoComplete="off"
             >
-                <OutlinedInput
+                <Input
+                    color="secondary"
                     className={genericClasses.userFields}
                     fullWidth={true}
                     placeholder={messages["login.form.username"]}
@@ -91,7 +93,8 @@ export const LoginForm = (props: any) => {
                     value={values.username}
                     onChange={handleChange('username')}
                 />
-                <OutlinedInput
+                <Input
+                    color="secondary"
                     className={genericClasses.userFields}
                     fullWidth={true}
                     id="standard-adornment-password"
@@ -106,7 +109,7 @@ export const LoginForm = (props: any) => {
                                 onClick={handleClickShowPassword}
                                 onMouseDown={handleMouseDownPassword}
                             >
-                                {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                                {values.showPassword ? <Visibility color="secondary" /> : <VisibilityOff color="secondary" />}
                             </IconButton>
                         </InputAdornment>
                     }
@@ -114,19 +117,23 @@ export const LoginForm = (props: any) => {
                 <Grid container justify="flex-end">
                     <Hidden mdDown>
                         <Grid md={5} item className={classes.mdUpMargin}>
-                            <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
-                                {(user.isLoading || isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
-                            </Button>
+                            <CTAButton
+                                disabled={notAllFieldsFilled}
+                                loading={user.isLoading || isLoading} type="submit" fullWidth size="large" variant="outlined" color="primary">
+                                {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
+                            </CTAButton>
                         </Grid>
                         <Grid md={12} item className={classes.mdUpMargin} >
                             <p><Link to="/forgotten-password">{messages["login.form.forgotten-password"]}</Link></p>
                         </Grid>
                     </Hidden>
                     <Hidden mdUp>
-                        <Grid item xs={12}>
-                            <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
-                                {(user.isLoading || isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Login")}
-                            </Button>
+                        <Grid item xs={12} className={classes.mdUpMargin}>
+                            <CTAButton
+                                disabled={notAllFieldsFilled}
+                                loading={user.isLoading || isLoading} type="submit" fullWidth size="small" variant="contained" color="primary">
+                                {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
+                            </CTAButton>
                         </Grid>
                     </Hidden>
                 </Grid>

@@ -9,10 +9,11 @@
   "version": "0.2.1",
   "private": true,
   "dependencies": {
-    "@brainhubeu/react-carousel": "file:tmp/react-carousel",
+    "@brainhubeu/react-carousel": "^1.19.26",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "axios": "^0.19.2",
+    "classnames": "^2.2.6",
     "fontsource-roboto": "^3.0.3",
     "http-server": "^0.12.3",
     "react": "^16.13.1",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/brainhubeu__react-carousel": "^2.0.2",
+    "@types/classnames": "^2.2.11",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.6"
   }

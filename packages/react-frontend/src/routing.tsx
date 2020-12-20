@@ -5,6 +5,7 @@ import { LoginPage } from "./pages/login/login.page";
 import { PropertiesPage } from "./pages/properties/properties.page";
 import { PropertiesOverviewPage } from "./pages/property-overview/property-overview.page";
 import { SettingsPage } from "./pages/settings/settings.page";
+import { UserPage } from "./pages/user-management/user-management.page";
 
 export const ROUTES = [
     {
@@ -73,7 +74,7 @@ export const ROUTES = [
             path: "/user-management",
             allowed: ["super", "admin", "owner"]
         },
-        component: () => "User Management"
+        component: UserPage
     },
     {
         auth: true,
