@@ -7,7 +7,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import { Placeholder } from "components/placeholder/placeholder";
 import { CustomTable } from "components/table/custom-table";
-import { messages } from "languages/en";
+import { messages } from "config/en";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";

@@ -1,19 +1,23 @@
 import { Card, CardContent, CardMedia, Typography } from "@material-ui/core";
+import { Image } from "pure-react-carousel";
 import React from "react";
 import { Link } from "react-router-dom";
+import { NoImagePlaceholder } from "../carousel/carousel";
 import { usePropertyCardStyles } from "./property-card.style";
+
 
 
 interface PropertyCardProps {
     createdOn: Date;
     modifiedOn: Date;
     name: string;
+    itemWidth: number;
     propertyId: number;
 }
 
-export const PropertyCard: React.SFC<PropertyCardProps> = ({ modifiedOn, name, propertyId }) => {
+export const PropertyCard: React.SFC<PropertyCardProps> = ({ modifiedOn, name, propertyId, itemWidth }) => {
 
-    const classes = usePropertyCardStyles();
+    const classes = usePropertyCardStyles(itemWidth)();
 
     return (
 
@@ -25,13 +29,16 @@ export const PropertyCard: React.SFC<PropertyCardProps> = ({ modifiedOn, name, p
                 }
             }}>
                 <CardMedia
-                className={classes.media}
-                image="https://via.placeholder.com/170x72"
-                title="Paella dish"
-            />
+                    title="Paella dish"
+                >
+                    <Image
+                        renderError={() => <NoImagePlaceholder />}
+                        src="https://via.placeholderh.com/450x250"
+                        hasMasterSpinner
+                    />
+                </CardMedia>
                 <CardContent className={classes.title}>
                     <Typography variant="h6">{name}</Typography>
-                    <sub>Modified On {new Date(modifiedOn).toDateString()}</sub>
                 </CardContent>
             </Link>
         </Card>

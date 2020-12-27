@@ -1,4 +1,5 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { COLOR_OVERRIDES } from "theme";
 
 export const useDashboardStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -7,7 +8,12 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             margin: `0 auto`
         },
         linkStyle: {
-            width: "100%"
+            display: "block",
+            marginTop: `${theme.spacing(3)}px`,
+            width: "100%",
+            "&:hover": {
+                textDecoration: "none",
+            },
         },
         table: {
             width: "40%"
@@ -27,6 +33,7 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             marginBottom: `${theme.spacing(1)}px`,
             '& h3': {
                 margin: 0,
+                color: COLOR_OVERRIDES.hdva_red
             },
         },
         media: {

@@ -1,11 +1,11 @@
 import { AppBar, Button, CircularProgress, Grid, Hidden, OutlinedInput, Typography } from "@material-ui/core";
+import { accessibility } from "config/accessibility";
 import { useAPI } from "hooks/useAPI";
-import { accessibility } from "languages/accessibility";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
 import { HeaderTitle } from "../../components/header/header";
-import { messages } from "../../languages/en";
+import { messages } from "../../config/en";
 import { useForgottenStyles } from "./forgotten-email.page.style";
 
 

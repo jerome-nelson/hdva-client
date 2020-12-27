@@ -1,22 +1,17 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
-export const usePropertyCardStyles = makeStyles((theme: Theme) =>
+export const usePropertyCardStyles = (itemWidth: number) => makeStyles((theme: Theme) =>
 createStyles({
     root: {
         backgroundColor: "#fff",
-        marginRight: "1%",
-        width: '80%', 
-        // TODO: REMOVE ITEM WIDTH!!
-    },
-    title: {
-        textAlign: "center",
+        padding: 0,
+        width: itemWidth,
         "& a": {
             color: "#000",
             textDecoration: "none"
         }
     },
-    media: {
-        height: 0,
-        paddingTop: '56.25%', // 16:9
-    },
+    title: {
+        textAlign: "center",
+    }
 }));

@@ -13,13 +13,23 @@ export const COLOR_OVERRIDES = {
     hdva_white: "#fafafa",
     hdva_black: "#1b1b1b",
     hdva_black_light: "#969696",
+    hdva_grey_light: "#cccccc",
+    hdva_grey: "#7f7f7f",
     hdva_red: "#f01656",
     hdva_red_dark: "#b6002e"
 }
 
 const OPACITY_BASE = 0.4;
+const WIDTHS = {
+    min: `480px`
+};
 
 export const STYLE_OVERRIDES = {
+    carousel: {
+        itemHeight: 325,
+        imageHeight: 250,
+        itemWidth: 455,
+    },
     input: {
         disabled: {
             opacity: OPACITY_BASE,
@@ -74,6 +84,13 @@ export const theme = createMuiTheme({
         },
     },
     overrides: {
+        MuiCssBaseline: {
+            '@global': {
+              body: {
+                  minWidth: WIDTHS.min,
+              }
+            }
+        },
         MuiInputBase: {
             root: STYLE_OVERRIDES.input.main,
         },
@@ -93,6 +110,7 @@ export const theme = createMuiTheme({
         },
         MuiButton: {
             containedSizeSmall: STYLE_OVERRIDES.button.main,
+            outlinedSizeSmall: STYLE_OVERRIDES.button.main,
             containedPrimary: {
                 backgroundColor: COLOR_OVERRIDES.hdva_red,
                 color: COLOR_OVERRIDES.hdva_white,
@@ -100,6 +118,15 @@ export const theme = createMuiTheme({
                     backgroundColor: COLOR_OVERRIDES.hdva_red_dark,
                 },
                 "&:disabled": STYLE_OVERRIDES.button.disabled
+            },
+            outlinedPrimary: {
+                border: `1px solid ${COLOR_OVERRIDES.hdva_white}`,
+                color: COLOR_OVERRIDES.hdva_white,
+                "&:hover": {
+                    border: `1px solid ${COLOR_OVERRIDES.hdva_black_light}`,
+                    backgroundColor: COLOR_OVERRIDES.hdva_white,
+                    color: COLOR_OVERRIDES.hdva_black
+                },
             },
             textPrimary: {
                 ...STYLE_OVERRIDES.button.main,

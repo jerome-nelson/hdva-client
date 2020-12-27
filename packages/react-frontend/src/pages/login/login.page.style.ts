@@ -8,7 +8,7 @@ createStyles({
         },
     },
     formMaxWidth: {
-        maxWidth: `455px`,
+        width: `455px`,
         margin: `0 auto`,
         [theme.breakpoints.up('md')]: {
             position: "absolute",

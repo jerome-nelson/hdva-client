@@ -1,8 +1,8 @@
-import React from "react";
 import { Box } from "@material-ui/core";
+import React from "react";
 import { Link } from "react-router-dom";
-
 import { useErrorPopupStyles } from "./error-popup.style";
+
 
 interface IErrorPopup {
     rounded?: boolean;
@@ -21,7 +21,7 @@ export const ErrorPopup: React.FC<IErrorPopup> = ({ children, message, rounded, 
     } : {};
 
     return (
-        <Box {...extraOptions} hidden={!show} bgcolor="secondary.main" color="secondary.contrastText" p={2} role="alert">
+        <Box className={classes.root} {...extraOptions} hidden={!show} bgcolor="secondary.main" color="secondary.contrastText" p={2} role="alert">
             {message && (message.link ?
                 <Link className={classes.link} to={message.link}>{message.text}</Link> : message.text)}
             {!message && children}

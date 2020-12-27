@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress, Grid, Hidden, OutlinedInput, Paper } from "@material-ui/core";
 import { CustomTable } from "components/table/custom-table";
+import { messages } from "config/en";
 import { useAPI } from "hooks/useAPI";
-import { messages } from "languages/en";
 import React from "react";
 import { getCurrentUser } from "services/auth.service";
 import { useGenericStyle } from "utils/generic.style";

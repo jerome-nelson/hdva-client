@@ -3,8 +3,8 @@ import { LoginForm } from "components/login-form/login-form";
 import React from "react";
 import { Link } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
-import { accessibility } from "../../languages/accessibility";
-import { messages } from "../../languages/en";
+import { accessibility } from "../../config/accessibility";
+import { messages } from "../../config/en";
 import { useLoginPageStyles } from "./login.page.style";
 
 
