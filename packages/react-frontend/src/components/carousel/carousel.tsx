@@ -2,7 +2,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import classNames from "classnames";
-import { useCarouselStyles } from 'components/carousel/carousel.style';
+import { PlaceholderProps, useCarouselStyles } from 'components/carousel/carousel.style';
 import { messages } from 'config/en';
 import { ButtonBack, ButtonNext, CarouselProvider, Slide, Slider } from 'pure-react-carousel';
 import 'pure-react-carousel/dist/react-carousel.es.css';
@@ -18,7 +18,7 @@ interface ArrowProps {
 }
 
 const Arrow: React.FC<ArrowProps> = ({ disabled, type }) => {
-    const classes = useCarouselStyles();
+    const classes = useCarouselStyles({ thumbnail: false });
     const disabledClass = classNames({
         [classes.slideFull]: Boolean(disabled)
     });
@@ -40,18 +40,18 @@ const Arrow: React.FC<ArrowProps> = ({ disabled, type }) => {
     );
 }
 
-export const NoImagePlaceholder = () => {
-    const classes = useCarouselStyles();
+export const NoImagePlaceholder: React.FC<PlaceholderProps> = ({ thumbnail }) => {
+    const classes = useCarouselStyles({ thumbnail });
     return (
         <div className={classes.imageCard}>
             <BrokenImageIcon color="disabled" className={classes.imageIcon} />
-            {messages["no.image"]}
+            {!thumbnail && messages["no.image"]}
         </div>
     );
 }
 
 export const CarouselContainer: React.FC = ({ children }) => {
-    const classes = useCarouselStyles();
+    const classes = useCarouselStyles({ thumbnail: false });
     const elemSize = useElementSize("slider-elem");
     const count = React.Children.count(children);
     const match = elemSize && elemSize.width;

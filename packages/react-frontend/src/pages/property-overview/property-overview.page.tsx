@@ -1,22 +1,23 @@
-import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Grid, Hidden } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, CircularProgress, Grid, Hidden } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
+import { CTAButton } from "components/buttons/cta";
+import { HeaderTitle } from "components/header/header";
 import { Placeholder } from "components/placeholder/placeholder";
 import { CustomTable } from "components/table/custom-table";
 import { messages } from "config/en";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
-import { HeaderTitle } from "../../components/header/header";
 import { useAPI } from "../../hooks/useAPI";
 import { getCurrentUser } from "../../services/auth.service";
 import { usePropertyOverviewStyles } from "./properties.overview.style";
 
-
+// TODO: Virtual Scroll OR table
 // TODO: RE-REVIEW TABLE
 const ChildOption: React.FC<{ link: string; pid: number; checked: boolean; setChecked: Dispatch<SetStateAction<any>> }> = ({ link, pid, checked, setChecked }) => {
     const user = getCurrentUser();
@@ -41,10 +42,8 @@ const ChildOption: React.FC<{ link: string; pid: number; checked: boolean; setCh
 
     return (
         <BottomNavigation
-            classes={{
-                root: classes.root
-            }}
             showLabels
+            className={classes.root}
         >
             <BottomNavigationAction
                 onClick={() => history.push(
@@ -104,6 +103,7 @@ const ChildOption: React.FC<{ link: string; pid: number; checked: boolean; setCh
 export const PropertiesOverviewPage: React.FC = () => {
     const user = getCurrentUser();
     const genericClasses = useGenericStyle();
+    const classes = usePropertyOverviewStyles();
     const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const [properties,] = useAPI<Record<string, any>>(`/properties${propertiesSuffix}`, {
         extraHeaders: {
@@ -126,10 +126,10 @@ export const PropertiesOverviewPage: React.FC = () => {
     return (
         <React.Fragment>
             <Hidden mdUp>
-                <HeaderTitle disableBack title="All Properties" />
+                <HeaderTitle title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
             <Hidden mdDown>
-                <HeaderTitle disableBack alignText="left" title="Properties" disableGutters />
+
             </Hidden>
             {noProperties ? (
                 <Placeholder
@@ -148,39 +148,46 @@ export const PropertiesOverviewPage: React.FC = () => {
                     {(hasSelected: string[] | undefined) => (
                         <React.Fragment>
                             <Hidden only={["md", "lg", "xl"]}>
-                                <Button
+                                <CTAButton
+                                    loading={false}
+                                    type="submit"
                                     onClick={() => alert(`Should download properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
                                     fullWidth
-                                    className={genericClasses.actionButton}
+                                    className={`${genericClasses.actionButton} ${classes.mobileBtn}`}
                                     disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                                    size="large" variant="outlined" color="primary"
+                                    size="large" variant="contained" color="secondary"
                                 >
                                     Download Selected
-                        </Button>
+                                </CTAButton>
                             </Hidden>
                             <Hidden only={["xs", "sm"]}>
                                 <Grid container xs={10} spacing={1}>
                                     <Grid item>
-                                        <Button
+                                        <CTAButton
+                                            loading={false}
                                             onClick={() => alert(`Should download properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
                                             fullWidth
                                             className={genericClasses.actionButton}
                                             disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                                            size="medium" variant="outlined" color="primary"
+                                            size="medium"
+                                            variant="contained"
+                                            color="primary"
+                                            type="submit"
                                         >
                                             Download Selected
-                                        </Button>
+                                        </CTAButton>
                                     </Grid>
                                     <Grid item>
-                                        <Button
+                                        <CTAButton
+                                            loading={false}
                                             onClick={() => alert(`Should de;ete properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
                                             fullWidth
                                             className={genericClasses.actionButton}
                                             disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                                            size="medium" variant="outlined" color="primary"
+                                            size="medium" variant="contained" color="primary" type="submit"
                                         >
                                             Delete Selected
-                                        </Button>
+                                        </CTAButton>
                                     </Grid>
                                 </Grid>
                             </Hidden>
@@ -188,11 +195,6 @@ export const PropertiesOverviewPage: React.FC = () => {
                     )}
                 </CustomTable>
                 )}
-            {/* {!noProperties &&(
-                   
-                       
-                )} */}
         </React.Fragment >
     )
 }
-// TODO: Add pagination

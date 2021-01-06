@@ -23,19 +23,6 @@ export const useCustomTableStyles = makeStyles((theme: Theme) =>
                 }
             }
         },
-        tableCell: {
-            padding: "8px 4px",
-        },
-        tableCellFirst: {
-            borderBottom: "none",
-            paddingLeft: "8px"
-        },
-        tableCellEnd: {
-            paddingRight: "8px"
-        },
-        folder: {
-            width: "1%"
-        },
         txtLink: {
             color: "#000",
             display: "block",

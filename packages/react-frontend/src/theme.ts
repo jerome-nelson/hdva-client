@@ -20,7 +20,7 @@ export const COLOR_OVERRIDES = {
     hdva_red_dark: "#b6002e"
 }
 
-export const DELAY_MENU_ANIMATION = 10*1000;
+export const DELAY_MENU_ANIMATION = 5*1000;
 export const OPACITY_BASE = 0.4;
 export const WIDTHS = {
     min: `480px`
@@ -32,6 +32,7 @@ export const STYLE_OVERRIDES = {
         imageHeight: 250,
         itemWidth: 455,
     },
+    thumbnail: 50,
     input: {
         disabled: {
             opacity: OPACITY_BASE,

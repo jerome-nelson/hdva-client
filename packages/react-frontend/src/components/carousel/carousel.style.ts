@@ -1,6 +1,10 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { COLOR_OVERRIDES, STYLE_OVERRIDES } from "theme";
 
+export interface PlaceholderProps {
+    thumbnail?: boolean;
+}
+
 export const useCarouselStyles = makeStyles((theme: Theme) => {
     return createStyles({
         imageCard: {
@@ -8,8 +12,8 @@ export const useCarouselStyles = makeStyles((theme: Theme) => {
             color: COLOR_OVERRIDES.hdva_grey,
             fontSize: `${theme.spacing(2.5)}px`,
             backgroundColor: COLOR_OVERRIDES.hdva_grey_light,
-            height: STYLE_OVERRIDES.carousel.imageHeight,
-            width: STYLE_OVERRIDES.carousel.itemWidth
+            height: (props: PlaceholderProps) => props.thumbnail ? STYLE_OVERRIDES.thumbnail : STYLE_OVERRIDES.carousel.imageHeight,
+            width: (props: PlaceholderProps) => props.thumbnail ? STYLE_OVERRIDES.thumbnail : STYLE_OVERRIDES.carousel.itemWidth
         },
         slides: {
             margin: `0 auto`,
@@ -21,7 +25,8 @@ export const useCarouselStyles = makeStyles((theme: Theme) => {
             color: COLOR_OVERRIDES.hdva_grey,
             display: 'block',
             margin: `0 auto`,
-            fontSize: `${theme.spacing(24)}px`
+            paddingTop: (props: PlaceholderProps) => props.thumbnail ? `5px` : `inherit`,
+            fontSize: (props: PlaceholderProps) => props.thumbnail ? `40px` : `${theme.spacing(24)}px`
         },
         carousel: {
             position: "relative",

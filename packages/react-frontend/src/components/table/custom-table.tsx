@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Box, Checkbox, Collapse, Hidden, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, useTheme } from "@material-ui/core";
+import { Box, Checkbox, Collapse, Hidden, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow, useTheme } from "@material-ui/core";
 // TODO: Style better for no images
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import PermMediaTwoToneIcon from '@material-ui/icons/PermMediaTwoTone';
+import { NoImagePlaceholder } from "components/carousel/carousel";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { getCurrentUser } from "services/auth.service";
 import { useCustomTableStyles } from "./custom-table.styles";
 
@@ -68,8 +68,13 @@ const SetRow: React.FC<{ isChecked: boolean; onSelect: any; row: any }> = ({ isC
 
 const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setChecked: Dispatch<SetStateAction<any>>; }> = ({ checked, children, setChecked, row }) => {
     const [collapsed, setCollapsed] = React.useState(false);
+    const history = useHistory();
     const user = getCurrentUser();
     const classes = useCustomTableStyles();
+
+    const lastUpdated = new Date(row.modifiedOn).toDateString();
+    const currentLink = encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`);
+    const generateLink = () => history.push(currentLink, { propertyId: row.propertyId });
 
     return (
         <React.Fragment>
@@ -80,44 +85,43 @@ const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setCheck
                 key={row.name}
                 hover>
                 <Hidden only={["xs", "sm"]}>
-                    <TableCell padding="checkbox" onClick={() => setChecked(!checked)} className={`${classes.tableCell} ${classes.tableCellFirst}`}>
+                    <TableCell padding="checkbox" onClick={() => setChecked(!checked)}>
                         <Checkbox checked={checked} />
                     </TableCell>
                 </Hidden>
-                <TableCell className={`${classes.folder} ${classes.tableCell}`}>
-                    {row.image ? row.image : <PermMediaTwoToneIcon fontSize="large" color="action" />}
+                <TableCell onClick={generateLink}>
+                    {row.image ? row.image : <NoImagePlaceholder thumbnail />}
                 </TableCell>
                 <Hidden only={["md", "lg", "xl"]}>
-                    <TableCell colSpan={children ? 1 : 2} className={`${classes.name} ${classes.tableCell}`} component="td" scope="row">
+                    <TableCell onClick={generateLink} colSpan={2} component="td" scope="row">
                         {row.name}
                     </TableCell>
                 </Hidden>
                 <Hidden only={["xs", "sm"]}>
-                    <TableCell className={`${classes.name} ${classes.tableCell}`} component="td" scope="row">
+                    <TableCell component="td" scope="row">
                         <Link
                             className={classes.txtLink}
                             to={{
                                 state: {
-                                    lastUpdated: new Date(row.modifiedOn).toDateString(),
+                                    lastUpdated,
                                     propertyName: row.name,
                                     propertyId: row.propertyId,
                                     groupId: user.group
                                 },
-                                pathname: encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`)
+                                pathname: currentLink
                             }}
                         >
                             {row.name}
                         </Link>
                     </TableCell>
-                    <TableCell className={classes.tableCell} component="td" scope="row">
-                        {new Date(row.modifiedOn).toDateString()}
+                    <TableCell component="td" scope="row">
+                        {lastUpdated}
                     </TableCell>
-                    <TableCell className={classes.tableCell}>
+                    <TableCell>
                         Test
                         </TableCell>
-                    <TableCell className={`${classes.tableCell} ${classes.tableCellEnd}`}>
-                        ww
-                                    <Menu
+                    <TableCell>
+                        <Menu
                             open={false}
                             id="long-menu"
                             keepMounted
@@ -128,7 +132,7 @@ const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setCheck
                 </Hidden>
                 {children && (
                     <Hidden only={["md", "lg", "xl"]}>
-                        <TableCell className={`${classes.tableCell} ${classes.tableCellEnd}`}>
+                        <TableCell>
                             <IconButton aria-label="expand row" size="small" onClick={() => setCollapsed(!collapsed)}>
                                 {collapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                             </IconButton>
@@ -216,7 +220,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({ ariaList, children, he
     return (
         <React.Fragment>
             <Table className={classes.table} {...ariaList}>
-                <TableHead>
+                {/* <TableHead>
                     <TableRow>
                         <Hidden only={["xs", "sm"]}>
                             <TableCell
@@ -258,7 +262,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({ ariaList, children, he
                         ))}
 
                     </TableRow>
-                </TableHead>
+                </TableHead> */}
                 <TableBody>
                     {stableSort(data, getComparator(order, orderBy))
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
