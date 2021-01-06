@@ -2,6 +2,7 @@ import { DashboardPage } from "./pages/dashboard/dashboard.page";
 import { ForgottenEmailPage } from "./pages/forgotten-email/forgotten-email.page";
 import { GroupPage } from "./pages/group-management/group-management.page";
 import { LoginPage } from "./pages/login/login.page";
+import { PasswordResetPage } from "./pages/password-reset/password-reset.page";
 import { PropertiesPage } from "./pages/properties/properties.page";
 import { PropertiesOverviewPage } from "./pages/property-overview/property-overview.page";
 import { SettingsPage } from "./pages/settings/settings.page";
@@ -32,6 +33,14 @@ export const ROUTES = [
         },
         component: ForgottenEmailPage
     },  
+    {
+        auth: false,
+        fullWidth: true,
+        props: {
+            path: '/verification',
+        },
+        component: PasswordResetPage
+    },
     {
         auth: true,
         props: {
