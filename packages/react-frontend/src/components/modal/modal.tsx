@@ -1,11 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
 import { Grid } from "@material-ui/core";
 import CancelIcon from '@material-ui/icons/Cancel';
-
+import classNames from "classnames";
+import React, { useContext, useEffect, useState } from "react";
 import { ErrorPopup } from "../error-popup/error-popup";
-import { useModalProviderStyles } from "./modal.style";
 import { ModalContext } from "./modal.context";
-
+import { useModalProviderStyles } from "./modal.style";
 
 interface ModalProps {
     options?: {}
@@ -16,8 +15,6 @@ export const Modal: React.FC<ModalProps> = ({ children }) => {
     const classes = useModalProviderStyles();
     const modalOptions = useContext(ModalContext);
     const [showModal, setModalState] = useState(false);
-
-    
     
     useEffect(() => {
         if (modalOptions.flashModal) {
@@ -31,7 +28,10 @@ export const Modal: React.FC<ModalProps> = ({ children }) => {
     return (
         <React.Fragment>
             <div className={classes.root}>
-                <div className={classes.modal}>
+                <div className={classNames({
+                    [classes.modal]: true,
+                    [classes.modalHidden]: !showModal
+                })}>
                     <ErrorPopup rounded show={showModal}>
                         <Grid className={classes.gridTxtAlignment} container alignItems="center">
                             <Grid sm={11} item>{modalOptions.message}</Grid>

@@ -10,6 +10,9 @@ export const useModalProviderStyles = makeStyles((theme: Theme) =>
             width: "100%",
             zIndex: 1
         },
+        modalHidden: {
+            display: 'none'
+        },
         modal: {
             margin: "0 auto",
             width: "80%",

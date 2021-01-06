@@ -12,6 +12,7 @@ import { FontWeightProperty, TextTransformProperty } from "csstype";
 export const COLOR_OVERRIDES = {
     hdva_white: "#fafafa",
     hdva_black: "#1b1b1b",
+    hdva_black_mid: "#424242",
     hdva_black_light: "#969696",
     hdva_grey_light: "#cccccc",
     hdva_grey: "#7f7f7f",
@@ -19,8 +20,9 @@ export const COLOR_OVERRIDES = {
     hdva_red_dark: "#b6002e"
 }
 
-const OPACITY_BASE = 0.4;
-const WIDTHS = {
+export const DELAY_MENU_ANIMATION = 10*1000;
+export const OPACITY_BASE = 0.4;
+export const WIDTHS = {
     min: `480px`
 };
 
