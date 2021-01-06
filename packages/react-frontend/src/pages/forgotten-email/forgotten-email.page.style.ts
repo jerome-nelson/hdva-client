@@ -1,10 +1,9 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { COLOR_OVERRIDES } from "theme";
 
 export const useForgottenStyles = makeStyles((theme: Theme) => createStyles({
-    [theme.breakpoints.up('md')]: {
-        formHeader: {
-            marginTop: `${theme.spacing(15)}px`
-        },
+    foregroundBg: {
+        background: COLOR_OVERRIDES.hdva_white
     },
     logo: {
         margin: `${theme.spacing(3)}px 0`,
@@ -13,7 +12,10 @@ export const useForgottenStyles = makeStyles((theme: Theme) => createStyles({
     forgottenDetails: {
         backgroundColor: 'transparent',
         fontWeight: 'bold',
-        padding: theme.spacing(3),
+        padding: `0 0 ${theme.spacing(3)}px`,
+        [theme.breakpoints.up('sm')]: {
+            padding: 0,
+        },
         textAlign: "center",
         top: 'auto',
         bottom: 0,
@@ -25,8 +27,17 @@ export const useForgottenStyles = makeStyles((theme: Theme) => createStyles({
     emailForm: {
         width: "100%"
     },
+    formMaxWidth: {
+        width: `455px`
+    },
+    desktopForm: {
+        top: `50%`,
+        left: `50%`,
+        position: `absolute`,
+        transform: `translate(-50%, -50%)`,
+        width: `600px`
+    },
     userField: {
-        borderRadius: `${theme.spacing(3)}px`,
         marginTop: `${theme.spacing(3)}px`,
     },
     submitBtn: {
@@ -39,10 +50,11 @@ export const useForgottenStyles = makeStyles((theme: Theme) => createStyles({
         marginTop: `${theme.spacing(2)}px`
     },
     title: {
-        marginTop: `${theme.spacing(10)}px`,
+        margin: `0 auto`,
         padding: `${theme.spacing(1)}px 0`,
     },
     description: {
+        color: COLOR_OVERRIDES.hdva_black,
         margin: 0
     }
 }));

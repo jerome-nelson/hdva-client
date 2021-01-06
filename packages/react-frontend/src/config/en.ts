@@ -1,5 +1,5 @@
 export const messages = {
-    "goto.login.page": "Go to login",
+    "goto.login.page": "Go back to login",
     "button.delete": "Delete Selected",
     "button.group.add": "Add Group",
     "group-management.title": "Group Management",

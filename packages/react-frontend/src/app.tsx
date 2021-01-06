@@ -1,19 +1,14 @@
-import React, { useState } from 'react';
-import {
-    BrowserRouter as Router,
-    Switch
-} from "react-router-dom";
 import { CssBaseline } from '@material-ui/core';
-import Container from '@material-ui/core/Container';
-
-import { ModalContext } from './components/modal/modal.context';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { Modal } from "./components/modal/modal";
+import { ModalContext } from './components/modal/modal.context';
 import { ROUTES } from "./routing";
 import { PrivateRoute } from "./utils/protected-route";
 
+
 // TODO: Minify
 export const AppComponent = () => (
-    <Container maxWidth="xl">
         <Router>
             <Switch>
                 {ROUTES.map(({ auth, fullWidth, exact, props, component }, key) => (
@@ -21,7 +16,6 @@ export const AppComponent = () => (
                 ))}
             </Switch>
         </Router>
-    </Container>
 );
 
 export const App = () => {

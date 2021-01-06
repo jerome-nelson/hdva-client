@@ -46,6 +46,12 @@ export const STYLE_OVERRIDES = {
             color: COLOR_OVERRIDES.hdva_red,
             opacity: OPACITY_BASE
         },
+        disabledInverse: {
+            backgroundColor: COLOR_OVERRIDES.hdva_black,
+            border: `solid 1px ${COLOR_OVERRIDES.hdva_white}`,
+            color: COLOR_OVERRIDES.hdva_white,
+            opacity: OPACITY_BASE
+        },
         main: {
             borderRadius: `8px`,
             boxShadow: `none`,
@@ -74,7 +80,12 @@ export const theme = createMuiTheme({
         type: "dark"
     },
     typography: {
+        // TODO: Change these to variants instead
         h2: {
+            color: COLOR_OVERRIDES.hdva_red,
+            fontWeight: STYLE_OVERRIDES.heading.main.fontWeight
+        },
+        h4: {
             color: COLOR_OVERRIDES.hdva_red,
             fontWeight: STYLE_OVERRIDES.heading.main.fontWeight
         },
@@ -82,13 +93,23 @@ export const theme = createMuiTheme({
             color: COLOR_OVERRIDES.hdva_black,
             fontWeight: STYLE_OVERRIDES.heading.sub.fontWeight
         },
+        h6: {
+            color: COLOR_OVERRIDES.hdva_black,
+            fontWeight: STYLE_OVERRIDES.heading.sub.fontWeight
+        }
     },
     overrides: {
+        MuiAppBar: {
+            colorPrimary: {
+                color: COLOR_OVERRIDES.hdva_black,
+                backgroundColor: COLOR_OVERRIDES.hdva_white
+            },
+        },
         MuiCssBaseline: {
             '@global': {
-              body: {
-                  minWidth: WIDTHS.min,
-              }
+                body: {
+                    minWidth: WIDTHS.min,
+                }
             }
         },
         MuiInputBase: {
@@ -98,6 +119,12 @@ export const theme = createMuiTheme({
             colorSecondary: {
                 color: COLOR_OVERRIDES.hdva_black,
             }
+        },
+        MuiOutlinedInput: {
+            input: {
+                padding: '6px 14px',
+                borderRadius: `4px`
+            },
         },
         MuiInput: {
             colorSecondary: {
@@ -118,6 +145,14 @@ export const theme = createMuiTheme({
                     backgroundColor: COLOR_OVERRIDES.hdva_red_dark,
                 },
                 "&:disabled": STYLE_OVERRIDES.button.disabled
+            },
+            containedSecondary: {
+                backgroundColor: COLOR_OVERRIDES.hdva_red,
+                color: COLOR_OVERRIDES.hdva_white,
+                "&:hover": {
+                    backgroundColor: COLOR_OVERRIDES.hdva_red_dark,
+                },
+                "&:disabled": STYLE_OVERRIDES.button.disabledInverse
             },
             outlinedPrimary: {
                 border: `1px solid ${COLOR_OVERRIDES.hdva_white}`,
@@ -142,6 +177,12 @@ export const theme = createMuiTheme({
             root: {
                 backgroundColor: COLOR_OVERRIDES.hdva_white,
                 padding: STYLE_OVERRIDES.paper.main.padding
+            }
+        },
+        MuiTypography: {
+            subtitle1: {
+                color: COLOR_OVERRIDES.hdva_black,
+                fontWeight: STYLE_OVERRIDES.heading.sub.fontWeight
             }
         }
     }

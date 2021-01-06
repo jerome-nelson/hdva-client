@@ -4,7 +4,6 @@ import { COLOR_OVERRIDES, STYLE_OVERRIDES } from "../theme";
 export const useGenericStyle = makeStyles((theme: Theme) =>
     createStyles({
         userFields: {
-            borderRadius: `${theme.spacing(3)}px !important`,
             marginTop: `${theme.spacing(3)}px`,
         },
         linkColor: {

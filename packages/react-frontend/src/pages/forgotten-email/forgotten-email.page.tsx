@@ -1,61 +1,57 @@
-import { AppBar, Button, CircularProgress, Grid, Hidden, OutlinedInput, Typography } from "@material-ui/core";
-import { accessibility } from "config/accessibility";
+import { Container, Grid, Hidden, Input, OutlinedInput, Paper, Typography } from "@material-ui/core";
+import { CTAButton } from "components/buttons/cta";
+import { HeaderTitle } from "components/header/header";
 import { useAPI } from "hooks/useAPI";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
-import { HeaderTitle } from "../../components/header/header";
 import { messages } from "../../config/en";
 import { useForgottenStyles } from "./forgotten-email.page.style";
 
 
 export const ForgottenEmailPage: React.FC = () => {
     const [email, setEmail] = useState("");
-    const [data, , , callAPI] = useAPI("/forgotten-password");
+    const [data, , , callAPI] = useAPI("/forgotten-password", { prevent: true });
     const classes = useForgottenStyles();
     const notAllFieldsFilled = !email;
-
+    const inProgress = data.isLoading;
     const genericClasses = useGenericStyle();
 
     return (
         <React.Fragment>
-            <Grid container className={classes.formHeader}>
-
-                <Hidden mdDown>
-                    <Grid className={classes.logo} item md={6}>
-                        <HeaderTitle
-                            title={
-                                <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" />
-                            } />
-                    </Grid>
-                </Hidden>
-                <Hidden mdUp>
-                    <Grid className={classes.logo} item xs={12}>
-                        <HeaderTitle
-                            title={
-                                <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" />
-                            } />
-                    </Grid>
-                </Hidden>
-            </Grid>
-            <Hidden mdUp>
-                <AppBar color="primary" className={classes.forgottenDetails} elevation={0} position="fixed">
-                    <Grid container className={classes.formHeader}>
-                        <Typography className={classes.title} variant="h6">
+            <Hidden smUp>
+                <HeaderTitle alignText="left" color="primary" title={messages["goto.login.page"]} variant="h6" />
+                <Container className={classes.foregroundBg} maxWidth="xl">
+                    <Grid className={classes.forgottenDetails} container>
+                        <Typography className={classes.title} variant="h4">
                             {messages["forgotten-password.title"]}
                         </Typography>
-                        <p className={classes.description}>{messages["forgotten-password.description"]}</p>
-
-                        <form className={classes.emailForm} onSubmit={() => {
-                            setTimeout(() => {
-                                callAPI({
-                                    email
-                                })
-                            })
-                        }}>
-                            <Grid container>
-                                <OutlinedInput
-                                    className={classes.userField}
+                        <Typography variant="subtitle1">
+                            {messages["forgotten-password.description"]}
+                        </Typography>
+                    </Grid>
+                </Container>
+            </Hidden>
+            <Container maxWidth="xl" >
+                <form onSubmit={() => {
+                    setTimeout(() => {
+                        callAPI({
+                            email
+                        })
+                    })
+                }}>
+                    <Hidden smDown>
+                        <Grid className={classes.desktopForm}>
+                            <Paper>
+                                <Typography className={classes.title} variant="h4">
+                                    {messages["forgotten-password.title"]}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                    {messages["forgotten-password.description"]}
+                                </Typography>
+                                <Input
+                                    color="secondary"
+                                    className={genericClasses.userFields}
                                     fullWidth={true}
                                     value={email}
                                     placeholder={messages["forgotten-password.form.email"]}
@@ -63,39 +59,57 @@ export const ForgottenEmailPage: React.FC = () => {
                                     onChange={event => setEmail(event.target.value)}
                                     type="text"
                                 />
+                                {/* TODO: Add mdUp to genericClasses */}
+                                <CTAButton
+                                    className={genericClasses.userFields}
+                                    disabled={notAllFieldsFilled}
+                                    loading={inProgress}
+                                    type="submit"
+                                    fullWidth
+                                    size="small"
+                                    variant="contained"
+                                    color="secondary"
+                                >
+                                    {(notAllFieldsFilled ? "Fill in all fields" : "Send reset email")}
+                                </CTAButton>
+                            </Paper>
+                            <Hidden smDown>
+                                <div className={genericClasses.userFields}>
+                                    <Link className={genericClasses.linkColor} to="/login">{messages["goto.login.page"]}</Link>
+                                </div>
+                            </Hidden>
+                        </Grid>
+                    </Hidden>
+                    <Hidden smUp>
+                        <Grid container className={classes.formMaxWidth}>
+                            <OutlinedInput
+                                className={classes.userField}
+                                fullWidth={true}
+                                value={email}
+                                placeholder={messages["forgotten-password.form.email"]}
+                                id="email"
+                                onChange={event => setEmail(event.target.value)}
+                                type="text"
+                            />
+                        </Grid>
+                        <Grid container justify="flex-start">
+                            <Grid sm={6} item className={classes.mdUpMargin}>
+                                <CTAButton
+                                    disabled={notAllFieldsFilled}
+                                    loading={inProgress}
+                                    type="submit"
+                                    fullWidth
+                                    size="small"
+                                    variant="contained"
+                                    color="secondary"
+                                >
+                                    {(notAllFieldsFilled ? "Fill in all fields" : "Send reset email")}
+                                </CTAButton>
                             </Grid>
-                            <Grid container justify="flex-start">
-                                <Grid md={6} item className={classes.mdUpMargin}>
-                                    <Button disabled={notAllFieldsFilled} type="submit" className={classes.submitBtn} fullWidth size="large" variant="outlined" color="primary">
-                                        {data.isLoading ? <CircularProgress size="1.5rem" color="secondary" /> : (notAllFieldsFilled ? "Fill in all fields" : "Submit")}
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </form>
-                    </Grid>
-                    <Link className={genericClasses.linkColor} to="/login">Go back to login</Link>
-                </AppBar>
-            </Hidden>
+                        </Grid>
+                    </Hidden>
+                </form>
+            </Container>
         </React.Fragment>
     );
-
-    // return (
-    //     <Grid container justify="center">
-    //         <AppBar color="transparent" elevation={0}>
-    //             <Toolbar>
-    //                 <Grid container alignContent="center" justify="center">
-    //                     <Grid item>
-    //                         <img alt="Logo" src="https://via.placeholder.com/200x45?text=HDVA+Logo" />
-    //                     </Grid>
-    //                 </Grid>
-    //             </Toolbar>
-    //         </AppBar>
-    //         <Grid md={4} xs={10} item>
-    //             <Grid container alignContent="flex-start">
-
-    //                 <Link to={"/login"}></Link>
-    //             </Grid>
-    //         </Grid>
-    //     </Grid>
-    // );
 };
