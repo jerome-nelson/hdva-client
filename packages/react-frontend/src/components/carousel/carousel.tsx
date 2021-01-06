@@ -17,7 +17,6 @@ interface ArrowProps {
     type: string;
 }
 
-// TODO: Add grayscale. Fix Icon
 const Arrow: React.FC<ArrowProps> = ({ disabled, type }) => {
     const classes = useCarouselStyles();
     const disabledClass = classNames({
