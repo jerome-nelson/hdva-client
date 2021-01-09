@@ -1,18 +1,20 @@
 import { List, ListItem, ListItemText, ListSubheader } from "@material-ui/core";
-import { Roles, useRoles } from "hooks/useRoles";
+import { Roles } from "hooks/useRoles";
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { Permissions } from "utils/permissions";
 import { getCurrentUser, logout } from "../../services/auth.service";
 import { useSettingsStyles } from "./settings.style";
 
 // TODO: Replace hardcode with ROUTE file
 export const Settings = () => {
 
+    const location = useLocation();
     const classes = useSettingsStyles();
     const history = useHistory();
+
+    // TODO: Create Global Context
     const [, setCurrentUser] = useState(getCurrentUser());
-    const [currentRole] = useRoles();
-    const location = useLocation();
 
     useEffect(() => {
         const user = getCurrentUser();
@@ -30,7 +32,7 @@ export const Settings = () => {
             >
                 <ListItem
                     button
-                    disabled={location.pathname === "/properties"} 
+                    disabled={location.pathname === "/properties"}
                     onClick={() => {
                         history.push("/properties")
                     }}
@@ -43,42 +45,44 @@ export const Settings = () => {
                     />
                 </ListItem>
             </List>
-        {[Roles.super, Roles.admin, Roles.owner].includes(currentRole) &&  <List
-                component="nav"
-                aria-labelledby="nested-list-subheader"
-                subheader={
-                    <ListSubheader className={classes.listHeader} component="div" id="nested-list-subheader">
-                        Management Settings
+            <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
+                <List
+                    component="nav"
+                    aria-labelledby="nested-list-subheader"
+                    subheader={
+                        <ListSubheader className={classes.listHeader} component="div" id="nested-list-subheader">
+                            Management Settings
                     </ListSubheader>
-                }
-                className={classes.root}
-            >
-                <ListItem
-                    button
-                    disabled={location.pathname === "/user-management"} 
-                    onClick={() => {
-                        history.push("/user-management")
-                    }}
+                    }
+                    className={classes.root}
                 >
-                    <ListItemText
-                        classes={{
-                            root: classes.listItem
+                    <ListItem
+                        button
+                        disabled={location.pathname === "/user-management"}
+                        onClick={() => {
+                            history.push("/user-management")
                         }}
-                        primary="User Management" />
-                </ListItem>
-                <ListItem 
-                    button
-                    disabled={location.pathname === "/group-management"} 
-                    onClick={() => {
-                        history.push("/group-management")
-                    }}>
-                    <ListItemText
-                        classes={{
-                            root: classes.listItem
-                        }}
-                        primary="Group Managment" />
-                </ListItem>
-            </List>}
+                    >
+                        <ListItemText
+                            classes={{
+                                root: classes.listItem
+                            }}
+                            primary="User Management" />
+                    </ListItem>
+                    <ListItem
+                        button
+                        disabled={location.pathname === "/group-management"}
+                        onClick={() => {
+                            history.push("/group-management")
+                        }}>
+                        <ListItemText
+                            classes={{
+                                root: classes.listItem
+                            }}
+                            primary="Group Managment" />
+                    </ListItem>
+                </List>
+            </Permissions>
             <List
                 component="nav"
                 aria-labelledby="nested-list-subheader"
@@ -89,9 +93,9 @@ export const Settings = () => {
                 }
                 className={classes.root}
             >
-                <ListItem 
-                disabled 
-                button
+                <ListItem
+                    disabled
+                    button
                 >
                     <ListItemText
                         classes={{

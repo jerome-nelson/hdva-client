@@ -129,7 +129,7 @@ export const PropertiesOverviewPage: React.FC = () => {
                 <HeaderTitle title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
             <Hidden mdDown>
-
+                kljsldjsldjkl;
             </Hidden>
             {noProperties ? (
                 <Placeholder

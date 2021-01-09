@@ -2,7 +2,7 @@ import { useEffect, useReducer, useState } from "react";
 import { getCurrentUser } from "services/auth.service";
 import { useAPI } from "./useAPI";
 
-
+// TODO: Use as ENUM 
 export const Roles: Record<string, string> = {
     super: "Super",
     admin: "Administrator",
@@ -12,7 +12,7 @@ export const Roles: Record<string, string> = {
 }
 
 //  TODO: Add Role Typing
-export interface Roles {
+export interface RoleAPI {
     createdOn: Date;
     modifiedOn: Date;
     rolename: string;
@@ -28,7 +28,7 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
         }
     } : {};
 
-    const [roles,,setURL] = useAPI<Roles>(``, {
+    const [roles,,setURL] = useAPI<RoleAPI>(``, {
         ...options
     });
     const {data: roleData, noData} = roles;

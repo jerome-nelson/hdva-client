@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { getCurrentUser } from "services/auth.service";
 import { STYLE_OVERRIDES } from "theme";
 import { useGenericStyle } from "utils/generic.style";
+import { Permissions } from "utils/permissions";
 import { CarouselContainer } from "../../components/carousel/carousel";
 import { Placeholder } from "../../components/placeholder/placeholder";
 import { useDashboardStyles } from "./dashboard.page.style";
@@ -82,51 +83,49 @@ export const DashboardPage = () => {
                     </Button>
             </Link>
             <Box className={classes.container}>
-
-
-                <h3>Group Users</h3>
-                {!noUsers && (<TableContainer component={Paper}>
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell component="th">Users In Group</TableCell>
-                                <TableCell component="th">Email</TableCell>
-                                <TableCell component="th">Role</TableCell>
-                                <TableCell component="th">Date Created</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {users.isLoading && <CircularProgress size="1.5rem" color="secondary" />}
-                            {/* TODO: Remove user from array */}
-                            {userData.map((row: any) => (
-                                <TableRow key={row.name}>
-                                    <TableCell component="td" scope="row">{row.name}</TableCell>
-                                    <TableCell component="td" scope="row">{row.email}</TableCell>
-                                    <TableCell component="td" scope="row">{row.role}</TableCell>
-                                    <TableCell component="td" scope="row">
-                                        {new Date(row.modifiedOn).toDateString()}
-                                    </TableCell>
+                <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader, Roles.owner]}>
+                    <h3>Group Users</h3>
+                    {!noUsers && (<TableContainer component={Paper}>
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell component="th">Users In Group</TableCell>
+                                    <TableCell component="th">Email</TableCell>
+                                    <TableCell component="th">Role</TableCell>
+                                    <TableCell component="th">Date Created</TableCell>
                                 </TableRow>
-                            ))}
+                            </TableHead>
+                            <TableBody>
+                                {users.isLoading && <CircularProgress size="1.5rem" color="secondary" />}
+                                {/* TODO: Remove user from array */}
+                                {userData.map((row: any) => (
+                                    <TableRow key={row.name}>
+                                        <TableCell component="td" scope="row">{row.name}</TableCell>
+                                        <TableCell component="td" scope="row">{row.email}</TableCell>
+                                        <TableCell component="td" scope="row">{row.role}</TableCell>
+                                        <TableCell component="td" scope="row">
+                                            {new Date(row.modifiedOn).toDateString()}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
 
-                        </TableBody>
-                    </Table>
-                </TableContainer>)}
-                {noUsers && (
-                    <Placeholder
-                        subtitle={messages["placeholder.users.subtitle"]}
-                        title={messages["placeholder.users.title"]}
-                    >
-                        <GroupIcon />
-                    </Placeholder>
-                )}
-                {(Roles.viewer !== currentRole) &&
+                            </TableBody>
+                        </Table>
+                    </TableContainer>)}
+                    {noUsers && (
+                        <Placeholder
+                            subtitle={messages["placeholder.users.subtitle"]}
+                            title={messages["placeholder.users.title"]}
+                        >
+                            <GroupIcon />
+                        </Placeholder>
+                    )}
                     <Link to={"/user-management"} className={classes.linkStyle}>
                         <Button className={genericStyles.actionButton} fullWidth size="large" variant="outlined" color="primary">
                             Add a new user
                     </Button>
                     </Link>
-                }
+                </Permissions>
             </Box>
         </React.Fragment>
     )
