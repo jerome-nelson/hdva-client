@@ -6,26 +6,22 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import SettingsIcon from '@material-ui/icons/Settings';
 import classNames from "classnames";
-import React, { useEffect, useState } from "react";
+import { LoginContext } from "components/login-form/login.context";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { getCurrentUser, logout } from "../../services/auth.service";
+import { logout } from "../../services/auth.service";
 import { DELAY_MENU_ANIMATION } from "../../theme";
 import { useBottomNavStyles } from "./bottom.nav.style";
 
 export const BottomNav = () => {
 
+    const { user } = useContext(LoginContext);
     const classes = useBottomNavStyles();
     const history = useHistory();
     const location = useLocation();
-    const [currentUser, setCurrentUser] = useState(getCurrentUser());
     const [showMenu, toggleMenu] = useState(true);
 
     useEffect(() => {
-        const user = getCurrentUser();
-        if (user) {
-            setCurrentUser(user);
-        }
-
         const menuHide = setTimeout(() => {
             toggleMenu(false);
         }, DELAY_MENU_ANIMATION);
@@ -33,7 +29,7 @@ export const BottomNav = () => {
         return () => clearTimeout(menuHide);
     }, []);
 
-    return currentUser ? (
+    return user ? (
         <React.Fragment>
             <div className={`${classes.toggleMenu} ${classes.positionUp}`} onClick={() => toggleMenu(!showMenu)}>
                 <KeyboardArrowUpIcon />

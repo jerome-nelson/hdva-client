@@ -3,8 +3,6 @@ import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CameraIcon from '@material-ui/icons/Camera';
 import ImageIcon from '@material-ui/icons/Image';
 import React from "react";
-import { useLocation } from "react-router-dom";
-import { getCurrentUser } from "services/auth.service";
 import { FullScreen } from "../../components/fullscreen/fullscreen";
 
 type Property = Record<string, string>;
@@ -47,8 +45,6 @@ const TabPanel = (props: TabPanelProps) => {
   } 
 
 export const PropertiesPage: React.SFC<PropertyProps> = () => {
-    const user = getCurrentUser();
-    const location = useLocation();
     const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {

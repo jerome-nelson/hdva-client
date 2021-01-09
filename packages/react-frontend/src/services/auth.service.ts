@@ -1,3 +1,4 @@
+// TODO: In global library - UserWithToken;
 export interface User {
   createdOn: Date;
   email: string;
@@ -6,6 +7,7 @@ export interface User {
   name: string;
   password: string;
   role: number;
+  token: string;
   userId: string;
   _id: string;
 }
@@ -33,3 +35,4 @@ const getCurrentUser = () => {
 };
 
 export { logout, setUser, getCurrentUser, };
+

@@ -1,7 +1,6 @@
 import { Hidden } from "@material-ui/core";
 import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
-import React, { useEffect, useState } from 'react';
-import { useRoles } from "../hooks/useRoles";
+import React, { useState } from 'react';
 
 export interface PermissionsProps {
     showOn: string[]; 
@@ -10,14 +9,16 @@ export interface PermissionsProps {
  
 export const Permissions: React.SFC<PermissionsProps> = ({ children, showOn }) => {
 
-    const [hiddenOn, setHiddenOn] = useState<Breakpoint[]>(["xs", "sm", "md" ,"lg", "xl"]);
-    const [currentRole,,rolesFailed] = useRoles();
+    const [hiddenOn, _] = useState<Breakpoint[]>([]);
+    // "xs", "sm", "md" ,"lg", "xl"
+    // const [currentRole,] = useRoles();
+    
 
-    useEffect(() => {
-        if (showOn.includes(currentRole)) {
-            setHiddenOn([]);
-        }
-    }, [currentRole, showOn]);
+    // useEffect(() => {
+    //     if (showOn.includes(currentRole)) {
+    //         setHiddenOn([]);
+    //     }
+    // }, [currentRole, showOn]);
 
     return (
         <Hidden only={hiddenOn}>

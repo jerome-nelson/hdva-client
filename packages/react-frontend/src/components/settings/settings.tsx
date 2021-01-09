@@ -1,10 +1,12 @@
 import { List, ListItem, ListItemText, ListSubheader } from "@material-ui/core";
 import { Roles } from "hooks/useRoles";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Permissions } from "utils/permissions";
-import { getCurrentUser, logout } from "../../services/auth.service";
+import { logout } from "../../services/auth.service";
 import { useSettingsStyles } from "./settings.style";
+
+// TODO: Add logout to login.context
 
 // TODO: Replace hardcode with ROUTE file
 export const Settings = () => {
@@ -12,16 +14,6 @@ export const Settings = () => {
     const location = useLocation();
     const classes = useSettingsStyles();
     const history = useHistory();
-
-    // TODO: Create Global Context
-    const [, setCurrentUser] = useState(getCurrentUser());
-
-    useEffect(() => {
-        const user = getCurrentUser();
-        if (user) {
-            setCurrentUser(user);
-        }
-    }, []);
 
     return (
         <React.Fragment>

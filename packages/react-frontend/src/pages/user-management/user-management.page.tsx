@@ -4,17 +4,12 @@ import { HeaderTitle } from "../../components/header/header";
 import { StickyHeader } from "../../components/sticky-header/sticky-header";
 import { messages } from "../../config/en";
 import { useAPI } from "../../hooks/useAPI";
-import { getCurrentUser, User } from "../../services/auth.service";
+import { User } from "../../services/auth.service";
 import { useGenericStyle } from "../../utils/generic.style";
 import { useGroupStyle } from "./user-management.page.style";
 
 export const UserPage: React.FC = () => {
-    const user = getCurrentUser();
-    const [users] = useAPI<User>(`/users`, {
-        extraHeaders: {
-            'Authorization': user.token
-        }
-    });
+    const [users] = useAPI<User>(`/users`, { useToken: true });
     const classes = useGroupStyle();
     const genericClasses = useGenericStyle();
 
@@ -36,16 +31,12 @@ export const UserPage: React.FC = () => {
                         </Grid>
                         <Grid xs={4}>
                             <Button type="submit" className={genericClasses.actionButton} fullWidth size="large" variant="outlined" color="primary">
-                                {(user.isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : messages["user.page.add"]}
+                                {(users.data.isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : messages["user.page.add"]}
                             </Button>
                         </Grid>
                     </Grid>
                 </StickyHeader>
             </Hidden>
-            <div style={{
-                height: "1000px",
-                background: "red",
-            }} />
             {/* <Hidden mdUp>
                 <HeaderTitle disableBack title={messages["user-management.title"]} />
             </Hidden>

@@ -1,17 +1,17 @@
 import { Grid, Hidden, IconButton, Input, InputAdornment, Paper } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { User } from "services/auth.service";
+import { setUser, User } from "services/auth.service";
 import { useGenericStyle } from "utils/generic.style";
 import { messages } from "../../config/en";
 import { useAPI } from "../../hooks/useAPI";
-import { setUser } from "../../services/auth.service";
 import { CTAButton } from "../buttons/cta";
 import { ErrorPopup } from "../error-popup/error-popup";
 import { HeaderTitle } from "../header/header";
 import { useLoginStyles } from "./login-form.style";
+import { LoginContext } from "./login.context";
 
 
 interface LoginState {
@@ -25,7 +25,7 @@ const LoginComponent = (props: any) => {
     const classes = useLoginStyles();
     const genericClasses = useGenericStyle();
     const history = useHistory();
-
+    const loginContext = useContext(LoginContext);
     const [user, , , callAPI] = useAPI<User>("/login", { prevent: true });
     const [isLoading, setIsLoading] = React.useState(false);
     const [values, setValues] = React.useState<LoginState>({
@@ -39,8 +39,14 @@ const LoginComponent = (props: any) => {
         const details = user.data;
         if (details.length > 0) {
             const [loggedIn] = details;
-            setUser(loggedIn);
-            history.push("/");
+            if (!loginContext.setUserDetails) {                
+                console.error("loginContext.setUserDetails is null");
+            } else {
+                loginContext.setUserDetails(loggedIn);
+                setUser(loggedIn);
+                debugger;
+                history.push("/");
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
@@ -58,7 +64,7 @@ const LoginComponent = (props: any) => {
     };
 
     const notAllFieldsFilled = [values.username, values.password].filter(elem => !!elem).length < 2;
-    const inProgress = user.isLoading || isLoading;
+    const inProgress = Boolean(user.isLoading || isLoading);
     
     return (
         <React.Fragment>
@@ -148,7 +154,6 @@ const LoginComponent = (props: any) => {
 }
 
 export const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
-    const classes = useLoginStyles();
     return (
         <Paper className={className}>
             <Hidden mdUp>
@@ -161,7 +166,7 @@ export const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
                     variant="h2"
                 />
             </Hidden>
-            <Grid item spacing={3}>
+            <Grid item>
                 <Hidden mdDown>
                     <HeaderTitle
                         alignText="left"

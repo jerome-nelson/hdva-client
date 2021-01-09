@@ -1,13 +1,13 @@
 import { Box, Button, CircularProgress, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
 import GroupIcon from '@material-ui/icons/Group';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
+import { LoginContext } from "components/login-form/login.context";
 import { PropertyCard } from "components/property-card/property-card";
 import { messages } from "config/en";
 import { useAPI } from "hooks/useAPI";
-import { Roles, useRoles } from "hooks/useRoles";
-import React from "react";
+import { Roles } from "hooks/useRoles";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { getCurrentUser } from "services/auth.service";
 import { STYLE_OVERRIDES } from "theme";
 import { useGenericStyle } from "utils/generic.style";
 import { Permissions } from "utils/permissions";
@@ -26,24 +26,15 @@ interface Properties {
 
 
 export const DashboardPage = () => {
-    const user = getCurrentUser();
-    const propertiesSuffix = !!user.group && user.group !== 1 ? `/${user.group}` : ``;
+    const { user } = useContext(LoginContext);
+    const propertiesSuffix = !!user && !!user.group && user.group !== 1 ? `/${user.group}` : ``;
     const classes = useDashboardStyles();
     const genericStyles = useGenericStyle();
-    const [properties,] = useAPI<Properties>(`/properties${propertiesSuffix}`, {
-        extraHeaders: {
-            'Authorization': user.token
-        }
-    });
-    const [users,] = useAPI<Record<string, any>>(`/users`, {
-        extraHeaders: {
-            'Authorization': user.token
-        }
-    });
+    const [properties,] = useAPI<Properties>(`/properties${propertiesSuffix}`, { useToken: true });
+    const [users,] = useAPI<Record<string, any>>(`/users`, { useToken: true });
 
     const { data: propertyData } = properties;
     const { data: userData, noData: noUsers } = users;
-    const [currentRole] = useRoles();
 
     return (
         <React.Fragment>

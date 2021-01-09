@@ -1,9 +1,8 @@
 import { Box, Button, CircularProgress, Grid, Hidden, OutlinedInput, Paper } from "@material-ui/core";
-import { CustomTable } from "components/table/custom-table";
+import { LoginContext } from "components/login-form/login.context";
 import { messages } from "config/en";
 import { useAPI } from "hooks/useAPI";
-import React from "react";
-import { getCurrentUser } from "services/auth.service";
+import React, { useContext } from "react";
 import { useGenericStyle } from "utils/generic.style";
 import { HeaderTitle } from "../../components/header/header";
 import { useGroupStyle } from "./group-management.page.style";
@@ -19,12 +18,8 @@ interface Groups {
 }
 
 export const GroupPage: React.FC = () => {
-    const user = getCurrentUser();
-    const [groups] = useAPI<Groups>(`/groups`, {
-        extraHeaders: {
-            'Authorization': user.token
-        }
-    });
+    const { user } = useContext(LoginContext); 
+    const [groups] = useAPI<Groups>(`/groups`, { useToken: true });
     const classes = useGroupStyle();
     const genericClasses = useGenericStyle();
 
@@ -104,7 +99,7 @@ export const GroupPage: React.FC = () => {
                                         <Box>
                                             <h3>{messages["groups-management.list"]}</h3>
                                         </Box>
-                                        <CustomTable user={user} headers={headCells} data={data}>
+                                        {/* <CustomTable user={user} headers={headCells} data={data}>
                                             {(hasSelected: string[] | undefined) => (
                                                 <React.Fragment>
                                                     <Hidden only={["md", "lg", "xl"]}>
@@ -135,7 +130,7 @@ export const GroupPage: React.FC = () => {
                                                     </Hidden>
                                                 </React.Fragment>
                                             )}
-                                        </CustomTable>
+                                        </CustomTable> */}
                                     </Grid>
                             )}
                         </React.Fragment>

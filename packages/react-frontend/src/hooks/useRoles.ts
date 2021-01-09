@@ -1,5 +1,5 @@
-import { useEffect, useReducer, useState } from "react";
-import { getCurrentUser } from "services/auth.service";
+import { LoginContext } from "components/login-form/login.context";
+import { useContext, useEffect, useReducer, useState } from "react";
 import { useAPI } from "./useAPI";
 
 // TODO: Use as ENUM 
@@ -21,20 +21,12 @@ export interface RoleAPI {
 }
 
 export const useRoles = (context: any = []): [string, boolean, boolean] => {
-    const user = getCurrentUser();
-    const options = user && user.token ? {
-        extraHeaders: {
-            'Authorization': user.token
-        }
-    } : {};
-
-    const [roles,,setURL] = useAPI<RoleAPI>(``, {
-        ...options
-    });
+    const { user } = useContext(LoginContext);
+    const [roles,,setURL] = useAPI<RoleAPI>(``, { useToken: true });
     const {data: roleData, noData} = roles;
     const [currentRole, setRole] = useState<string>("");
     const [canAccess, dispatch] = useReducer((state: any, action: any) => {
-        if (action.allowed.length <= 0 || noData) {
+        if (action.allowed.length <= 0 || noData || !user) {
             return state;
         }
         return action.allowed
@@ -61,7 +53,7 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
                 allowed: context
             })
         }
-    }, [roles, user, context]);
+    }, [roles, user, context, noData, roleData]);
 
     return [currentRole, canAccess, roles.isError];
 }

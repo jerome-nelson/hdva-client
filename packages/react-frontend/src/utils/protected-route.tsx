@@ -1,11 +1,11 @@
 import { Grid, Hidden } from "@material-ui/core";
-import React, { useContext, useEffect, useState } from "react";
+import { LoginContext } from "components/login-form/login.context";
+import React, { useContext } from "react";
 import { Redirect, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ModalContext } from "../components/modal/modal.context";
 import { BottomNav } from "../components/navigation/bottom.nav";
 import { SideNav } from "../components/navigation/side.nav";
 import { useRoles } from "../hooks/useRoles";
-import { getCurrentUser } from "../services/auth.service";
 
 
 export interface RouterProps extends RouteProps {
@@ -17,25 +17,18 @@ export interface RouterProps extends RouteProps {
 
 export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps) => {
 
-  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const { user } = useContext(LoginContext);
   const history = useHistory();
   const modalSettings = useContext(ModalContext);
   const permissions = rest && rest.allowed;
-
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (user) {
-      setCurrentUser(user);
-    }
-  }, []);
-
   
   const location = useLocation();
   const [, canAccess, isError] = useRoles(permissions);
 
+  const isAuthCanView = auth && !user;
   const DynamicComponent = toRender;
   //  TODO Fix redirects
-  if (auth && !currentUser) {
+  if (isAuthCanView) {
     return <Redirect
       to={{
         pathname: "/login",

@@ -1,20 +1,23 @@
 import axios, { AxiosResponse } from "axios";
+import { LoginContext } from "components/login-form/login.context";
 import querystring from "querystring";
 import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 import { ModalContext } from "../components/modal/modal.context";
 
 interface ApiOptions {
-  prevent?: boolean,
-  initialDataType?: any,
-  extraHeaders?: Record<string, string>
+  prevent: boolean,
+  useToken: boolean,
+  initialDataType: any,
+  extraHeaders: Record<string, string>
 }
 
 interface APIResponse<T> {
-    data: T[];
+  data: T[];
 }
 
 const DEFAULT_OPTIONS = {
   extraHeaders: {},
+  useToken: false,
   prevent: false,
   initialDataType: [],
 }
@@ -24,14 +27,16 @@ const DEFAULT_OPTIONS = {
 
 interface APIReturnProps<T> { done: boolean, data: T[], isLoading: boolean, isError: boolean, noData: boolean }
 
-export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnProps<T>, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
+export const useAPI = <T>(endpoint: string, options?: Partial<ApiOptions>): [APIReturnProps<T>, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
   const settings = {
     ...DEFAULT_OPTIONS,
     ...options
   };
 
+  const { user } = useContext(LoginContext);
   const modal = useContext(ModalContext);
   const [url, setUrl] = useState(endpoint);
+  const [headers, setHeaders] = useState(settings.extraHeaders);
   const [payload, addPayload] = useState(settings.initialDataType);
 
   const [status, setStatus] = useState({
@@ -49,7 +54,18 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
       ...status,
       empty
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payload])
+
+  useEffect(() => {
+    if (settings.useToken && user && user.token) {
+      setHeaders({
+        ...headers,
+        'Authorization': user.token
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const enoughTries = Boolean(status.attempts === 3);
   const fetchData = async () => {
@@ -71,9 +87,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
     });
 
     try {
-      const result = await axios(`${process.env.REACT_APP_API}${url}`, {
-        headers: settings.extraHeaders
-      });
+      const result = await axios(`${process.env.REACT_APP_API}${url}`, { headers });
       const empty = !result.data.data || !result.data.data.length;
       setStatus({
         ...status,
@@ -104,6 +118,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
 
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchData() }, [url]);
 
   const callAPI = useCallback(payload => {
@@ -113,11 +128,11 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
     });
     axios({
       method: 'post',
-      url: `${process.env.REACT_APP_API}${url}`, 
+      url: `${process.env.REACT_APP_API}${url}`,
       data: querystring.stringify(payload),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        ...settings.extraHeaders,
+        ...headers,
       },
     }).then((res: AxiosResponse<APIResponse<T>>) => {
       addPayload(res.data.data);
@@ -136,7 +151,7 @@ export const useAPI = <T>(endpoint: string, options?: ApiOptions): [APIReturnPro
         loading: false
       });
     })
-  }, [settings.extraHeaders, url])
+  }, [headers, status, url])
 
   return [
     {

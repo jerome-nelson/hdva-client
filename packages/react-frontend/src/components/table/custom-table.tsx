@@ -4,9 +4,9 @@ import { Box, Checkbox, Collapse, Hidden, IconButton, Menu, MenuItem, Table, Tab
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { NoImagePlaceholder } from "components/carousel/carousel";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { LoginContext } from "components/login-form/login.context";
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { getCurrentUser } from "services/auth.service";
 import { useCustomTableStyles } from "./custom-table.styles";
 
 
@@ -54,7 +54,7 @@ const SetRow: React.FC<{ isChecked: boolean; onSelect: any; row: any }> = ({ isC
 
     useEffect(() => {
         onSelect(selected);
-    }, [selected]);
+    }, [onSelect, selected]);
 
     const ChildC = row.collapsedTab;
     return (
@@ -69,14 +69,15 @@ const SetRow: React.FC<{ isChecked: boolean; onSelect: any; row: any }> = ({ isC
 const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setChecked: Dispatch<SetStateAction<any>>; }> = ({ checked, children, setChecked, row }) => {
     const [collapsed, setCollapsed] = React.useState(false);
     const history = useHistory();
-    const user = getCurrentUser();
+    const { user } = useContext(LoginContext);
     const classes = useCustomTableStyles();
 
     const lastUpdated = new Date(row.modifiedOn).toDateString();
     const currentLink = encodeURI(`/properties/${encodeURIComponent(String(row.name).replace(" ", "-").toLowerCase())}`);
     const generateLink = () => history.push(currentLink, { propertyId: row.propertyId });
 
-    return (
+    // TODO: How to approach User typing without overriding
+    return user && (
         <React.Fragment>
             <TableRow
                 className={classes.tableRow}

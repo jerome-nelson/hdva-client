@@ -3,8 +3,9 @@ import React from "react";
 
 // TODO: Create generic type that adds className - all custom components should use this
 // TODO: Fix onClick typing
-type CTAProps = ExtendButtonBaseTypeMap<ButtonTypeMap<{ type: "button" | "reset" | "submit" | undefined; loading: boolean }>>["props"] & { 
+type CTAProps = ExtendButtonBaseTypeMap<ButtonTypeMap<{ type: "button" | "reset" | "submit" | undefined; }>>["props"] & { 
     onClick?(e?: any): void;
+    loading: boolean;
     className?: string; };
 
 export const CTAButton: React.FC<CTAProps> = props => {
