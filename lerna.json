@@ -1,32 +1,33 @@
 {
-	"packages": [
-		"packages/*"
-	],
-	"version": "independent",
-	"command": {
-		"publish": {
-			"yes": true,
-			"message": "chore: publish new versions",
-			"registry": "https://npm.pkg.github.com/",
-			"conventionalCommits": true,
-			"ignoreChanges": [
-				"*.md",
-				"*.spec.ts"
-			]
-		},
-		"bootstrap": {
-			"scope": [
-				"@jerome-nelson/*"
-			],
-			"hoist": true
-		},
-		"exec": {
-			"scope": [
-				"@jerome-nelson/*"
-			]
-		},
-		"clean": {
-			"yes": true
-		}
-	}
+    "command": {
+        "bootstrap": {
+            "hoist": true,
+            "ignore": "@jerome-nelson/hdva-sls-api",
+            "scope": [
+                "@jerome-nelson/*"
+            ]
+        },
+        "clean": {
+            "yes": true
+        },
+        "exec": {
+            "scope": [
+                "@jerome-nelson/*"
+            ]
+        },
+        "publish": {
+            "conventionalCommits": true,
+            "ignoreChanges": [
+                "*.md",
+                "*.spec.ts"
+            ],
+            "message": "chore: publish new versions",
+            "registry": "https://npm.pkg.github.com/",
+            "yes": true
+        }
+    },
+    "packages": [
+        "packages/*"
+    ],
+    "version": "independent"
 }
