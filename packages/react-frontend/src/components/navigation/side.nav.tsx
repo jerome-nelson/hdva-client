@@ -32,12 +32,12 @@ export const SideNav: React.FC = () => {
                     name: "Home"
                 }].map((text, index) => {
                     return (
-                        <ListItem disabled={location.pathname === text.props.path} onClick={() => history.push(text.props.path)} button key={text.name}>
+                        <ListItem className={classes.home} disabled={location.pathname === text.props.path} onClick={() => history.push(text.props.path)} button key={text.name}>
                             <ListItemText primary={text.name} />
                         </ListItem>
                     );
                 })}
-                <Settings />
+                <Settings variant="light" />
             </List>
         </Drawer>
     ) : null

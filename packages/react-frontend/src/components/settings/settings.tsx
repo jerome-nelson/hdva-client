@@ -9,10 +9,14 @@ import { useSettingsStyles } from "./settings.style";
 // TODO: Add logout to login.context
 
 // TODO: Replace hardcode with ROUTE file
-export const Settings = () => {
+export interface SettingsProps {
+    variant: "light" | "dark";
+}
+
+export const Settings: React.SFC<SettingsProps> = ({ variant }) => {
 
     const location = useLocation();
-    const classes = useSettingsStyles();
+    const classes = useSettingsStyles({ variant });
     const history = useHistory();
 
     return (
