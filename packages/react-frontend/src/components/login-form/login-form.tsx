@@ -44,7 +44,6 @@ const LoginComponent = (props: any) => {
             } else {
                 loginContext.setUserDetails(loggedIn);
                 setUser(loggedIn);
-                debugger;
                 history.push("/");
             }
         }

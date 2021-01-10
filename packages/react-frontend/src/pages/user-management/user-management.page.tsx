@@ -1,26 +1,10 @@
-import { Box, Button, CircularProgress, Grid, Hidden } from "@material-ui/core";
+import { Box, Grid, Hidden } from "@material-ui/core";
 import React from "react";
 import { HeaderTitle } from "../../components/header/header";
 import { StickyHeader } from "../../components/sticky-header/sticky-header";
 import { messages } from "../../config/en";
-import { useAPI } from "../../hooks/useAPI";
-import { User } from "../../services/auth.service";
-import { useGenericStyle } from "../../utils/generic.style";
-import { useGroupStyle } from "./user-management.page.style";
 
 export const UserPage: React.FC = () => {
-    const [users] = useAPI<User>(`/users`, { useToken: true });
-    const classes = useGroupStyle();
-    const genericClasses = useGenericStyle();
-
-    const { data } = users;
-
-    const headCells: Record<string, unknown>[] = [
-        { id: 'icon', label: 'Name' },
-        { id: 'name', numeric: false, disablePadding: false, label: "" },
-        { id: 'description', numeric: false, disablePadding: false, label: "" },
-    ];
-
     return (
         <Box>
             <Hidden mdUp>
@@ -28,11 +12,6 @@ export const UserPage: React.FC = () => {
                     <Grid container>
                         <Grid xs={8}>
                             <HeaderTitle disableBack alignText="left" title={messages["user.page.title"]} disableGutters />
-                        </Grid>
-                        <Grid xs={4}>
-                            <Button type="submit" className={genericClasses.actionButton} fullWidth size="large" variant="outlined" color="primary">
-                                {(users.data.isLoading) ? <CircularProgress size="1.5rem" color="secondary" /> : messages["user.page.add"]}
-                            </Button>
                         </Grid>
                     </Grid>
                 </StickyHeader>

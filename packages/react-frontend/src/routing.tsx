@@ -3,6 +3,7 @@ import { ForgottenEmailPage } from "./pages/forgotten-email/forgotten-email.page
 import { GroupPage } from "./pages/group-management/group-management.page";
 import { LoginPage } from "./pages/login/login.page";
 import { PasswordResetPage } from "./pages/password-reset/password-reset.page";
+import { ProfilePage } from "./pages/profile/profile.page";
 import { PropertiesPage } from "./pages/properties/properties.page";
 import { PropertiesOverviewPage } from "./pages/property-overview/property-overview.page";
 import { SettingsPage } from "./pages/settings/settings.page";
@@ -62,6 +63,13 @@ export const ROUTES = [
             path: '/properties/:id',
         },
         component: PropertiesPage
+    },
+    {
+        auth: true,
+        props: {
+            path: '/profile-settings',
+        },
+        component: ProfilePage
     },
     {
         auth: false,

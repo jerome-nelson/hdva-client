@@ -8,9 +8,20 @@ export const useSidenavStyles = makeStyles((theme: Theme) =>
             width: `${theme.spacing(25)}px`,
             minWidth: `${theme.spacing(25)}px`,
         },
+        listBtn: {
+            borderRadius: `${theme.spacing(4)}px`,
+            "&:hover": {
+                background: `rgba(0,0,0, 0.05)`,
+            },
+        },
+        selectedBtn: {
+            background: `rgba(0,0,0, 0.05)`,
+        },
         home: {
             color: COLOR_OVERRIDES.hdva_grey,
-            fontSize: `1.1rem`
+            "& .MuiTypography-body1": {
+                fontSize: `1.1rem`
+            }
         },
         nav: {
             marginTop: `${theme.spacing(2)}px`,

@@ -22,9 +22,6 @@ export const COLOR_OVERRIDES = {
 
 export const DELAY_MENU_ANIMATION = 5*1000;
 export const OPACITY_BASE = 0.4;
-export const WIDTHS = {
-    min: `480px`
-};
 
 export const STYLE_OVERRIDES = {
     carousel: {
@@ -77,6 +74,11 @@ export const STYLE_OVERRIDES = {
         }
     }
 }
+
+export const WIDTHS = {
+    min: `480px`,
+    imageCell: `${STYLE_OVERRIDES.thumbnail + 10}px`
+};
 
 export const theme = createMuiTheme({
     palette: {
@@ -171,6 +173,11 @@ export const theme = createMuiTheme({
                 color: COLOR_OVERRIDES.hdva_white
             },
         },
+        MuiTableCell: {
+            root: {
+                fontSize: `1rem`
+            }
+        },
         MuiCircularProgress: {
             colorSecondary: {
                 color: COLOR_OVERRIDES.hdva_white
@@ -178,6 +185,7 @@ export const theme = createMuiTheme({
         },
         MuiPaper: {
             root: {
+                color: COLOR_OVERRIDES.hdva_black,
                 backgroundColor: COLOR_OVERRIDES.hdva_white,
                 padding: STYLE_OVERRIDES.paper.main.padding
             }

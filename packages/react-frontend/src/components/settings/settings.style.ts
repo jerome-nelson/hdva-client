@@ -9,6 +9,15 @@ createStyles({
         maxWidth: 360,
         backgroundColor: ({ variant }: SettingsProps) => variant === "light" ? COLOR_OVERRIDES.hdva_white : theme.palette.background.paper,
     },
+    listBtn: {
+        borderRadius: `${theme.spacing(4)}px`,
+        "&:hover": {
+            background: `rgba(0,0,0, 0.05)`,
+        },
+    },
+    selectedBtn: {
+        background: `rgba(0,0,0, 0.05)`,
+    },
     listItem: {
         "& span": {
             color: ({ variant }: SettingsProps) => variant === "light" ? theme.palette.background.paper : COLOR_OVERRIDES.hdva_white,

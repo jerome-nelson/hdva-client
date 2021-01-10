@@ -9,7 +9,7 @@ export const SettingsPage: React.FC = () => {
             <Hidden mdUp>
                 <HeaderTitle title="Settings" alignText="center" color="primary" variant="h5" />
             </Hidden>
-            <Settings />
+            <Settings variant="light" />
         </React.Fragment>
     );
 }
