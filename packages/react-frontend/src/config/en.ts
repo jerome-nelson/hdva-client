@@ -1,4 +1,7 @@
-export const messages = {
+export const messages: Record<string, string> = {
+    "roles.super": "As a Super User you can see more information than any other users. You can: add, edit and delete properties/users/groups",
+    "roles.owner": "As a owner of your group - you can add more users if you wish to do so",
+    "roles.uploader": "As an uploader you are able to add/edit and delete groups/users and properties",
     "goto.login.page": "Go back to login",
     "button.delete": "Delete Selected",
     "button.group.add": "Add Group",

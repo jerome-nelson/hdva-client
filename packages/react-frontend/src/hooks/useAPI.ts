@@ -1,12 +1,13 @@
 import axios, { AxiosResponse } from "axios";
 import { LoginContext } from "components/login-form/login.context";
+import { ModalContext } from "components/modal/modal.context";
 import querystring from "querystring";
 import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
-import { ModalContext } from "../components/modal/modal.context";
 
 interface ApiOptions {
   prevent: boolean,
   useToken: boolean,
+  token?: string | null,
   initialDataType: any,
   extraHeaders: Record<string, string>
 }
@@ -18,6 +19,7 @@ interface APIResponse<T> {
 const DEFAULT_OPTIONS = {
   extraHeaders: {},
   useToken: false,
+  token: null,
   prevent: false,
   initialDataType: [],
 }
@@ -27,16 +29,25 @@ const DEFAULT_OPTIONS = {
 
 interface APIReturnProps<T> { done: boolean, data: T[], isLoading: boolean, isError: boolean, noData: boolean }
 
-export const useAPI = <T>(endpoint: string, options?: Partial<ApiOptions>): [APIReturnProps<T>, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
+export const useAPI = <T>(
+  endpoint: string, 
+  options?: Partial<ApiOptions>
+): [APIReturnProps<T>, Dispatch<SetStateAction<any>>, Dispatch<SetStateAction<string>>, (payload: any) => void] => {
+
+  // 1. Merge Settings
   const settings = {
     ...DEFAULT_OPTIONS,
     ...options
   };
 
+  // 2. Context for Authentication
+  // 2i. Context for Modal
   const { user } = useContext(LoginContext);
   const modal = useContext(ModalContext);
+  
   const [url, setUrl] = useState(endpoint);
-  const [headers, setHeaders] = useState(settings.extraHeaders);
+  // TODO: Type with Header Typing
+  const [headers, setHeaders] = useState<any>(settings.extraHeaders);
   const [payload, addPayload] = useState(settings.initialDataType);
 
   const [status, setStatus] = useState({
@@ -118,8 +129,12 @@ export const useAPI = <T>(endpoint: string, options?: Partial<ApiOptions>): [API
 
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchData() }, [url]);
+  useEffect(() => { 
+    if (settings.useToken && user && user.token && headers && headers.Authorization) {
+      fetchData(); 
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headers]);
 
   const callAPI = useCallback(payload => {
     setStatus({
@@ -132,6 +147,7 @@ export const useAPI = <T>(endpoint: string, options?: Partial<ApiOptions>): [API
       data: querystring.stringify(payload),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': user && user.token,
         ...headers,
       },
     }).then((res: AxiosResponse<APIResponse<T>>) => {
@@ -151,7 +167,7 @@ export const useAPI = <T>(endpoint: string, options?: Partial<ApiOptions>): [API
         loading: false
       });
     })
-  }, [headers, status, url])
+  }, [headers, status, url, user])
 
   return [
     {
@@ -165,4 +181,33 @@ export const useAPI = <T>(endpoint: string, options?: Partial<ApiOptions>): [API
     setUrl,
     callAPI
   ];
+}
+
+export const postAPI = async <T>(
+  endpoint: string, 
+  payload?: any, 
+  options?: Partial<ApiOptions>,
+): Promise<T[]> => {
+  const { data: { data } } = await axios({
+    method: 'post',
+    url: `${process.env.REACT_APP_API}${endpoint}`,
+    data: payload && querystring.stringify(payload),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...(options && options.token) ? {
+        'Authorization': options && options.token, 
+      } : {},
+    },
+  });
+  return data;
+}
+
+export const getAPI = async <T>(
+  endpoint: string, 
+  options?: Partial<ApiOptions>,
+): Promise<T[]> => {
+  const { data: { data } } = await axios(`${process.env.REACT_APP_API}${endpoint}`, { headers: {
+    'Authorization': options!.token, 
+  }})
+  return data;
 }

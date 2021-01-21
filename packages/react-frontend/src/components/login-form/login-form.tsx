@@ -1,12 +1,13 @@
 import { Grid, Hidden, IconButton, Input, InputAdornment, Paper } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { Link, useHistory } from "react-router-dom";
 import { setUser, User } from "services/auth.service";
 import { useGenericStyle } from "utils/generic.style";
 import { messages } from "../../config/en";
-import { useAPI } from "../../hooks/useAPI";
+import { postAPI } from "../../hooks/useAPI";
 import { CTAButton } from "../buttons/cta";
 import { ErrorPopup } from "../error-popup/error-popup";
 import { HeaderTitle } from "../header/header";
@@ -17,7 +18,6 @@ import { LoginContext } from "./login.context";
 interface LoginState {
     username: string;
     password: string;
-    isLoading: boolean;
     showPassword: boolean;
 }
 
@@ -26,18 +26,26 @@ const LoginComponent = (props: any) => {
     const genericClasses = useGenericStyle();
     const history = useHistory();
     const loginContext = useContext(LoginContext);
-    const [user, , , callAPI] = useAPI<User>("/login", { prevent: true });
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [buttonLoading, setButtonLoading] = useState(false);
+    const { isLoading, isSuccess, isError, data: details, refetch } = useQuery({
+        queryKey: "login",
+        retry: false,
+        queryFn: () => postAPI<User>("/login", {
+            username: values.username,
+            password: values.password
+        }),
+        staleTime: 0,
+        enabled: false
+    })
     const [values, setValues] = React.useState<LoginState>({
         username: '',
         password: '',
-        showPassword: false,
-        isLoading: false
+        showPassword: false
     });
 
     useEffect(() => {
-        const details = user.data;
-        if (details.length > 0) {
+        if (isSuccess && Array.isArray(details)) {
+            setButtonLoading(false);
             const [loggedIn] = details;
             if (!loginContext.setUserDetails) {                
                 console.error("loginContext.setUserDetails is null");
@@ -48,7 +56,7 @@ const LoginComponent = (props: any) => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [isSuccess]);
 
     const handleChange = (prop: keyof LoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -63,8 +71,7 @@ const LoginComponent = (props: any) => {
     };
 
     const notAllFieldsFilled = [values.username, values.password].filter(elem => !!elem).length < 2;
-    const inProgress = Boolean(user.isLoading || isLoading);
-    
+
     return (
         <React.Fragment>
             <ErrorPopup
@@ -72,27 +79,22 @@ const LoginComponent = (props: any) => {
                     text: messages["login.forgotten-password"],
                     link: "/forgotten-password"
                 }}
-                show={user.isError}
+                show={isError}
             />
             <form
                 onSubmit={event => {
                     event.preventDefault();
                     setValues(values);
-                    setIsLoading(true);
-
+                    setButtonLoading(true);
                     // UX Change - delayed on purpose
                     setTimeout(() => {
-                        callAPI({
-                            username: values.username,
-                            password: values.password
-                        })
-                        setIsLoading(false);
+                        refetch();
                     }, 3000);
                 }}
                 autoComplete="off"
             >
                 <Input
-                    disabled={inProgress}
+                    disabled={buttonLoading || isLoading}
                     color="secondary"
                     className={genericClasses.userFields}
                     fullWidth={true}
@@ -103,7 +105,7 @@ const LoginComponent = (props: any) => {
                     onChange={handleChange('username')}
                 />
                 <Input
-                    disabled={inProgress}
+                    disabled={buttonLoading || isLoading}
                     color="secondary"
                     className={genericClasses.userFields}
                     fullWidth={true}
@@ -129,7 +131,7 @@ const LoginComponent = (props: any) => {
                         <Grid md={5} item className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
-                                loading={inProgress} type="submit" fullWidth size="small" variant="contained" color="primary">
+                                loading={buttonLoading || isLoading} type="submit" fullWidth size="small" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>
@@ -141,7 +143,7 @@ const LoginComponent = (props: any) => {
                         <Grid item xs={12} className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
-                                loading={inProgress} type="submit" fullWidth size="small" variant="contained" color="primary">
+                                loading={buttonLoading || isLoading} type="submit" fullWidth size="small" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>

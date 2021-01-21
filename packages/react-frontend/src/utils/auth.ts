@@ -12,3 +12,10 @@ export default function authHeader() {
     return {};
   }
 }
+
+export const getToken = () => {
+  const user = localStorage.getItem("user");
+  const item = user && JSON.parse(user);
+  debugger;
+  return item && item.token;
+}

@@ -1,15 +1,19 @@
-import { Avatar, Button } from "@material-ui/core";
-import AssignmentIcon from '@material-ui/icons/Assignment';
-import FolderIcon from '@material-ui/icons/Folder';
-import PageviewIcon from '@material-ui/icons/Pageview';
+import { Avatar, Button, CircularProgress } from "@material-ui/core";
+import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
-import React from "react";
+import { postAPI } from "hooks/useAPI";
+import { ReactComponent as FloorplanSVG } from "media/floorplan.svg";
+import { CustomIcons } from "media/icons";
+import { ReactComponent as PhotoSVG } from "media/photography.svg";
+import { ReactComponent as VRSVG } from "media/vr.svg";
+import React, { useContext, useEffect, useState } from "react";
 import LazyLoad from "react-lazyload";
+import { useQuery } from "react-query";
 import { Link } from 'react-router-dom';
 import { STYLE_OVERRIDES } from 'theme';
 import { useTableStyles } from "./property-table.style";
 
-interface Properties {
+export interface Properties {
     createdOn: number;
     modifiedOn: number;
     name: string;
@@ -19,10 +23,48 @@ interface Properties {
 
 interface PropertyTableProps {
     show?: number;
-    limit?: number;
 }
 
-export const PropertyTable: React.FC<PropertyTableProps> = ({ show, limit }) => {
+export const PropertyTable: React.FC<PropertyTableProps> = ({ show }) => {
+
+    const { user } = useContext(LoginContext);
+    const { data: properties, isLoading, isSuccess, refetch } = useQuery({
+        queryKey: [`properties`, user && user.group],
+        queryFn: () => postAPI<Properties>('/properties', {
+            limit: show || null,
+            group: user && user.group > 1 ? user && user.group : null
+        }, {
+            token: user && user.token 
+        }),
+        retry: 3,
+        enabled: false
+    });
+    const [data, setData] = useState<any>([]);
+
+    useEffect(() => {
+        if (user && user.group) {
+            refetch();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    useEffect(() => {
+        if (properties && properties.length > 0) {
+            const data = (properties as Properties[]).map(property => {
+                    return createData(
+                        "https://hdva-image-bucket-web.s3.amazonaws.com/properties/19th+Floor%2C+Apartment+09/19.09+Strata_2343_high-35x35.jpg",
+                        property.name,
+                        {
+                            vt: true,
+                            floorplan: true,
+                            images: true
+                        },
+                        new Date(property.modifiedOn).toDateString()  
+                    )
+                });
+            setData(data);
+        }
+    }, [properties]);
 
     const classes = useTableStyles();
     function createData(image: string, name: string, propertyDetails: Record<string, boolean>, updated: string) {
@@ -48,17 +90,23 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ show, limit }) => 
                 <div>
                     {propertyDetails.floorplan && (
                         <Avatar>
-                            <FolderIcon />
+                            <CustomIcons>
+                                <FloorplanSVG />
+                            </CustomIcons>
                         </Avatar>
                     )}
                     {propertyDetails.vt && (
                         <Avatar>
-                            <PageviewIcon />
+                            <CustomIcons>
+                                <VRSVG />
+                            </CustomIcons>
                         </Avatar>
                     )}
                     {propertyDetails.images && (
                         <Avatar>
-                            <AssignmentIcon />
+                            <CustomIcons>
+                                <PhotoSVG />
+                            </CustomIcons>
                         </Avatar>
                     )}
                 </div>
@@ -77,25 +125,6 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ show, limit }) => 
         };
     }
 
-    const data = createData(
-        "https://hdva-image-bucket-web.s3.amazonaws.com/19th+Floor%2C+Apartment+09/19.09+Strata_2343_high-35x35.jpg",
-        "19th Floor, Apartment 09",
-        {
-            vt: true,
-            floorplan: true,
-            images: true
-        },
-        new Date().toDateString()
-    );
-
-    const rows: any[] = [data];
-
-    if (show && !isNaN(show)) {
-        for (let i = 0; i < show; i += 1) {
-            rows.push(data);
-        }
-    }
-
     const head = [
         { name: "Name", className: classes.tableHeadCell, colSpan: 3 },
         { name: "Last Updated", className: classes.tableHeadCell, colSpan: 2 }
@@ -108,11 +137,11 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ show, limit }) => 
         { className: classes.media }
     ];
 
-    return (
+    return (isLoading || !isSuccess || data.length <= 0) ? <CircularProgress /> : (
         <GenericTable
             head={head}
             cells={cells}
-            data={rows}
+            data={data}
             className={classes.tableContainer}
         />
     );

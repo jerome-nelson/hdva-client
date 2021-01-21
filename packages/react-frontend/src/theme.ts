@@ -191,6 +191,15 @@ export const theme = createMuiTheme({
             }
         },
         MuiTypography: {
+            colorPrimary: {
+                color: COLOR_OVERRIDES.hdva_red,
+                fontSize: `12px`,
+                marginTop: `20px`,
+                fontWeight: `bold`,
+                lineHeight: `12px`,
+                marginBottom: `5px`,
+                textTransform: `uppercase` 
+            },
             subtitle1: {
                 color: COLOR_OVERRIDES.hdva_black,
                 fontWeight: STYLE_OVERRIDES.heading.sub.fontWeight

@@ -2,18 +2,24 @@ import { ThemeProvider } from '@material-ui/core';
 import 'fontsource-roboto';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from 'react-query/devtools';
 import { App } from "./app";
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
 
-// TODO: Integrate all theme colours into theme override
+const queryClient = new QueryClient();
 
+// TODO: Integrate all theme colours into theme override
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

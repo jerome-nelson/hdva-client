@@ -8,6 +8,9 @@ interface GenericTableProps {
     head: any[];
     cells: any[];
     data: any[];
+    showCols?: {
+        onMobile?: number;
+    };
 }
 
 export const GenericTable: React.FC<GenericTableProps> = ({ className, head, cells, data }) => {

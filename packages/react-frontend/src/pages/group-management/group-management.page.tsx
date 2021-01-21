@@ -1,8 +1,9 @@
 import { Box, Button, CircularProgress, Grid, Hidden, OutlinedInput, Paper } from "@material-ui/core";
 import { LoginContext } from "components/login-form/login.context";
 import { messages } from "config/en";
-import { useAPI } from "hooks/useAPI";
+import { getAPI } from "hooks/useAPI";
 import React, { useContext } from "react";
+import { useQuery } from "react-query";
 import { useGenericStyle } from "utils/generic.style";
 import { HeaderTitle } from "../../components/header/header";
 import { useGroupStyle } from "./group-management.page.style";
@@ -19,12 +20,12 @@ interface Groups {
 
 export const GroupPage: React.FC = () => {
     const { user } = useContext(LoginContext); 
-    const [groups] = useAPI<Groups>(`/groups`, { useToken: true });
+    const { data: groups, isLoading } = useQuery({
+        queryKey: "groups",
+        queryFn: () => getAPI<Groups>(`/groups`, { token: user && user.token })
+    });
     const classes = useGroupStyle();
     const genericClasses = useGenericStyle();
-
-    const { data } = groups;
-
     const headCells: Record<string, unknown>[] = [
         { id: 'icon', label: 'Name' },
         { id: 'name', numeric: false, disablePadding: false, label: "" },
@@ -41,7 +42,7 @@ export const GroupPage: React.FC = () => {
             </Hidden>
             <Grid container>
                 {
-                    groups.isLoading ?
+                    isLoading ?
                         <CircularProgress size="1.5rem" color="secondary" /> :
                         <React.Fragment>
                             <Grid container alignItems="center">
@@ -91,7 +92,7 @@ export const GroupPage: React.FC = () => {
                                 </Grid>
                             </Grid>
                             {(
-                                groups.noData ?
+                                groups && groups.length <= 0 ?
                                     (
                                         "no dataaa"
                                     ) :
