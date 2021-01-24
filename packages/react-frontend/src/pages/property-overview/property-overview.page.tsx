@@ -4,17 +4,12 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import { HeaderTitle } from "components/header/header";
-import { LoginContext } from "components/login-form/login.context";
-import { Placeholder } from "components/placeholder/placeholder";
-import { Properties } from "components/property/property-table";
-import { messages } from "config/en";
-import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { PropertyTable } from "components/property/property-table";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
-import { postAPI, useAPI } from "../../hooks/useAPI";
+import { useAPI } from "../../hooks/useAPI";
 import { usePropertyOverviewStyles } from "./properties.overview.style";
 
 // TODO: Virtual Scroll OR table
@@ -98,27 +93,8 @@ const ChildOption: React.FC<{ link: string; pid: number; checked: boolean; setCh
 }
 
 export const PropertiesOverviewPage: React.FC = () => {
-    const { user } = useContext(LoginContext);
     const genericClasses = useGenericStyle();
     const classes = usePropertyOverviewStyles();
-    const { data: properties, isLoading, isSuccess, refetch } = useQuery({
-        queryKey: [`properties`, user && user.group],
-        queryFn: () => postAPI<Properties>('/properties', {
-            limit: 100,
-            group: user && user.group > 1 ? user && user.group : null
-        }, {
-            token: user && user.token 
-        }),
-        retry: 3,
-        enabled: false
-    });
-
-    useEffect(() => {
-        if (user && user.group) {
-            refetch();
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
 
     const headCells: Record<string, unknown>[] = [
         { id: 'icon', label: 'Name' },
@@ -136,16 +112,18 @@ export const PropertiesOverviewPage: React.FC = () => {
             <Hidden mdUp>
                 <HeaderTitle isFixed title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
-            {properties && properties.length === 0 ? (
-                <Placeholder
-                    subtitle={messages["placeholder.properties.subtitle"]}
-                    title={messages["placeholder.properties.title"]}
-                >
-                    <HomeWorkIcon />
-                </Placeholder>
-            ) : (
+            {
+                <PropertyTable selectable show={100} />
+            // properties && properties.length === 0 ? (
+                // <Placeholder
+                //     subtitle={messages["placeholder.properties.subtitle"]}
+                //     title={messages["placeholder.properties.title"]}
+                // >
+                //     <HomeWorkIcon />
+                // </Placeholder>
+            // ) : (
                 // properties.isLoading ?
-                <CircularProgress size="1.5rem" color="secondary" /> 
+                // <CircularProgress size="1.5rem" color="secondary" /> 
                 // :
                 // <CustomTable user={user as User} headers={headCells} data={propertyData.map(property => ({
                 //     ...property,
@@ -202,7 +180,8 @@ export const PropertiesOverviewPage: React.FC = () => {
                 //     )}
                 // </CustomTable>
                 // )}
-            )}
+            // )
+            }
         </React.Fragment>
     )
 }

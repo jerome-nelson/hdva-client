@@ -17,6 +17,9 @@ interface GenericTableProps {
 
 export const useGenericTableStyles = makeStyles((theme: Theme) => (
     createStyles({
+        hideCheckbox: {
+            visibility: `hidden`
+        },
         noBg: {
             borderBottomColor: "transparent"
         },
@@ -35,10 +38,12 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
 
     const classes = useGenericTableStyles();
     const [itemsSelected, setSelected] = useState<number[]>([]);
+    const [toggleCheckbox, setToggle] = useState<number | null>(null);
 
     const indeterminate = React.useMemo(
         () => itemsSelected.length > 0 && itemsSelected.length !== data.length,
-        [data, itemsSelected]);
+        [data, itemsSelected]
+    );
 
     const headerSelect = (checked: boolean) => {
         if (checked) {
@@ -47,6 +52,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                 newState.push(i);
             }
             setSelected(newState);
+            setToggle(-1);
             return;
         }
         setSelected([]);
@@ -69,8 +75,16 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                 <TableHead>
                     <TableRow>
                         {selectable && (
-                            <TableCell className={classes.noBg} padding="checkbox">
+                            <TableCell
+                                onMouseOver={() => setToggle(-1)}
+                                onMouseOut={() => setToggle(null)}
+                                className={classes.noBg}
+                                padding="checkbox"
+                            >
                                 <Checkbox
+                                    className={classNames({
+                                        [classes.hideCheckbox]: !indeterminate && !toggleCheckbox
+                                    })}
                                     onChange={({ target: { checked } }) => headerSelect(checked)}
                                     indeterminate={indeterminate}
                                 />
@@ -85,8 +99,16 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                         return (
                             <TableRow hover={selectable}>
                                 {selectable && (
-                                    <TableCell className={classes.noBg} padding="checkbox">
+                                    <TableCell
+                                        onMouseOver={() => setToggle(rowIndex)}
+                                        onMouseOut={() => setToggle(null)}
+                                        className={classes.noBg}
+                                        padding="checkbox"
+                                    >
                                         <Checkbox
+                                            className={classNames({
+                                                [classes.hideCheckbox]: toggleCheckbox !== -1 || (!indeterminate && toggleCheckbox !== rowIndex)
+                                            })}
                                             checked={isItemSelected}
                                             onChange={({ target: { checked } }) => rowSelect(checked, rowIndex)}
                                         />

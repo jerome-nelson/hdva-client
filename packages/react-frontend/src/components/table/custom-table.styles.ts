@@ -4,7 +4,6 @@ export const useCustomTableStyles = makeStyles((theme: Theme) =>
     createStyles({
         table: {
             width: "90%",
-
             [theme.breakpoints.down('md')]: {
                 width: "100%",
 

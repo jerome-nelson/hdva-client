@@ -37,7 +37,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
         enabled: Boolean(user)
     });
     const { data: propertyData, isLoading, isSuccess } = useQuery({
-        queryKey: [`properties`, user!.group],
+        queryKey: [`properties`, user!.group, show || 0],
         queryFn: () => postAPI<Properties>('/properties', {
             limit: show || null,
             group: user!.group > 1 ? user!.group : null
@@ -55,7 +55,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
         }
 
         const newData = propertyData.map((property: Properties) => {
-            const groupName = groups.reduce((accu: string, curr) => { 
+            const groupName = groups.reduce((accu: string, curr: Groups) => { 
                 return curr.groupId === property.groupId ? curr.name : accu;
             } , "Group Not Found");
             return createData(
