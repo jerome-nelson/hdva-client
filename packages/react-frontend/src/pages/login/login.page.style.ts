@@ -1,4 +1,5 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { STYLE_OVERRIDES } from "theme";
 
 export const useLoginPageStyles = makeStyles((theme: Theme) =>
 createStyles({
@@ -22,7 +23,12 @@ createStyles({
     },
     logo: {
         margin: `${theme.spacing(3)}px 0`,
-        textAlign: 'center',
+
+        "& > div": {
+            margin: `0 auto`,
+            width: `${STYLE_OVERRIDES.logo.width}px`,
+            height: `${STYLE_OVERRIDES.logo.height}px`
+        }
     },
     forgottenDetails: {
         backgroundColor: 'transparent',

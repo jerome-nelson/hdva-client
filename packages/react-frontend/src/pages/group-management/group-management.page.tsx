@@ -9,7 +9,7 @@ import { HeaderTitle } from "../../components/header/header";
 import { useGroupStyle } from "./group-management.page.style";
 
 
-interface Groups {
+export interface Groups {
     createdOn: Date;
     description?: string;
     modifiedOn: Date;

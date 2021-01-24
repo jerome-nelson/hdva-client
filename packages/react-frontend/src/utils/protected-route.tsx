@@ -5,13 +5,12 @@ import { Redirect, RouteProps, useHistory, useLocation } from "react-router-dom"
 import { ModalContext } from "../components/modal/modal.context";
 import { BottomNav } from "../components/navigation/bottom.nav";
 import { SideNav } from "../components/navigation/side.nav";
-import { useRoles } from "../hooks/useRoles";
-
+import { RoleTypes, useRoles } from "../hooks/useRoles";
 
 export interface RouterProps extends RouteProps {
   fullWidth?: boolean;
   auth?: boolean;
-  allowed?: string[];
+  allowed?: RoleTypes[];
   toRender: any; // TODO: Type correctly
 }
 

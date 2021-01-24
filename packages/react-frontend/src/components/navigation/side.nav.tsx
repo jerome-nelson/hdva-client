@@ -1,6 +1,7 @@
 import { Drawer, Grid, List, ListItem, ListItemText } from "@material-ui/core";
 import classNames from "classnames";
 import { LoginContext } from "components/login-form/login.context";
+import { ReactComponent as LogoSVG } from "media/logo.svg";
 import React, { useContext } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Settings } from "../../components/settings/settings";
@@ -22,7 +23,9 @@ export const SideNav: React.FC = () => {
                 >
                     <Grid className={classes.nav} container>
                         <Grid item xs={12}>
-                            <img alt="Logo" src="https://via.placeholder.com/60?text=Ico" />
+                            <div className={classes.logo}>
+                                <LogoSVG />
+                            </div>
                         </Grid>
                     </Grid>
                     <List className={classes.root}>

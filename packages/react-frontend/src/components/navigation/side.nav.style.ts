@@ -3,6 +3,11 @@ import { COLOR_OVERRIDES } from "theme";
 
 export const useSidenavStyles = makeStyles((theme: Theme) =>
     createStyles({
+        logo: {
+            width: `140px`,
+            height: `44px`,
+            marginBottom: `${theme.spacing(2)}px`
+        },
         root: {
             backgroundColor: COLOR_OVERRIDES.hdva_white,
             width: `${theme.spacing(25)}px`,

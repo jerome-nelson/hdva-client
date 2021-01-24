@@ -3,8 +3,9 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import { useQuery } from "react-query";
 import { getAPI } from "./useAPI";
 
-// TODO: Use as ENUM 
-export const Roles: Record<string, string> = {
+export type RoleTypes = "super" | "admin" | "owner" | "uploader" | "viewer";
+
+export const Roles: Record<RoleTypes, string> = {
     super: "Super",
     admin: "Administrator",
     owner: "{{Group Name}} Leader",
@@ -12,50 +13,54 @@ export const Roles: Record<string, string> = {
     viewer: "Read-only Access"
 }
 
-//  TODO: Add Role Typing
 export interface RoleAPI {
     createdOn: Date;
     modifiedOn: Date;
-    rolename: string;
+    rolename: RoleTypes;
     id: number;
     _id: string;
 }
 
-export const useRoles = (context: any = []): [string, boolean, boolean] => {
+export const useRoles = (context: RoleTypes[] = []): [string, boolean, boolean] => {
+
     const { user } = useContext(LoginContext);
-    const { isError, data: roles, refetch } = useQuery({
+    const [data, setData] = useState<RoleAPI[]>([]);
+    const [currentRole, setRole] = useState<string>("");
+    
+    const { isError, refetch } = useQuery({
         queryKey: "roles",
-        queryFn: () => getAPI<RoleAPI>("/roles", { 
-            token: user && user.token 
+        queryFn: () => getAPI<RoleAPI>("/roles", {
+            token: user && user.token
         }),
-        retry: 3,
+        select: data => {
+            setData(data);
+        },
         enabled: false
     });
-    const [currentRole, setRole] = useState<string>("");
     const [canAccess, dispatch] = useReducer((state: any, action: any) => {
-        if (action.allowed.length <= 0 || !roles || !user) {
+        if (action.allowed.length <= 0 || !data.length || !user) {
             return state;
         }
         return action.allowed
             .filter((name: string) =>
-                name.toLowerCase() === String((roles as RoleAPI[]).filter(role => user.role === role.id)[0].rolename).toLowerCase()).length
+                name.toLowerCase() === String((data as RoleAPI[]).filter(role => user.role === role.id)[0].rolename).toLowerCase()).length
     }, true);
 
     useEffect(() => {
-        if (user && user.token) {
+        if (!data.length && user && user.token) {
             refetch();
         }
-        
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     // TODO: Examine other hooks in React and review current conditionals
     useEffect(() => {
-        if (!roles || !user) {
+        if (!data.length || !user) {
             return;
         }
 
-        const specificRole = (roles as RoleAPI[]).filter(role => user.role === role.id);
+        const specificRole = (data as RoleAPI[]).filter(role => user.role === role.id);
         if (specificRole && specificRole.length > 0) {
             setRole((Roles[specificRole[0].rolename]));
             dispatch({
@@ -63,7 +68,7 @@ export const useRoles = (context: any = []): [string, boolean, boolean] => {
             })
         }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [context]);
 
     return [currentRole, canAccess, isError];

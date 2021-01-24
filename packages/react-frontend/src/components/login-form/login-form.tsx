@@ -34,6 +34,7 @@ const LoginComponent = (props: any) => {
             username: values.username,
             password: values.password
         }),
+        cacheTime: 0,
         staleTime: 0,
         enabled: false
     })

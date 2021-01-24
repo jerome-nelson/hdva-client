@@ -31,13 +31,13 @@ export const useTableStyles = makeStyles((theme: Theme) => createStyles({
             width: WIDTHS.imageCell
         }
     },
+    moreCell: {
+        textAlign: `center`,
+    },
     // TODO: Insert into Theme Directly
     tableHeadCell: {
         fontSize: `0.8rem`,
         fontWeight: `bolder`,
-        paddingBottom: `${theme.spacing(1)}px`,
-        "table &:first-child": {
-            paddingLeft: 0
-        }
+        paddingBottom: `${theme.spacing(1)}px`
     }
 }));

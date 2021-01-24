@@ -1,9 +1,9 @@
 import { AppBar, Grid, Hidden } from "@material-ui/core";
 import { LoginForm } from "components/login-form/login-form";
+import { ReactComponent as LogoSVG } from "media/logo.svg";
 import React from "react";
 import { Link } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
-import { accessibility } from "../../config/accessibility";
 import { messages } from "../../config/en";
 import { useLoginPageStyles } from "./login.page.style";
 
@@ -16,15 +16,16 @@ export const LoginPage = () => {
             <Grid container className={classes.formHeader}>
                 <Hidden mdDown>
                     <Grid className={classes.logo} item md={6}>
-                        <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" />
+                        <div><LogoSVG /></div>
+                        {/* <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" /> */}
                     </Grid>
                     <Grid item md={6}>
-                        <LoginForm className={classes.formMaxWidth}/>
+                        <LoginForm className={classes.formMaxWidth} />
                     </Grid>
                 </Hidden>
                 <Hidden mdUp>
                     <Grid className={classes.logo} item xs={12}>
-                        <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" />
+                        <div><LogoSVG /></div>
                     </Grid>
                 </Hidden>
             </Grid>

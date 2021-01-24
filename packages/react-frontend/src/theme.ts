@@ -24,6 +24,10 @@ export const DELAY_MENU_ANIMATION = 5*1000;
 export const OPACITY_BASE = 0.4;
 
 export const STYLE_OVERRIDES = {
+    logo: {
+        height: 55,
+        width: 175
+    },
     carousel: {
         itemHeight: 325,
         imageHeight: 250,

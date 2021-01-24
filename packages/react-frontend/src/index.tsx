@@ -9,7 +9,16 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { theme } from "./theme";
 
-const queryClient = new QueryClient();
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3,
+      staleTime: 1000 * 60 * 60 * 24,
+      cacheTime: 1000 * 60 * 60 * 24
+    }
+  }
+});
 
 // TODO: Integrate all theme colours into theme override
 ReactDOM.render(
