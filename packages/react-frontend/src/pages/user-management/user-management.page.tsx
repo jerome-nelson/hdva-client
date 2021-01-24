@@ -11,7 +11,7 @@ export const UserPage: React.FC = () => {
                 <StickyHeader>
                     <Grid container>
                         <Grid xs={8}>
-                            <HeaderTitle disableBack alignText="left" title={messages["user.page.title"]} disableGutters />
+                            <HeaderTitle isFixed disableBack alignText="left" title={messages["user.page.title"]} disableGutters />
                         </Grid>
                     </Grid>
                 </StickyHeader>

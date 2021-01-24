@@ -1,4 +1,4 @@
-import { Hidden } from "@material-ui/core";
+import { Grid, Hidden, Typography } from "@material-ui/core";
 import { HeaderTitle } from "components/header/header";
 import { PropertyTable } from "components/property/property-table";
 import { LIMITS } from "config/data";
@@ -11,14 +11,29 @@ export const DashboardPage = () => {
     return (
         <React.Fragment>
             <Hidden mdUp>
-                <HeaderTitle 
-                    disableBack 
-                    title={<div className={classes.logo}><LogoSVG /></div>} 
-                    alignText="left" 
-                    color="primary" 
+                <HeaderTitle
+                    disableBack
+                    isFixed
+                    title={<div className={classes.logo}><LogoSVG /></div>}
+                    alignText="left"
+                    color="primary"
                 />
             </Hidden>
-            <PropertyTable selectable show={LIMITS.home} />
+            <Grid className={classes.container}>
+                <HeaderTitle
+                    disableBack
+                    title="Overview"
+                    alignText="left"
+                    color="secondary"
+                    variant="h5"
+                />
+                <Grid className={classes.infoText}>
+                <Typography color="primary" variant="body1">
+                    The most recently uploaded properties are shown here
+                </Typography>
+                </Grid>
+                <PropertyTable selectable show={LIMITS.home} />
+            </Grid>
         </React.Fragment>
     )
 }

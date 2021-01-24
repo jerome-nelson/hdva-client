@@ -17,7 +17,6 @@ export const LoginPage = () => {
                 <Hidden mdDown>
                     <Grid className={classes.logo} item md={6}>
                         <div><LogoSVG /></div>
-                        {/* <img {...accessibility.logoIMG} src="https://hdva-image-bucket-web.s3.amazonaws.com/logo-mobile.png" /> */}
                     </Grid>
                     <Grid item md={6}>
                         <LoginForm className={classes.formMaxWidth} />

@@ -32,7 +32,7 @@ export const ProfilePage: React.SFC = () => {
   return (
     <React.Fragment>
       <Hidden mdUp>
-        <HeaderTitle title="Profile Settings" alignText="center" color="primary" variant="h5" />
+        <HeaderTitle isFixed title="Profile Settings" alignText="center" color="primary" variant="h5" />
       </Hidden>
 
       <div className={classes.container}>

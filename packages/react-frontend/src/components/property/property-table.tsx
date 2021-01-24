@@ -55,7 +55,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
         }
 
         const newData = propertyData.map((property: Properties) => {
-            const groupName = groups.reduce((accu, curr) => { 
+            const groupName = groups.reduce((accu: string, curr) => { 
                 return curr.groupId === property.groupId ? curr.name : accu;
             } , "Group Not Found");
             return createData(
@@ -150,7 +150,6 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
             head={head}
             cells={cells}
             data={data}
-            className={classes.tableContainer}
         />
     );
 }

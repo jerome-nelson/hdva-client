@@ -20,7 +20,7 @@ export const COLOR_OVERRIDES = {
     hdva_red_dark: "#b6002e"
 }
 
-export const DELAY_MENU_ANIMATION = 5*1000;
+export const DELAY_MENU_ANIMATION = 5 * 1000;
 export const OPACITY_BASE = 0.4;
 
 export const STYLE_OVERRIDES = {
@@ -113,6 +113,17 @@ export const theme = createMuiTheme({
                 color: COLOR_OVERRIDES.hdva_black,
                 backgroundColor: COLOR_OVERRIDES.hdva_white
             },
+            colorSecondary: {
+                backgroundColor: `transparent`,
+                color: COLOR_OVERRIDES.hdva_white,
+                borderBottom: `solid 1px ${COLOR_OVERRIDES.hdva_white}`,
+                "& > .MuiToolbar-gutters": {
+                    padding: 0,
+                    "& > [class*=MuiTypography-]": {
+                        color: COLOR_OVERRIDES.hdva_white
+                    }
+                },
+            }
         },
         MuiCssBaseline: {
             '@global': {
@@ -202,7 +213,7 @@ export const theme = createMuiTheme({
                 fontWeight: `bold`,
                 lineHeight: `12px`,
                 marginBottom: `5px`,
-                textTransform: `uppercase` 
+                textTransform: `uppercase`
             },
             subtitle1: {
                 color: COLOR_OVERRIDES.hdva_black,

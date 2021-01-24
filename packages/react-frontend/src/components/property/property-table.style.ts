@@ -23,9 +23,6 @@ export const useTableStyles = makeStyles((theme: Theme) => createStyles({
             color: COLOR_OVERRIDES.hdva_white
         }
     },
-    tableContainer: {
-        width: "90%",
-    },
     imageCell: {
         "&, & > div": {
             width: WIDTHS.imageCell

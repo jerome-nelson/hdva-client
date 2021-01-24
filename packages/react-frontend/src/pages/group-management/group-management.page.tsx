@@ -35,7 +35,7 @@ export const GroupPage: React.FC = () => {
     return (
         <Box>
             <Hidden mdUp>
-                <HeaderTitle disableBack title={messages["group-management.title"]} />
+                <HeaderTitle isFixed title={messages["group-management.title"]} />
             </Hidden>
             <Hidden mdDown>
                 <HeaderTitle disableBack alignText="left" title={messages["group-management.title"]} disableGutters />

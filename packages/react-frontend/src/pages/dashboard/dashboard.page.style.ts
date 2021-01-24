@@ -1,10 +1,20 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { COLOR_OVERRIDES } from "theme";
 
 export const useDashboardStyles = makeStyles((theme: Theme) =>
     createStyles({
+        container: {
+            width: "90%",
+            margin: `75px auto 0`
+        },
         logo: {
             width: "30%",
             padding: `${theme.spacing(1)}px`
+        },
+        infoText: {
+            border: `solid 1px ${COLOR_OVERRIDES.hdva_white}`,
+            padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+            margin: `${theme.spacing(2)}px 0`
         }
         // container: {
         //     width: "80%",

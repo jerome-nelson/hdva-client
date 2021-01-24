@@ -5,7 +5,7 @@ import classNames from "classnames";
 import React, { useState } from "react";
 
 interface GenericTableProps {
-    className: string;
+    className?: string;
     selectable?: boolean;
     head: any[];
     cells: any[];

@@ -134,7 +134,7 @@ export const PropertiesOverviewPage: React.FC = () => {
     return (
         <React.Fragment>
             <Hidden mdUp>
-                <HeaderTitle title="All Properties" alignText="center" color="primary" variant="h5" />
+                <HeaderTitle isFixed title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
             {properties && properties.length === 0 ? (
                 <Placeholder

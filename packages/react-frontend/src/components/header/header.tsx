@@ -9,19 +9,20 @@ export interface HeaderProps {
     alignText?: 'center' | 'left' | 'right';
     color?: 'primary' | 'secondary';
     variant?: Variant;
+    isFixed?: boolean;
     disableGutters?: boolean;
     disableBack?: boolean;
     title?: React.ReactNode;
     subtitle?: React.ReactNode;
 }
 
-export const HeaderTitle: React.SFC<HeaderProps> = ({ alignText, color, disableGutters, disableBack, title, subtitle, variant }) => {
+export const HeaderTitle: React.SFC<HeaderProps> = ({ alignText, color, isFixed, disableGutters, disableBack, title, subtitle, variant }) => {
     const classes = useHeaderStyles({ disableBack, title, alignText });
     return (
         <React.Fragment>
             <AppBar
                 color={color || "transparent"}
-                position="static"
+                position={isFixed ? "fixed" : "static"}
                 className={classes.reset}
                 classes={{
                     root: classes.paperReset

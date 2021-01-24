@@ -1,4 +1,5 @@
 import { CssBaseline } from '@material-ui/core';
+import { RoleTypes } from 'hooks/useRoles';
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { getCurrentUser, User } from 'services/auth.service';
@@ -14,7 +15,7 @@ export const AppComponent = () => (
     <Router>
         <Switch>
             {ROUTES.map(({ auth, fullWidth, exact, props, component }, key) => (
-                <PrivateRoute auth={auth} fullWidth={fullWidth} exact={exact} key={`${key}-route`} allowed={props.allowed} path={props.path} toRender={component} />
+                <PrivateRoute auth={auth} fullWidth={fullWidth} exact={exact} key={`${key}-route`} allowed={props.allowed as RoleTypes[]} path={props.path} toRender={component} />
             ))}
         </Switch>
     </Router>
