@@ -1,6 +1,7 @@
-import { Avatar, Button, CircularProgress } from "@material-ui/core";
+import { Avatar, Button, CircularProgress, Hidden } from "@material-ui/core";
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
+import { MobileTable } from "components/table/mobile-table";
 import { getAPI, postAPI } from "hooks/useAPI";
 import { ReactComponent as FloorplanSVG } from "media/floorplan.svg";
 import { CustomIcons } from "media/icons";
@@ -28,10 +29,10 @@ interface PropertyTableProps {
 }
 
 export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }) => {
-    
+
     const [data, setData] = useState<any>([]);
     const { user } = useContext(LoginContext);
-    const {data: groups } = useQuery({
+    const { data: groups } = useQuery({
         queryKey: [`groups`, user!.group],
         queryFn: () => getAPI<Groups>('/groups', { token: user!.token }),
         enabled: Boolean(user)
@@ -55,9 +56,9 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
         }
 
         const newData = propertyData.map((property: Properties) => {
-            const groupName = groups.reduce((accu: string, curr: Groups) => { 
+            const groupName = groups.reduce((accu: string, curr: Groups) => {
                 return curr.groupId === property.groupId ? curr.name : accu;
-            } , "Group Not Found");
+            }, "Group Not Found");
             return createData(
                 "https://hdva-image-bucket-web.s3.amazonaws.com/properties/19th+Floor%2C+Apartment+09/19.09+Strata_2343_high-35x35.jpg",
                 property.name,
@@ -76,55 +77,70 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
     const classes = useTableStyles();
     function createData(image: string, name: string, group: string, propertyDetails: Record<string, boolean>, updated: string) {
         return {
-            image: (
-                <LazyLoad height={STYLE_OVERRIDES.thumbnail}>
-                    <Link to="/properties">
-                        <img
-                            alt={name}
-                            height={STYLE_OVERRIDES.thumbnail}
-                            width={STYLE_OVERRIDES.thumbnail}
-                            src={image}
-                        />
-                    </Link>
-                </LazyLoad>
-            ),
-            name: <Link to="/properties">{name}</Link>,
-            group,
-            propertyDetails: (
-                <div>
-                    {propertyDetails.floorplan && (
-                        <Avatar>
-                            <CustomIcons>
-                                <FloorplanSVG />
-                            </CustomIcons>
-                        </Avatar>
-                    )}
-                    {propertyDetails.vt && (
-                        <Avatar>
-                            <CustomIcons>
-                                <VRSVG />
-                            </CustomIcons>
-                        </Avatar>
-                    )}
-                    {propertyDetails.images && (
-                        <Avatar>
-                            <CustomIcons>
-                                <PhotoSVG />
-                            </CustomIcons>
-                        </Avatar>
-                    )}
-                </div>
-            ),
-            updated,
-            download: (
-                <Button
-                    size="large"
-                    variant="outlined"
-                    color="primary"
-                >
-                    Download
-                </Button>
-            )
+            image: {
+                data: (
+                    <LazyLoad height={STYLE_OVERRIDES.thumbnail}>
+                        <Link to="/properties">
+                            <img
+                                alt={name}
+                                height={STYLE_OVERRIDES.thumbnail}
+                                width={STYLE_OVERRIDES.thumbnail}
+                                src={image}
+                            />
+                        </Link>
+                    </LazyLoad>
+                )
+            },
+            name: {
+                data: <Link to="/properties">{name}</Link>,
+            },
+            group: {
+                data: group,
+            },
+            propertyDetails: {
+                mobile: true,
+                data: (
+                    <div>
+                        {propertyDetails.floorplan && (
+                            <Avatar>
+                                <CustomIcons>
+                                    <FloorplanSVG />
+                                </CustomIcons>
+                            </Avatar>
+                        )}
+                        {propertyDetails.vt && (
+                            <Avatar>
+                                <CustomIcons>
+                                    <VRSVG />
+                                </CustomIcons>
+                            </Avatar>
+                        )}
+                        {propertyDetails.images && (
+                            <Avatar>
+                                <CustomIcons>
+                                    <PhotoSVG />
+                                </CustomIcons>
+                            </Avatar>
+                        )}
+                    </div>
+                )
+            },
+            updated: {
+                mobile: true,
+                data: updated
+            },
+            download: {
+                mobile: true,
+                data: (
+                    <Button
+                        size="large"
+                        variant="outlined"
+                        color="primary"
+                    >
+                        Download
+                    </Button>
+                )
+            }
         };
     }
 
@@ -145,11 +161,20 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
     ];
 
     return (isLoading || !isSuccess || data.length <= 0) ? <CircularProgress /> : (
-        <GenericTable
-            selectable={selectable}
-            head={head}
-            cells={cells}
-            data={data}
-        />
+        <React.Fragment>
+            <Hidden only={["xs"]}>
+                <GenericTable
+                    selectable={selectable}
+                    head={head}
+                    cells={cells}
+                    data={data}
+                />
+            </Hidden>
+            <Hidden mdUp>
+                <MobileTable
+                    data={data}
+                />
+            </Hidden>
+        </React.Fragment>
     );
 }

@@ -19,7 +19,7 @@ interface GenericTableProps {
 export const useGenericTableStyles = makeStyles((theme: Theme) => (
     createStyles({
         cellStyle: {
-            borderLeft: `2px solid ${COLOR_OVERRIDES.hdva_black_bg}`,  
+            borderLeft: `2px solid ${COLOR_OVERRIDES.hdva_black_bg}`,
             "tr > & ~ &": {
                 borderLeftColor: `transparent`
             },
@@ -78,9 +78,6 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
         }
     }
 
-    console.log(`testing: `, indeterminate);
-    console.log(`lengths: `, itemsSelected.length, data.length);
-
     return (
         <TableContainer className={className}>
             <Table>
@@ -98,6 +95,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                         [classes.hideCheckbox]: !indeterminate && !(itemsSelected.length === data.length)
                                     })}
                                     onChange={({ target: { checked } }) => headerSelect(checked)}
+                                    checked={!indeterminate}
                                     indeterminate={indeterminate}
                                 />
                             </TableCell>
@@ -108,8 +106,9 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                 <TableBody>
                     {data.map((row, rowIndex) => {
                         const isItemSelected = itemsSelected.includes(rowIndex);
+                        const shouldHideCheckbox = !isItemSelected && !indeterminate && (toggleCheckbox !== rowIndex && toggleCheckbox !== -1);
                         return (
-                            <TableRow 
+                            <TableRow
                                 key={`row-${rowIndex}`}
                                 hover={selectable}
                                 onClick={() => rowSelect(!isItemSelected, rowIndex)}
@@ -122,27 +121,27 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                         padding="checkbox"
                                     >
                                         <Checkbox
-                                            className={classNames({
-                                                [classes.hideCheckbox]: !!(toggleCheckbox === -1) || !!(toggleCheckbox === rowIndex) || !indeterminate
-                                            })}
+                                            className={classNames({ [classes.hideCheckbox]: shouldHideCheckbox })}
                                             checked={isItemSelected}
                                             onChange={({ target: { checked } }) => rowSelect(checked, rowIndex)}
                                         />
                                     </TableCell>
                                 )}
-                                {Object.keys(row).map((item, index) => (
-                                    <TableCell
-                                        key={`cell-${index}`}
-                                        {...cells[index]}
-                                        className={classNames({
-                                            [cells[index].className]: true,
-                                            [classes.cellStyle]: true,
-                                            [classes.trSelected]: isItemSelected
-                                        })}
-                                    >
-                                        {row[item]}
-                                    </TableCell>
-                                ))}
+                                {Object.keys(row).map((item, index) => {
+                                    return (
+                                        <TableCell
+                                            key={`cell-${index}`}
+                                            {...cells[index]}
+                                            className={classNames({
+                                                [cells[index].className]: true,
+                                                [classes.cellStyle]: true,
+                                                [classes.trSelected]: isItemSelected
+                                            })}
+                                        >
+                                            {row[item].data}
+                                        </TableCell>
+                                    )
+                                })}
                             </TableRow>
                         );
                     })}
