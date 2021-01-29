@@ -9,10 +9,10 @@ type CTAProps = ExtendButtonBaseTypeMap<ButtonTypeMap<{ type: "button" | "reset"
     className?: string; };
 
 export const CTAButton: React.FC<CTAProps> = props => {
-    const { children, ...rest } = props;
+    const { children, loading, ...rest } = props;
     return (
         <Button {...rest}>
-            {props.loading ? <CircularProgress size="1.5rem" color="secondary" /> : children}
+            {loading ? <CircularProgress size="1.5rem" color="secondary" /> : children}
         </Button>
     );
 };

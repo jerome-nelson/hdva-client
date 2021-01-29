@@ -11,6 +11,7 @@ import { FontWeightProperty, TextTransformProperty } from "csstype";
 
 export const COLOR_OVERRIDES = {
     hdva_white: "#fafafa",
+    hdva_black_bg: "#303030",
     hdva_black: "#1b1b1b",
     hdva_black_mid: "#424242",
     hdva_black_light: "#969696",
@@ -129,6 +130,10 @@ export const theme = createMuiTheme({
             '@global': {
                 body: {
                     minWidth: WIDTHS.min,
+                },
+                a: {
+                    color: COLOR_OVERRIDES.hdva_white,
+                    textDecoration: `none`
                 }
             }
         },
