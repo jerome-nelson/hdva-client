@@ -1,4 +1,4 @@
-import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
+import { Collapse, IconButton, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
@@ -125,6 +125,7 @@ interface MobileTableProps {
 interface CustomRowProps {
     row: Record<string, any>;
     checked?: boolean;
+    selected?: boolean;
     setChecked?: Dispatch<SetStateAction<any>>;
 }
 
@@ -145,9 +146,9 @@ const CustomRow: React.FC<CustomRowProps> = ({ row, children }) => {
             </TableRow>
             {row && (
                 <TableRow>
-                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <TableCell style={{ padding: 0 }} colSpan={6}>
                         <Collapse in={collapsed} timeout="auto" unmountOnExit>
-                            <Box margin={1}>{row}</Box>
+                           {row}
                         </Collapse>
                     </TableCell>
                 </TableRow>
@@ -167,17 +168,18 @@ const SetRow: React.FC<SetRowProps> = ({ isChecked, onSelect, row }) => {
 
     useEffect(() => {
         onSelect(selected);
-    }, [onSelect, selected]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [onSelect]);
 
     const data = useMemo(() => {
         return Object.keys(row).map(item => row[item]);
     }, [row]);
 
-    const cells = useMemo(() => data.filter(cells => !cells.mobile).map(elem => elem.data), [data]);
+    const cells = useMemo(() => data.filter(cells => !cells.mobile && !cells.hideOnMobile).map(elem => elem.data), [data]);
     const collapsedCells = useMemo(() => data.filter(cells => cells.mobile).map(elem => elem.data), [data]);
 
     return (
-        <CustomRow row={collapsedCells}>
+        <CustomRow selected={selected} row={collapsedCells}>
             {cells.map((item, index) => (<TableCell key={`row-${index}`}>{item}</TableCell>))}
         </CustomRow>
     );

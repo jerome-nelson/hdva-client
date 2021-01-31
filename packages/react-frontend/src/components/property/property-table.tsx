@@ -1,4 +1,8 @@
-import { Avatar, Button, CircularProgress, Hidden } from "@material-ui/core";
+import { Avatar, BottomNavigation, BottomNavigationAction, Button, CircularProgress, Hidden } from "@material-ui/core";
+import BurstModeIcon from '@material-ui/icons/BurstMode';
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
@@ -29,7 +33,6 @@ interface PropertyTableProps {
 }
 
 export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }) => {
-
     const [data, setData] = useState<any>([]);
     const { user } = useContext(LoginContext);
     const { data: groups } = useQuery({
@@ -95,10 +98,11 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
                 data: <Link to="/properties">{name}</Link>,
             },
             group: {
+                hideOnMobile: true,
                 data: group,
             },
             propertyDetails: {
-                mobile: true,
+                hideOnMobile: true,
                 data: (
                     <div>
                         {propertyDetails.floorplan && (
@@ -126,19 +130,81 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
                 )
             },
             updated: {
-                mobile: true,
                 data: updated
             },
-            download: {
+            extras: {
                 mobile: true,
                 data: (
-                    <Button
-                        size="large"
-                        variant="outlined"
-                        color="primary"
-                    >
-                        Download
+                    <React.Fragment>
+                        <Hidden mdUp>
+                            <BottomNavigation
+                                showLabels
+                                // className={classes.root}
+                            >
+                                <BottomNavigationAction
+                                    // onClick={() => history.push(
+                                    //     link,
+                                    //     {
+                                    //         propertyId: pid
+                                    //     })}
+                                    icon={<BurstModeIcon />}
+                                    label="View Images" />
+                                <BottomNavigationAction
+                                    // classes={
+                                    //     checked ? {
+                                    //         root: classes.navigationSelected
+                                    //     } : {}
+                                    // }
+                                    label="Select Folder"
+                                    // onClick={() => setChecked(!checked)}
+                                    // checked ? <CreateNewFolderIcon /> : 
+                                    icon={<CreateNewFolderOutlinedIcon />}
+                                />
+                                <BottomNavigationAction
+                                    // onClick={() => {
+                                    //     // TODO: Download API
+                                    //     setStatus({
+                                    //         ...processing,
+                                    //         downloading: true
+                                    //     });
+                                    // }}
+                                    label="Download Folder"
+                                    icon={
+                                        // processing.downloading ?
+                                        //     <CircularProgress variant="indeterminate" size="1.2rem" /> :
+                                            <CloudDownloadIcon />
+                                    }
+                                />
+                                {/* Only available to admin users */}
+                                <BottomNavigationAction
+                                    label="Delete Folder"
+                                    // onClick={() => {
+                                    //     setStatus({
+                                    //         ...processing,
+                                    //         deleting: response.isLoading
+                                    //     });
+                                    //     callAPI({
+                                    //         pids: [pid]
+                                    //     });
+                                    // }}
+                                    icon={
+                                        // processing.deleting ?
+                                        //     <CircularProgress variant="indeterminate" size="1.2rem" /> :
+                                            <DeleteForeverIcon />
+                                    }
+                                />
+                            </BottomNavigation>
+                        </Hidden>
+                        <Hidden mdDown>
+                            <Button
+                                size="large"
+                                variant="outlined"
+                                color="primary"
+                            >
+                                Download
                     </Button>
+                        </Hidden>
+                    </React.Fragment>
                 )
             }
         };
