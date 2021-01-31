@@ -113,7 +113,7 @@ export const PropertiesOverviewPage: React.FC = () => {
                 <HeaderTitle isFixed title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
             {
-                <PropertyTable selectable show={100} />
+                <PropertyTable selectable show={20} showPagination />
             // properties && properties.length === 0 ? (
                 // <Placeholder
                 //     subtitle={messages["placeholder.properties.subtitle"]}

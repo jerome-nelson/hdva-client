@@ -7,6 +7,7 @@ import { COLOR_OVERRIDES } from 'theme';
 
 interface GenericTableProps {
     className?: string;
+    onSelect?(): void;
     selectable?: boolean;
     head: any[];
     cells: any[];
@@ -25,6 +26,8 @@ export const useGenericTableStyles = makeStyles((theme: Theme) => (
             },
         },
         hideCheckbox: {
+            // TODO: TEMPORARY UNTIL CAN FIX ALIGNMENT
+            display: `none`,
             visibility: `hidden`
         },
         noBg: {
@@ -87,12 +90,13 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                             <TableCell
                                 onMouseOver={() => setToggle(-1)}
                                 onMouseOut={() => setToggle(null)}
-                                className={classes.noBg}
+                                className={`${classes.noBg} ${classes.hideCheckbox}`}
                                 padding="checkbox"
                             >
                                 <Checkbox
                                     className={classNames({
-                                        [classes.hideCheckbox]: !indeterminate && !(itemsSelected.length === data.length)
+                                        // [classes.hideCheckbox]: !indeterminate && !(itemsSelected.length === data.length)
+                                        [classes.hideCheckbox]: true
                                     })}
                                     onChange={({ target: { checked } }) => headerSelect(checked)}
                                     checked={!indeterminate}
@@ -117,11 +121,14 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                     <TableCell
                                         onMouseOver={() => setToggle(rowIndex)}
                                         onMouseOut={() => setToggle(null)}
-                                        className={classes.noBg}
+                                        className={`${classes.noBg} ${classes.hideCheckbox}`}
                                         padding="checkbox"
                                     >
                                         <Checkbox
-                                            className={classNames({ [classes.hideCheckbox]: shouldHideCheckbox })}
+                                            className={classNames({ 
+                                                // [classes.hideCheckbox]: shouldHideCheckbox 
+                                                [classes.hideCheckbox]: true 
+                                            })}
                                             checked={isItemSelected}
                                             onChange={({ target: { checked } }) => rowSelect(checked, rowIndex)}
                                         />

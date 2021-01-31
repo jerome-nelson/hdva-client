@@ -10,6 +10,11 @@ export const useTableStyles = makeStyles((theme: Theme) => createStyles({
             },
         }
     },
+    hideOnMobile: {
+        [theme.breakpoints.down("xs")]: {
+            display: `none`
+        }
+    },
     nameCellContainer: {
         width: `400px`,
         "& > a": {

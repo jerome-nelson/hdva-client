@@ -1,77 +1,79 @@
-import { Box, Tab, Tabs, Typography } from "@material-ui/core";
-import BurstModeIcon from '@material-ui/icons/BurstMode';
-import CameraIcon from '@material-ui/icons/Camera';
-import ImageIcon from '@material-ui/icons/Image';
-import React from "react";
-import { FullScreen } from "../../components/fullscreen/fullscreen";
+import { LoginContext } from "components/login-form/login.context";
+import { GenericTable } from "components/table/generic-table";
+import { postAPI } from "hooks/useAPI";
+import React, { useContext, useState } from "react";
+import { useQuery } from "react-query";
+import { useLocation } from "react-router-dom";
 
 type Property = Record<string, string>;
 
 interface PropertyProps {
-    propertyName: string;
+  propertyName: string;
 }
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: any;
-    value: any;
-  }
+// const initialState = {
+//   photo: [],
+//   floorplan: [],
+//   vt: ""
+// };
 
-const TabPanel = (props: TabPanelProps) => {
-    const { children, value, index, ...other } = props;
-  
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box p={3}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
-    );
+// function mediaReducer(state, action) {
+//   switch (action.type) {
+//     case 'increment':
+//       return {count: state.count + 1};
+//     case 'decrement':
+//       return {count: state.count - 1};
+//     default:
+//       throw new Error();
+//   }
+// }
+
+const getImage = (url: string, type: string): string => {
+  let fileName = url.replace(/ /g, "+");
+  if (type === "floorplan") {
+    const seperator = fileName.split(".");
+    fileName = `${seperator[0]}-500x350.${seperator[1]}`;
   }
-  
-  function a11yProps(index: any) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-  } 
+  return `${process.env.REACT_APP_IMG}/${fileName}`;
+}
 
 export const PropertiesPage: React.SFC<PropertyProps> = () => {
-    const [value, setValue] = React.useState(0);
+  const { user } = useContext(LoginContext);
+  
+  const location = useLocation<{ propertyName: string; propertyId: string; }>();
+  const [propertyData, setPropertyData] = useState<any>({});
+  // const [mediaFiles, getMedia] = useReducer(mediaReducer, initialState);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
-    // TODO: Map API to use names as well (no more state) - or instead add as custom headers
-    // TODO: Add localstorage caching for textual data
+  const { data } = useQuery({
+    queryKey: [`properties`, user!.group, location.state.propertyId],
+    queryFn: () => postAPI<any>('/get-media', {
+      pids: [location.state.propertyId],
+    }, {
+      token: user!.token
+    }),
+    select: data => {
+      const media = data.reduce((list, curr) => {
+        return {
+          ...list,
+          [curr.type]: (list[curr.type] || []).concat([curr.resource]),
+        }
+      }, {});
+      setPropertyData(media);
+    },
+    enabled: Boolean(user && user.group && location.state.propertyId)
+  });
 
 
-    return (
-        <React.Fragment>
-            <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-                <Tab icon={<BurstModeIcon />} />
-                <Tab icon={<CameraIcon />} />
-                <Tab icon={<ImageIcon />} />
-            </Tabs>
-            <TabPanel value={value} index={0} {...a11yProps(0)}>
-                Photos
-            </TabPanel>
-            <TabPanel value={value} index={1} {...a11yProps(1)}>
-                <FullScreen>
-                    Virtual Tour
-                </FullScreen>
-            </TabPanel>
-            <TabPanel value={value} index={2} {...a11yProps(2)}>
-                Floorplan
-            </TabPanel>
-        </React.Fragment>
-    );
+  return (
+    <React.Fragment>
+      {propertyData && (
+        <GenericTable 
+          
+        />
+      )}
+      {propertyData.floorplan && propertyData.floorplan.map((plan: any) => (
+        <img src={getImage(`${location.state.propertyName}/${plan}`, "floorplan")} />
+      ))}
+    </React.Fragment>
+  );
 }

@@ -56,7 +56,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
 
   return (
     <React.Fragment>
-      <Hidden mdDown>
+      <Hidden smDown>
         <Grid container>
           {!fullWidth && (<Grid item md={2}>
             <SideNav />

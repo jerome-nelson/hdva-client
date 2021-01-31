@@ -14,7 +14,7 @@ export interface Groups {
     description?: string;
     modifiedOn: Date;
     name: string;
-    groupId: number;
+    groupId: string;
     _id: string;
 }
 

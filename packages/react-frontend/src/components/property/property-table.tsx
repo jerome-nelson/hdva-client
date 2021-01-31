@@ -3,11 +3,13 @@ import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Pagination from '@material-ui/lab/Pagination';
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
 import { getAPI, postAPI } from "hooks/useAPI";
 import { ReactComponent as FloorplanSVG } from "media/floorplan.svg";
+import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { CustomIcons } from "media/icons";
 import { ReactComponent as PhotoSVG } from "media/photography.svg";
 import { ReactComponent as VRSVG } from "media/vr.svg";
@@ -15,40 +17,56 @@ import { Groups } from "pages/group-management/group-management.page";
 import React, { useContext, useEffect, useState } from "react";
 import LazyLoad from "react-lazyload";
 import { useQuery } from "react-query";
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { STYLE_OVERRIDES } from 'theme';
+import { convertToSlug } from "utils/auth";
 import { useTableStyles } from "./property-table.style";
 
 export interface Properties {
     createdOn: number;
     modifiedOn: number;
     name: string;
-    propertyId: number;
-    groupId: number;
+    propertyId: string;
+    groupId: string;
 }
 
 interface PropertyTableProps {
     show?: number;
+    showPagination?: boolean;
     selectable?: boolean;
 }
 
-export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }) => {
+export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, showPagination }) => {
     const [data, setData] = useState<any>([]);
+    const history = useHistory();
+    const [pageNumber, setPageNumber] = useState(1);
     const { user } = useContext(LoginContext);
     const { data: groups } = useQuery({
         queryKey: [`groups`, user!.group],
         queryFn: () => getAPI<Groups>('/groups', { token: user!.token }),
         enabled: Boolean(user)
     });
+    const { data: total } = useQuery({
+        queryKey: [`properties`, user!.group, 'total'],
+        queryFn: () => postAPI<number>('/properties-count', {
+            group: user!.group > 1 ? user!.group : null,
+        },
+            {
+                token: user!.token
+            }),
+        enabled: Boolean(user && groups)
+    });
     const { data: propertyData, isLoading, isSuccess } = useQuery({
-        queryKey: [`properties`, user!.group, show || 0],
+        queryKey: [`properties`, user!.group, show || 0, pageNumber],
         queryFn: () => postAPI<Properties>('/properties', {
+            group: user!.group > 1 ? user!.group : null,
             limit: show || null,
-            group: user!.group > 1 ? user!.group : null
+            offset: show && pageNumber > 1 ? show * (pageNumber - 1) : null
         }, {
             token: user!.token
         }),
-        enabled: Boolean(user && groups)
+        keepPreviousData: true,
+        enabled: Boolean(total && user && groups)
     });
 
 
@@ -63,7 +81,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
                 return curr.groupId === property.groupId ? curr.name : accu;
             }, "Group Not Found");
             return createData(
-                "https://hdva-image-bucket-web.s3.amazonaws.com/properties/19th+Floor%2C+Apartment+09/19.09+Strata_2343_high-35x35.jpg",
+                property.propertyId,
                 property.name,
                 groupName,
                 {
@@ -75,27 +93,35 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
             )
         });
         setData(newData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groups, propertyData])
 
     const classes = useTableStyles();
-    function createData(image: string, name: string, group: string, propertyDetails: Record<string, boolean>, updated: string) {
+    function createData(id: string, name: string, group: string, propertyDetails: Record<string, boolean>, updated: string) {
         return {
             image: {
                 data: (
                     <LazyLoad height={STYLE_OVERRIDES.thumbnail}>
-                        <Link to="/properties">
-                            <img
-                                alt={name}
-                                height={STYLE_OVERRIDES.thumbnail}
-                                width={STYLE_OVERRIDES.thumbnail}
-                                src={image}
-                            />
+                        <Link to={{
+                            pathname: `/properties/${convertToSlug(name)}`,
+                            state: {
+                                propertyName: name,
+                                propertyId: id
+                            }
+                        }}>
+                           <FolderSVG />
                         </Link>
                     </LazyLoad>
                 )
             },
             name: {
-                data: <Link to="/properties">{name}</Link>,
+                data: <Link to={{
+                    pathname: `/properties/${convertToSlug(name)}`,
+                    state: {
+                        propertyName: name,
+                        propertyId: id
+                    }
+                }}>{name}</Link>,
             },
             group: {
                 hideOnMobile: true,
@@ -136,17 +162,19 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
                 mobile: true,
                 data: (
                     <React.Fragment>
-                        <Hidden mdUp>
+                        <Hidden smUp>
                             <BottomNavigation
                                 showLabels
-                                // className={classes.root}
+                            // className={classes.root}
                             >
                                 <BottomNavigationAction
-                                    // onClick={() => history.push(
-                                    //     link,
-                                    //     {
-                                    //         propertyId: pid
-                                    //     })}
+                                    onClick={() => history.push(
+                                        `/properties/${convertToSlug(name)}`,
+                                        {
+                                           propertyName: name,
+                                           propertyId: id
+                                        }
+                                    )}
                                     icon={<BurstModeIcon />}
                                     label="View Images" />
                                 <BottomNavigationAction
@@ -172,7 +200,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
                                     icon={
                                         // processing.downloading ?
                                         //     <CircularProgress variant="indeterminate" size="1.2rem" /> :
-                                            <CloudDownloadIcon />
+                                        <CloudDownloadIcon />
                                     }
                                 />
                                 {/* Only available to admin users */}
@@ -190,12 +218,12 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
                                     icon={
                                         // processing.deleting ?
                                         //     <CircularProgress variant="indeterminate" size="1.2rem" /> :
-                                            <DeleteForeverIcon />
+                                        <DeleteForeverIcon />
                                     }
                                 />
                             </BottomNavigation>
                         </Hidden>
-                        <Hidden mdDown>
+                        <Hidden smDown>
                             <Button
                                 size="large"
                                 variant="outlined"
@@ -218,7 +246,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
 
 
     const cells = [
-        { className: classes.imageCell },
+        { className: `${classes.hideOnMobile} ${classes.imageCell}` },
         {},
         { className: classes.nameCellContainer },
         { className: classes.media },
@@ -228,17 +256,45 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show }
 
     return (isLoading || !isSuccess || data.length <= 0) ? <CircularProgress /> : (
         <React.Fragment>
-            <Hidden only={["xs"]}>
+            <Hidden xsDown>
                 <GenericTable
+                    // onSelected={() => {
+                    //     <Grid container xs={10} spacing={1}>
+                    //         <Grid item>
+                    //             <CTAButton
+                    //                 loading={false}
+                    //                 onClick={() => alert(`Should download properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
+                    //                 fullWidth
+                    //                 className={genericClasses.actionButton}
+                    //                 disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
+                    //                 size="medium"
+                    //                 variant="contained"
+                    //                 color="primary"
+                    //                 type="submit"
+                    //             >
+                    //                 Download Selected
+                    //                     </CTAButton>
+                    //         </Grid>
+                    // }}
                     selectable={selectable}
                     head={head}
                     cells={cells}
                     data={data}
                 />
+                {showPagination && (
+                    <Pagination
+                        count={total as unknown as number}
+                        onChange={(event, pagenumber) => { setPageNumber(pagenumber) }}
+                        variant="outlined"
+                        shape="rounded"
+                    />
+                )}
             </Hidden>
-            <Hidden mdUp>
-                <MobileTable
-                    data={data}
+            <Hidden smUp>
+                <MobileTable 
+                    cellStyles={[cells[0]]}
+                    selectable={selectable} 
+                    data={data} 
                 />
             </Hidden>
         </React.Fragment>

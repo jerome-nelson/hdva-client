@@ -7,13 +7,9 @@ import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from "r
 
 interface MobileTableProps {
     className?: string;
+    cellStyles?: Record<string, any>[];
     selectable?: boolean;
-    head?: any[];
-    cells?: any[];
     data: any[];
-    showCols?: {
-        onMobile?: number;
-    };
 }
 
 // const SetRow: React.FC<{ isChecked: boolean; onSelect: any; row: any }> = ({ isChecked, row, onSelect }) => {
@@ -148,7 +144,7 @@ const CustomRow: React.FC<CustomRowProps> = ({ row, children }) => {
                 <TableRow>
                     <TableCell style={{ padding: 0 }} colSpan={6}>
                         <Collapse in={collapsed} timeout="auto" unmountOnExit>
-                           {row}
+                            {row}
                         </Collapse>
                     </TableCell>
                 </TableRow>
@@ -160,15 +156,16 @@ const CustomRow: React.FC<CustomRowProps> = ({ row, children }) => {
 interface SetRowProps {
     isChecked: boolean;
     onSelect(selected: boolean): void;
+    styles?: Record<string, any>[];
     row: Record<string, any>;
 }
 
-const SetRow: React.FC<SetRowProps> = ({ isChecked, onSelect, row }) => {
+const SetRow: React.FC<SetRowProps> = ({ isChecked, onSelect, row, styles }) => {
     const [selected, setSelected] = useState(isChecked);
 
     useEffect(() => {
         onSelect(selected);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onSelect]);
 
     const data = useMemo(() => {
@@ -180,12 +177,15 @@ const SetRow: React.FC<SetRowProps> = ({ isChecked, onSelect, row }) => {
 
     return (
         <CustomRow selected={selected} row={collapsedCells}>
-            {cells.map((item, index) => (<TableCell key={`row-${index}`}>{item}</TableCell>))}
+            {cells.map((item, index) => {
+                const className = (styles && styles[index] && styles[index].className) || "";
+                return <TableCell key={`row-${index}`} className={className}>{item}</TableCell>
+            })}
         </CustomRow>
     );
 }
 
-export const MobileTable: React.FC<MobileTableProps> = ({ data }) => {
+export const MobileTable: React.FC<MobileTableProps> = ({ data, cellStyles }) => {
     const [itemsSelected, setSelected] = useState<number[]>([]);
     return (
         <React.Fragment>
@@ -208,6 +208,7 @@ export const MobileTable: React.FC<MobileTableProps> = ({ data }) => {
                                     newItems.push(rowIndex);
                                     setSelected(newItems);
                                 }}
+                                styles={cellStyles}
                                 row={row}
                                 isChecked={Boolean(key > -1)}
                             />

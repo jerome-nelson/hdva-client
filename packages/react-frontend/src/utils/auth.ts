@@ -19,3 +19,11 @@ export const getToken = () => {
   debugger;
   return item && item.token;
 }
+
+export const convertToSlug = (text: string) => {
+    return text
+        .toLowerCase()
+        .replace(/[^\w ]+/g,'')
+        .replace(/ +/g,'-')
+        ;
+}
