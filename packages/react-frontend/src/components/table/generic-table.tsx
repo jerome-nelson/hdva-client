@@ -9,7 +9,7 @@ interface GenericTableProps {
     className?: string;
     onSelect?(): void;
     selectable?: boolean;
-    head: any[];
+    head?: any[];
     cells: any[];
     data: any[];
     showCols?: {
@@ -104,7 +104,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                 />
                             </TableCell>
                         )}
-                        {head.map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
+                        {(head || []).map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -140,7 +140,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                             key={`cell-${index}`}
                                             {...cells[index]}
                                             className={classNames({
-                                                [cells[index].className]: true,
+                                                ...(cells[index] && cells[index].className ?{ [cells[index].className]: true } : null),
                                                 [classes.cellStyle]: true,
                                                 [classes.trSelected]: isItemSelected
                                             })}

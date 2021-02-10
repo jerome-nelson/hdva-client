@@ -1,9 +1,10 @@
-import { Avatar, BottomNavigation, BottomNavigationAction, Button, CircularProgress, Hidden } from "@material-ui/core";
+import { Avatar, BottomNavigation, BottomNavigationAction, Button, Hidden, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Pagination from '@material-ui/lab/Pagination';
+import Skeleton from '@material-ui/lab/Skeleton';
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
@@ -93,7 +94,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
             )
         });
         setData(newData);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groups, propertyData])
 
     const classes = useTableStyles();
@@ -109,7 +110,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                                 propertyId: id
                             }
                         }}>
-                           <FolderSVG />
+                            <FolderSVG />
                         </Link>
                     </LazyLoad>
                 )
@@ -121,11 +122,15 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                         propertyName: name,
                         propertyId: id
                     }
-                }}>{name}</Link>,
+                }}>
+                    <Typography noWrap>
+                        {name}
+                    </Typography>
+                </Link>,
             },
             group: {
                 hideOnMobile: true,
-                data: group,
+                data:  <Typography noWrap>{group}</Typography>,
             },
             propertyDetails: {
                 hideOnMobile: true,
@@ -156,7 +161,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                 )
             },
             updated: {
-                data: updated
+                data: <Typography noWrap>{updated}</Typography>
             },
             extras: {
                 mobile: true,
@@ -171,8 +176,8 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                                     onClick={() => history.push(
                                         `/properties/${convertToSlug(name)}`,
                                         {
-                                           propertyName: name,
-                                           propertyId: id
+                                            propertyName: name,
+                                            propertyId: id
                                         }
                                     )}
                                     icon={<BurstModeIcon />}
@@ -254,7 +259,31 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
         { className: classes.moreCell }
     ];
 
-    return (isLoading || !isSuccess || data.length <= 0) ? <CircularProgress /> : (
+    const sample = {
+        image: {
+            data: <Skeleton variant="rect" animation="wave" height={65} width={65} />
+        },
+        name: {
+            data: <Skeleton variant="rect" animation="wave" height={20} width={300} />
+        },
+        group: {
+            data: <Skeleton variant="rect" animation="wave" height={20} width={300} />
+        },
+        dateUpdate: {
+            data: <Skeleton variant="rect" animation="wave" height={20} width={300} />
+        },
+        extra: {
+            data: <Skeleton variant="rect" animation="wave" height={40} width={130} />
+        },
+    };
+    const skeleton = [
+        sample,
+        sample,
+        sample,
+        sample
+    ];
+
+    return (
         <React.Fragment>
             <Hidden xsDown>
                 <GenericTable
@@ -279,7 +308,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                     selectable={selectable}
                     head={head}
                     cells={cells}
-                    data={data}
+                    data={(isLoading || !isSuccess || data.length <= 0) ? skeleton : data}
                 />
                 {showPagination && (
                     <Pagination
@@ -291,10 +320,10 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                 )}
             </Hidden>
             <Hidden smUp>
-                <MobileTable 
+                <MobileTable
                     cellStyles={[cells[0]]}
-                    selectable={selectable} 
-                    data={data} 
+                    selectable={selectable}
+                    data={data}
                 />
             </Hidden>
         </React.Fragment>
