@@ -6,6 +6,7 @@ import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutli
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { HeaderTitle } from "components/header/header";
 import { PropertyTable } from "components/property/property-table";
+import { LIMITS } from "config/data";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
@@ -113,7 +114,7 @@ export const PropertiesOverviewPage: React.FC = () => {
                 <HeaderTitle isFixed title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
             {
-                <PropertyTable selectable show={20} showPagination />
+                <PropertyTable selectable show={LIMITS.property} showPagination />
             // properties && properties.length === 0 ? (
                 // <Placeholder
                 //     subtitle={messages["placeholder.properties.subtitle"]}

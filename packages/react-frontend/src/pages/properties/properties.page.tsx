@@ -1,5 +1,6 @@
 import { Box, Breadcrumbs, Grid, Hidden, Link, Paper, Typography } from "@material-ui/core";
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
+import Skeleton from '@material-ui/lab/Skeleton';
 import { HeaderTitle } from "components/header/header";
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
@@ -68,7 +69,7 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
   const location = useLocation<{ propertyName: string; propertyId: string; }>();
   const [propertyData, setPropertyData] = useState<any>([]);
 
-  useQuery({
+  const { isLoading, isSuccess} = useQuery({
     queryKey: [`properties`, user!.group, location.state.propertyId],
     queryFn: () => postAPI<any>('/get-media', {
       pids: [location.state.propertyId],
@@ -104,6 +105,27 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
     className: classes.iconTableCell
   }];
 
+  const sample = {
+    image: {
+        data: <Skeleton variant="rect" animation="wave" height={50} width={50} />
+    },
+    name: {
+        data: <Skeleton variant="rect" animation="wave" height={25} width={540} />
+    },
+    group: {
+      data: <Skeleton variant="rect" animation="wave" height={25} width={165} />
+    },
+    dateUpdate: {
+        data: <Skeleton variant="rect" animation="wave" height={25} width={25} />
+    },
+};
+const skeleton = [
+    sample,
+    sample,
+    sample,
+    sample
+];
+
   return (
     <Box>
       <Hidden mdDown>
@@ -133,7 +155,7 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
                 { name: "Modified", className: classes.tableHeadCell, colSpan: 2 }
               ]}
               cells={cells}
-              data={tableStylesData(propertyData)}
+              data={(isLoading || !isSuccess) ? skeleton : tableStylesData(propertyData)}
             />
           )}
         </Grid>

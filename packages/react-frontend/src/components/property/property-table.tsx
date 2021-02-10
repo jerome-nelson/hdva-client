@@ -1,19 +1,15 @@
-import { Avatar, BottomNavigation, BottomNavigationAction, Button, Hidden, Typography } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Button, Hidden, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import Pagination from '@material-ui/lab/Pagination';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { LoginContext } from "components/login-form/login.context";
+import { CustomPagination } from "components/pagination/pagination";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
 import { getAPI, postAPI } from "hooks/useAPI";
-import { ReactComponent as FloorplanSVG } from "media/floorplan.svg";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
-import { CustomIcons } from "media/icons";
-import { ReactComponent as PhotoSVG } from "media/photography.svg";
-import { ReactComponent as VRSVG } from "media/vr.svg";
 import { Groups } from "pages/group-management/group-management.page";
 import React, { useContext, useEffect, useState } from "react";
 import LazyLoad from "react-lazyload";
@@ -130,35 +126,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
             },
             group: {
                 hideOnMobile: true,
-                data:  <Typography noWrap>{group}</Typography>,
-            },
-            propertyDetails: {
-                hideOnMobile: true,
-                data: (
-                    <div>
-                        {propertyDetails.floorplan && (
-                            <Avatar>
-                                <CustomIcons>
-                                    <FloorplanSVG />
-                                </CustomIcons>
-                            </Avatar>
-                        )}
-                        {propertyDetails.vt && (
-                            <Avatar>
-                                <CustomIcons>
-                                    <VRSVG />
-                                </CustomIcons>
-                            </Avatar>
-                        )}
-                        {propertyDetails.images && (
-                            <Avatar>
-                                <CustomIcons>
-                                    <PhotoSVG />
-                                </CustomIcons>
-                            </Avatar>
-                        )}
-                    </div>
-                )
+                data: <Typography noWrap>{group}</Typography>,
             },
             updated: {
                 data: <Typography noWrap>{updated}</Typography>
@@ -253,7 +221,6 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
     const cells = [
         { className: `${classes.hideOnMobile} ${classes.imageCell}` },
         {},
-        { className: classes.nameCellContainer },
         { className: classes.media },
         {},
         { className: classes.moreCell }
@@ -310,13 +277,13 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                     cells={cells}
                     data={(isLoading || !isSuccess || data.length <= 0) ? skeleton : data}
                 />
-                {showPagination && (
-                    <Pagination
-                        count={total as unknown as number}
-                        onChange={(event, pagenumber) => { setPageNumber(pagenumber) }}
-                        variant="outlined"
-                        shape="rounded"
-                    />
+                {showPagination && show && !isNaN(total as unknown as number) && (
+                    <div className={classes.pagination}>
+                        <CustomPagination
+                            count={Math.floor((total as unknown as number) / show)}
+                            onChange={pagenumber => { setPageNumber(pagenumber) }}
+                        />
+                    </div>
                 )}
             </Hidden>
             <Hidden smUp>

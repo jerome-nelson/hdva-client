@@ -2,6 +2,11 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { COLOR_OVERRIDES, WIDTHS } from "theme";
 
 export const useTableStyles = makeStyles((theme: Theme) => createStyles({
+    pagination: {
+        position: `fixed`,
+        bottom: `5%`,
+        zIndex: 1
+    },
     media: {
         "& > div": {
             display: 'flex',
