@@ -8,7 +8,7 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             margin: `75px auto 0`
         },
         table: {
-            width: "95%",
+            width: "90%",
             margin: `0 auto`
         },
         logo: {

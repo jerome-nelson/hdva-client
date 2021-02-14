@@ -141,6 +141,12 @@ export const theme = createMuiTheme({
             root: STYLE_OVERRIDES.input.main,
         },
         MuiSvgIcon: {
+            colorDisabled: {
+                color: COLOR_OVERRIDES.hdva_grey,
+            },
+            colorPrimary: {
+                color: COLOR_OVERRIDES.hdva_red,
+            },
             colorSecondary: {
                 color: COLOR_OVERRIDES.hdva_black,
             }
