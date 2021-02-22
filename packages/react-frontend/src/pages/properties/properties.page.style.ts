@@ -8,6 +8,14 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
             fontWeight: `bolder`,
             paddingBottom: `${theme.spacing(1)}px`
         },
+        variantBG: {
+            background: `rgba(0, 0, 0, 0.13)`,
+            marginBottom: `10px`,
+        },
+        photoBG: {
+            height: 300,
+            width: 400
+        },
         breadcrumb: {
             marginTop: `42px`,
             marginBottom: `20px`,
@@ -15,6 +23,13 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
                 // TODO: Integrate into the theme
                 fontSize: `1.5rem`
             }
+        },
+        sidePanel: {
+            position: `fixed`,
+            top: 0,
+            right: 0,
+            height: `100%`,
+            width: `500px`
         },
         link: {
             display: 'flex',

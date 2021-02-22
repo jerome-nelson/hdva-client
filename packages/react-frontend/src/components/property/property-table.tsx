@@ -17,6 +17,7 @@ import { useQuery } from "react-query";
 import { Link, useHistory } from 'react-router-dom';
 import { STYLE_OVERRIDES } from 'theme';
 import { convertToSlug } from "utils/auth";
+import { PropertyGTM } from "./property-gtm";
 import { useTableStyles } from "./property-table.style";
 
 export interface Properties {
@@ -31,13 +32,15 @@ interface PropertyTableProps {
     show?: number;
     showPagination?: boolean;
     selectable?: boolean;
+    onSelect?(items: number[]): void;
 }
 
-export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, showPagination }) => {
+export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, showPagination, onSelect }) => {
     const [data, setData] = useState<any>([]);
     const history = useHistory();
     const [pageNumber, setPageNumber] = useState(1);
     const { user } = useContext(LoginContext);
+    const analytics = PropertyGTM();
     const { data: groups } = useQuery({
         queryKey: [`groups`, user!.group],
         queryFn: () => getAPI<Groups>('/groups', { token: user!.token }),
@@ -65,7 +68,6 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
         keepPreviousData: true,
         enabled: Boolean(total && user && groups)
     });
-
 
     useEffect(() => {
 
@@ -99,26 +101,40 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
             image: {
                 data: (
                     <LazyLoad height={STYLE_OVERRIDES.thumbnail}>
-                        <Link to={{
-                            pathname: `/properties/${convertToSlug(name)}`,
-                            state: {
-                                propertyName: name,
-                                propertyId: id
-                            }
-                        }}>
+                        <Link
+                            onClick={() => {
+                                analytics.onAction({
+                                    eventAction: "Navigate to Property - Image",
+                                    eventLabel: name,
+                                })
+                            }}
+                            to={{
+                                pathname: `/properties/${convertToSlug(name)}`,
+                                state: {
+                                    propertyName: name,
+                                    propertyId: id
+                                }
+                            }}>
                             <FolderSVG />
                         </Link>
                     </LazyLoad>
                 )
             },
             name: {
-                data: <Link to={{
-                    pathname: `/properties/${convertToSlug(name)}`,
-                    state: {
-                        propertyName: name,
-                        propertyId: id
-                    }
-                }}>
+                data: <Link
+                    onClick={() => {
+                        analytics.onAction({
+                            eventAction: "Navigate to Property - Link",
+                            eventLabel: name
+                        })
+                    }}
+                    to={{
+                        pathname: `/properties/${convertToSlug(name)}`,
+                        state: {
+                            propertyName: name,
+                            propertyId: id
+                        }
+                    }}>
                     <Typography noWrap>
                         {name}
                     </Typography>
@@ -141,13 +157,15 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                             // className={classes.root}
                             >
                                 <BottomNavigationAction
-                                    onClick={() => history.push(
-                                        `/properties/${convertToSlug(name)}`,
-                                        {
-                                            propertyName: name,
-                                            propertyId: id
-                                        }
-                                    )}
+                                    onClick={() => {
+                                        history.push(
+                                            `/properties/${convertToSlug(name)}`,
+                                            {
+                                                propertyName: name,
+                                                propertyId: id
+                                            }
+                                        )
+                                    }}
                                     icon={<BurstModeIcon />}
                                     label="View Images" />
                                 <BottomNavigationAction
@@ -162,13 +180,19 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                                     icon={<CreateNewFolderOutlinedIcon />}
                                 />
                                 <BottomNavigationAction
-                                    // onClick={() => {
-                                    //     // TODO: Download API
-                                    //     setStatus({
-                                    //         ...processing,
-                                    //         downloading: true
-                                    //     });
-                                    // }}
+                                    onClick={async () => {
+                                        // generate-download
+                                        analytics.onAction({
+                                            eventAction: "Download Property",
+                                            eventLabel: name
+                                        });
+    
+                                        await postAPI<any>('/generate-download', {
+                                            pid: [id],
+                                        }, {
+                                            token: user!.token
+                                        })
+                                    }}
                                     label="Download Folder"
                                     icon={
                                         // processing.downloading ?
@@ -198,6 +222,19 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                         </Hidden>
                         <Hidden smDown>
                             <Button
+                                onClick={async () => {
+                                    // generate-download
+                                    analytics.onAction({
+                                        eventAction: "Download Property",
+                                        eventLabel: name
+                                    });
+
+                                    await postAPI<any>('/generate-download', {
+                                        pid: [id],
+                                    }, {
+                                        token: user!.token
+                                    })
+                                }}
                                 size="large"
                                 variant="outlined"
                                 color="primary"
@@ -252,8 +289,9 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
 
     return (
         <React.Fragment>
-            <Hidden xsDown>
+            <Hidden smDown>
                 <GenericTable
+                    onSelect={onSelect}
                     // onSelected={() => {
                     //     <Grid container xs={10} spacing={1}>
                     //         <Grid item>
@@ -277,7 +315,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                     cells={cells}
                     data={(isLoading || !isSuccess || data.length <= 0) ? skeleton : data}
                 />
-                {showPagination && show && !isNaN(total as unknown as number) && (
+                {!(isLoading || !isSuccess || data.length <= 0) && showPagination && show && !isNaN(total as unknown as number) && (
                     <div className={classes.pagination}>
                         <CustomPagination
                             count={Math.floor((total as unknown as number) / show)}
@@ -286,7 +324,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                     </div>
                 )}
             </Hidden>
-            <Hidden smUp>
+            <Hidden mdUp>
                 <MobileTable
                     cellStyles={[cells[0]]}
                     selectable={selectable}

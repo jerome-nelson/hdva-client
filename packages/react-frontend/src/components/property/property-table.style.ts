@@ -4,7 +4,9 @@ import { COLOR_OVERRIDES, WIDTHS } from "theme";
 export const useTableStyles = makeStyles((theme: Theme) => createStyles({
     pagination: {
         position: `fixed`,
-        bottom: `5%`,
+        left: `55%`,
+        bottom: `0%`,
+        transform: `translate(-50%, -10%)`,
         zIndex: 1
     },
     media: {

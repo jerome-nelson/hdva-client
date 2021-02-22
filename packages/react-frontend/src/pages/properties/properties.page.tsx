@@ -1,13 +1,14 @@
-import { Box, Breadcrumbs, Grid, Hidden, Link, Paper, Typography } from "@material-ui/core";
+import { Box, Breadcrumbs, Card, Grid, Hidden, Link, Paper, Typography } from "@material-ui/core";
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
 import { postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { usePropertyStyles } from "pages/properties/properties.page.style";
-import React, { useContext, useState } from "react";
+import React, { useContext, useReducer, useState } from "react";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 
@@ -61,15 +62,30 @@ const getThumbnailUrl = (url: string, type: string): string => {
   return `${process.env.REACT_APP_IMG}/${fileName}`;
 }
 
-
+const initialState = {
+  amount: 0,
+  txt: "Images"
+}
+function reducer(_: Record<string, any>, action: { amount: number }) {
+  const amount = action.amount;
+  return amount > 0 ? {
+    amount,
+    txt: "Images"
+  } : {
+      amount,
+      ...initialState
+    };
+}
 
 export const PropertiesPage: React.SFC<PropertyProps> = () => {
   const { user } = useContext(LoginContext);
   const classes = usePropertyStyles();
+  const [amountTxt, updateAmount] = useReducer(reducer, initialState);
   const location = useLocation<{ propertyName: string; propertyId: string; }>();
+  const [currentMedia, setCurrentMedia] = useState<Record<string, any>>();
   const [propertyData, setPropertyData] = useState<any>([]);
 
-  const { isLoading, isSuccess} = useQuery({
+  const { isLoading, isSuccess } = useQuery({
     queryKey: [`properties`, user!.group, location.state.propertyId],
     queryFn: () => postAPI<any>('/get-media', {
       pids: [location.state.propertyId],
@@ -107,60 +123,98 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
 
   const sample = {
     image: {
-        data: <Skeleton variant="rect" animation="wave" height={50} width={50} />
+      data: <Skeleton variant="rect" animation="wave" height={50} width={50} />
     },
     name: {
-        data: <Skeleton variant="rect" animation="wave" height={25} width={540} />
+      data: <Skeleton variant="rect" animation="wave" height={25} width={540} />
     },
     group: {
       data: <Skeleton variant="rect" animation="wave" height={25} width={165} />
     },
     dateUpdate: {
-        data: <Skeleton variant="rect" animation="wave" height={25} width={25} />
+      data: <Skeleton variant="rect" animation="wave" height={25} width={25} />
     },
-};
-const skeleton = [
+  };
+  const skeleton = [
     sample,
     sample,
     sample,
     sample
-];
-
+  ];
+  console.log(amountTxt.amount);
   return (
-    <Box>
-      <Hidden mdDown>
-        <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
-          <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
-            <FolderSVG className={classes.icon} />
+    <React.Fragment>
+      <Hidden smDown>
+        <Card className={classes.sidePanel} square elevation={0}>
+          <Typography gutterBottom variant="h5" component="h2">
+            Overview
+        </Typography>
+          {currentMedia ? currentMedia.title : <Skeleton className={classes.variantBG} animation={false} variant="rect" height={20} width={400} />}
+          <div className={`${classes.variantBG} ${classes.photoBG}`} />
+          <CTAButton
+            size="small"
+            variant="contained"
+            color="primary"
+            disabled={!amountTxt.amount}
+            loading={false}
+            type="button">
+            Download {amountTxt.txt}
+          </CTAButton>
+        </Card>
+      </Hidden>
+      <Box>
+        <Hidden mdDown>
+          <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
+            <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
+              <FolderSVG className={classes.icon} />
           HDVA
           </Link>
-          <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
-            Properties
+            <Link color="textSecondary" href="/properties" onClick={() => { }} className={classes.link}>
+              Properties
           </Link>
-          <Link color="secondary" href="/" onClick={() => { }} className={classes.link}>
-            {location.state.propertyName}
-          </Link>
-        </Breadcrumbs>
-      </Hidden>
-      <Hidden mdUp>
-        <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={location.state.propertyName} />
-      </Hidden>
-      <Grid container>
-        <Grid item xs={7}>
-          {propertyData && (
-            <GenericTable
-              selectable
-              head={[
-                { name: "Name", className: classes.tableHeadCell, colSpan: 2 },
-                { name: "Modified", className: classes.tableHeadCell, colSpan: 2 }
-              ]}
-              cells={cells}
-              data={(isLoading || !isSuccess) ? skeleton : tableStylesData(propertyData)}
-            />
-          )}
-        </Grid>
-      </Grid>
-    </Box>
+            <Link color="secondary" href="/" onClick={() => { }} className={classes.link}>
+              {location.state.propertyName}
+            </Link>
+          </Breadcrumbs>
+        </Hidden>
+        <Hidden mdUp>
+          <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={location.state.propertyName} />
+        </Hidden>
+        <Grid container>
+          <Grid item md={7} xs={12}>
+            <CTAButton
+              onClick={async () => {
+                await postAPI<any>('/generate-download', {
+                  pid: [location.state.propertyId],
+              }, {
+                  token: user!.token
+              })
+              }}
+              size="small"
+              variant="contained"
+              color="primary"
+              loading={false}
+              type="button">
+              Download All
+          </CTAButton>
+            {propertyData && (
+              <GenericTable
+                selectable
+                onSelect={items => {
 
+                  updateAmount({ amount: items.length })
+                }}
+                head={[
+                  { name: "Name", className: classes.tableHeadCell, colSpan: 2 },
+                  { name: "Modified", className: classes.tableHeadCell, colSpan: 2 }
+                ]}
+                cells={cells}
+                data={(isLoading || !isSuccess) ? skeleton : tableStylesData(propertyData)}
+              />
+            )}
+          </Grid>
+        </Grid>
+      </Box>
+    </React.Fragment>
   );
 }

@@ -34,7 +34,7 @@ export const Modal: React.FC<ModalProps> = ({ children }) => {
                 })}>
                     <ErrorPopup rounded show={showModal}>
                         <Grid className={classes.gridTxtAlignment} container alignItems="center">
-                            <Grid sm={11} item>{modalOptions.message}</Grid>
+                            <Grid sm={11} item><span dangerouslySetInnerHTML={{ __html: modalOptions.message }} /></Grid>
                             <Grid className={classes.lastItem} item>
                                 <CancelIcon className={classes.closeIcon} onClick={() => setModalState(false)} />
                             </Grid>

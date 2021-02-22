@@ -1,4 +1,4 @@
-import { BottomNavigation, BottomNavigationAction, CircularProgress, Hidden } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Breadcrumbs, CircularProgress, Hidden, Link } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
@@ -7,6 +7,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { HeaderTitle } from "components/header/header";
 import { PropertyTable } from "components/property/property-table";
 import { LIMITS } from "config/data";
+import { ReactComponent as FolderSVG } from "media/folder.svg";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
@@ -113,16 +114,26 @@ export const PropertiesOverviewPage: React.FC = () => {
             <Hidden mdUp>
                 <HeaderTitle isFixed title="All Properties" alignText="center" color="primary" variant="h5" />
             </Hidden>
+            <Hidden mdDown>
+                <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
+                    <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
+                        <FolderSVG className={classes.icon} /> HDVA
+                    </Link>
+                    <Link color="secondary" onClick={() => { }} className={classes.link}>
+                        All Properties
+                    </Link>
+                </Breadcrumbs>
+            </Hidden>
             {
                 <PropertyTable selectable show={LIMITS.property} showPagination />
-            // properties && properties.length === 0 ? (
+                // properties && properties.length === 0 ? (
                 // <Placeholder
                 //     subtitle={messages["placeholder.properties.subtitle"]}
                 //     title={messages["placeholder.properties.title"]}
                 // >
                 //     <HomeWorkIcon />
                 // </Placeholder>
-            // ) : (
+                // ) : (
                 // properties.isLoading ?
                 // <CircularProgress size="1.5rem" color="secondary" /> 
                 // :
@@ -181,7 +192,7 @@ export const PropertiesOverviewPage: React.FC = () => {
                 //     )}
                 // </CustomTable>
                 // )}
-            // )
+                // )
             }
         </React.Fragment>
     )

@@ -1,34 +1,38 @@
-import { ThemeProvider } from '@material-ui/core';
+import { init } from "@sentry/react";
+import { gtmOverview } from 'config/analytics';
 import 'fontsource-roboto';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from 'react-query/devtools';
+import TagManager from "react-gtm-module";
 import { App } from "./app";
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { theme } from "./theme";
+
+// TODO: Setup Releases and Commit Logging
+init({
+  dsn: process.env.REACT_APP_SENTRY_ID,
+  environment: process.env.REACT_APP_ENV || "development",
+  // integrations: [
+  //   new Integrations.BrowserTracing({
+  //     routingInstrumentation: reactRouterV5Instrumentation(),
+  //   })
+  // ],
+  debug: Boolean(process.env.REACT_APP_DEBUG),
+  tracesSampleRate: 1.0,
+});
 
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      staleTime: 1000 * 60 * 60 * 24,
-      cacheTime: 1000 * 60 * 60 * 24
-    }
+TagManager.initialize({
+  gtmId: gtmOverview.id,
+  dataLayer: {
+    brand: gtmOverview.brand
   }
 });
 
 // TODO: Integrate all theme colours into theme override
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+          <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

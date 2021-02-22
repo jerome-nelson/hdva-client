@@ -3,6 +3,9 @@ import { COLOR_OVERRIDES, STYLE_OVERRIDES } from "../theme";
 
 export const useGenericStyle = makeStyles((theme: Theme) =>
     createStyles({
+        fullWidth: {
+            width: `100%`,
+        },
         userFields: {
             marginTop: `${theme.spacing(3)}px`,
         },

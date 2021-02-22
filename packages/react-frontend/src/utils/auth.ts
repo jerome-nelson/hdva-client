@@ -20,6 +20,7 @@ export const getToken = () => {
   return item && item.token;
 }
 
+// Add to global library
 export const convertToSlug = (text: string) => {
     return text
         .toLowerCase()

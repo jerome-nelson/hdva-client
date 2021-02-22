@@ -2,12 +2,12 @@ import { Checkbox, createStyles, makeStyles, TableBody, TableCell, TableHead, Ta
 import Table from '@material-ui/core/Table';
 import TableContainer from '@material-ui/core/TableContainer';
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { COLOR_OVERRIDES } from 'theme';
 
 interface GenericTableProps {
     className?: string;
-    onSelect?(): void;
+    onSelect?(items: number[]): void;
     selectable?: boolean;
     head?: any[];
     cells: any[];
@@ -44,7 +44,7 @@ export const useGenericTableStyles = makeStyles((theme: Theme) => (
 ));
 
 
-export const GenericTable: React.FC<GenericTableProps> = ({ className, head, selectable, cells, data }) => {
+export const GenericTable: React.FC<GenericTableProps> = ({ className, head, selectable, cells, data, onSelect }) => {
 
     const classes = useGenericTableStyles();
     const [itemsSelected, setSelected] = useState<number[]>([]);
@@ -54,6 +54,12 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
         () => itemsSelected.length > 0 && itemsSelected.length !== data.length,
         [data, itemsSelected]
     );
+
+    useEffect(() => {
+        if (onSelect) {
+            onSelect(itemsSelected);
+        }
+    }, [itemsSelected]);
 
     const headerSelect = (checked: boolean) => {
         if (checked) {

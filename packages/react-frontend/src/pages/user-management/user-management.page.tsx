@@ -1,23 +1,67 @@
-import { Box, Grid, Hidden } from "@material-ui/core";
+import { Box, Breadcrumbs, Grid, Hidden, InputAdornment, Link, Paper, TextField, Typography } from "@material-ui/core";
+import SearchIcon from '@material-ui/icons/Search';
+import Skeleton from "@material-ui/lab/Skeleton";
+import { GenericTable } from "components/table/generic-table";
+import { ReactComponent as FolderSVG } from "media/folder.svg";
 import React from "react";
+import { useGenericStyle } from "utils/generic.style";
 import { HeaderTitle } from "../../components/header/header";
-import { StickyHeader } from "../../components/sticky-header/sticky-header";
 import { messages } from "../../config/en";
+import { useUserStyles } from "./user-management.page.style";
+
+const SearchUsers: React.FC = () => {
+    const generic = useGenericStyle();
+    return (
+        <TextField
+            className={generic.fullWidth}
+            placeholder="Search for users"
+            color="secondary"
+            InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <SearchIcon color="secondary" />
+                    </InputAdornment>
+                ),
+            }}
+        />
+    );
+}
 
 export const UserPage: React.FC = () => {
+    const classes = useUserStyles();
     return (
         <Box>
-            <Hidden mdUp>
-                <StickyHeader>
-                    <Grid container>
-                        <Grid xs={8}>
-                            <HeaderTitle isFixed disableBack alignText="left" title={messages["user.page.title"]} disableGutters />
-                        </Grid>
-                    </Grid>
-                </StickyHeader>
+            <Hidden mdDown>
+                <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
+                    <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
+                        <FolderSVG className={classes.icon} /> HDVA
+                    </Link>
+                    <Link color="secondary" onClick={() => { }} className={classes.link}>
+                        {messages["user.page.title"]}
+                    </Link>
+                </Breadcrumbs>
             </Hidden>
+            <Hidden mdUp>
+                <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={messages["user.page.title"]} />
+            </Hidden>
+            <Grid container>
+                <Grid md={4} xs={12}>
+                    <Paper className={classes.paperOverride}>
+                        <SearchUsers />
+                        <Typography color="primary" variant="h6">
+                            Recent Users
+                        </Typography>
+                        <Skeleton className={classes.variantBG} variant="circle" animation="pulse" height={30} width={30}/>
+                        <Skeleton className={classes.variantBG} variant="rect" animation="pulse" width={150} height={20} />
+                        <GenericTable
+                            cells={[]}
+                            data={[]}
+                        />
+                    </Paper>
+                </Grid>
+            </Grid>
             {/* <Hidden mdUp>
-                <HeaderTitle disableBack title={messages["user-management.title"]} />
+                <HeaderTitle disableBack title={} />
             </Hidden>
             <Grid container>
                 {
