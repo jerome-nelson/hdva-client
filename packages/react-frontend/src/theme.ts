@@ -139,6 +139,16 @@ export const theme = createMuiTheme({
         },
         MuiInputBase: {
             root: STYLE_OVERRIDES.input.main,
+            colorSecondary: {
+                color: COLOR_OVERRIDES.hdva_black,
+                "&.Mui-disabled": STYLE_OVERRIDES.input.disabled,
+                "&.MuiInput-underline::before": {
+                    borderBottom: `1px solid ${COLOR_OVERRIDES.hdva_black_light} !important`
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: `rgba(0, 0, 0, 0.23)`,
+                },
+            },
         },
         MuiSvgIcon: {
             colorDisabled: {
@@ -202,6 +212,11 @@ export const theme = createMuiTheme({
         MuiTableCell: {
             root: {
                 fontSize: `1rem`
+            }
+        },
+        MuiLinearProgress: {
+            colorSecondary: {
+                color: COLOR_OVERRIDES.hdva_white
             }
         },
         MuiCircularProgress: {

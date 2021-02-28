@@ -1,4 +1,4 @@
-import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Hidden, Typography } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Grid, Hidden, LinearProgress, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -6,17 +6,17 @@ import { LoginContext } from "components/login-form/login.context";
 import { CustomPagination } from "components/pagination/pagination";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
-import { getAPI, postAPI } from "hooks/useAPI";
+import { getAPI, getDownload, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { Groups } from "pages/group-management/group-management.page";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import LazyLoad from "react-lazyload";
-import { useQuery } from "react-query";
+import { useQueries, useQuery } from "react-query";
 import { Link, useHistory } from 'react-router-dom';
 import { STYLE_OVERRIDES } from 'theme';
 import { convertToSlug } from "utils/auth";
 import { PropertyGTM } from "./property-gtm";
-import { useTableStyles } from "./property-table.style";
+import { useMiniTableStyles, useTableStyles } from "./property-table.style";
 
 export interface Properties {
     createdOn: number;
@@ -26,14 +26,117 @@ export interface Properties {
     groupId: string;
 }
 
-interface PropertyTableProps {
+export interface PropertyTableProps {
+    mini?: boolean;
     show?: number;
     showPagination?: boolean;
     selectable?: boolean;
     onSelect?(items: number[]): void;
 }
 
-export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, showPagination, onSelect }) => {
+export interface PropertyMiniTableProps {
+    className?: string;
+    color?: "primary" | "secondary";
+    filter?: string;
+    onResult?(data: number): void;
+}
+
+export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className, color, filter, onResult }) => {
+    const [pageNumber, setPageNumber] = useState(1);
+    const [propertyData, setPropertyData] = useState<any>([]);
+    const [searchTerm, setSearchTerm] = useState(filter || "");
+    const { user } = useContext(LoginContext);
+    const classes = useMiniTableStyles({ filter });
+    const { data: groups } = useQuery({
+        queryKey: [`groups`, user!.group],
+        queryFn: () => getAPI<Groups>('/groups', { token: user!.token }),
+        enabled: Boolean(user)
+    });
+
+
+    useEffect(() => {
+        if (onResult) {
+            onResult(propertyData.length)
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [propertyData]);
+
+    const debounce = (func: any, delay: number) => {
+        let inDebounce: any;
+        return function() {
+          const context = this as any;
+          const args = arguments
+          clearTimeout(inDebounce)
+          inDebounce = setTimeout(() => func.apply(context, args), delay)
+        }
+      }
+      const debouncedSave = useRef(debounce((nextFilter: any) => {
+          setSearchTerm(nextFilter || "")
+          results[0].refetch();
+          results[1].refetch();
+
+        }, 1000))
+      .current;
+    const results = useQueries([
+        {
+            queryKey: [`properties`, user!.group, 'total'],
+            queryFn: () => postAPI<number>(
+                '/properties-count',
+                { 
+                    filter,
+                    group: user!.group > 1 ? user!.group : null 
+                },
+                { token: user!.token }
+            ),
+            retry: 3,
+            enabled: Boolean(user && groups)
+        },
+        {
+            queryKey: [`properties`, user!.group, 3, pageNumber],
+            queryFn: () => postAPI<Properties>(
+                '/properties',
+                {
+                    filter,
+                    group: user!.group > 1 ? user!.group : null,
+                    limit: 3,
+                    offset: pageNumber > 1 ? 3 * (pageNumber - 1) : null
+                }, {
+                token: user!.token
+            }),
+            retry: 3,
+            select: (data: any) => {
+                const refined = data.map((el: any) => ({
+                    image: {
+                        data: <FolderSVG />
+                    },
+                    name: {
+                        data: el.name
+                    }
+                }));
+                setPropertyData(refined);
+                return;
+            },
+            keepPreviousData: true,
+            enabled: Boolean(user && groups)
+        }
+    ]);
+    const isFetching = useMemo(() => results[0].isFetching || results[0].isLoading || results[1].isLoading || results[1].isFetching, [results]);
+    useEffect(() => {
+        if (!!filter) {
+            debouncedSave(filter);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filter]);
+    return (
+        <Grid container className={className}>
+            <Grid className={classes.root} xs={12} item>
+                {isFetching ? <LinearProgress color="secondary" /> : <GenericTable color={color} data={propertyData} cells={[]} mini />}
+            </Grid>
+        </Grid>
+    )
+}
+
+export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, mini, show, showPagination, onSelect }) => {
     const [data, setData] = useState<any>([]);
     const history = useHistory();
     const [pageNumber, setPageNumber] = useState(1);
@@ -52,6 +155,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
             {
                 token: user!.token
             }),
+        retry: 3,
         enabled: Boolean(user && groups)
     });
     const { data: propertyData, isLoading, isFetching, isSuccess } = useQuery({
@@ -63,14 +167,12 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
         }, {
             token: user!.token
         }),
+        retry: 3,
         keepPreviousData: true,
         enabled: Boolean(total && user && groups)
     });
 
-    console.log(isFetching);
-
     useEffect(() => {
-
         if (!propertyData || !groups) {
             return;
         }
@@ -95,7 +197,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groups, propertyData])
 
-    const classes = useTableStyles();
+    const classes = useTableStyles({ mini });
     function createData(id: string, name: string, group: string, propertyDetails: Record<string, boolean>, updated: string) {
         return {
             image: {
@@ -141,13 +243,16 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                 </Link>,
             },
             group: {
+                hide: mini,
                 hideOnMobile: true,
                 data: <Typography noWrap>{group}</Typography>,
             },
             updated: {
+                hide: mini,
                 data: <Typography noWrap>{updated}</Typography>
             },
             extras: {
+                hide: mini,
                 mobile: true,
                 data: (
                     <React.Fragment>
@@ -200,11 +305,12 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                                         eventLabel: name
                                     });
 
-                                    await postAPI<any>('/generate-download', {
+                                    const zip = await postAPI<any>('/generate-download', {
                                         pid: [id],
                                     }, {
                                         token: user!.token
                                     })
+                                    await getDownload(zip as unknown as string, `${convertToSlug(name)}.zip`);
                                 }}
                                 size="large"
                                 variant="outlined"
@@ -221,8 +327,8 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
 
     const head = [
         { name: "Name", className: classes.tableHeadCell, colSpan: 2 },
-        { name: "Group", className: classes.tableHeadCell, colSpan: 2 },
-        { name: "Modified", className: classes.tableHeadCell, colSpan: 2 }
+        { name: "Group", className: classes.tableHeadCell, colSpan: 2, hide: mini },
+        { name: "Modified", className: classes.tableHeadCell, colSpan: 2, hide: mini }
     ];
 
 
@@ -264,7 +370,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                 <GenericTable
                     head={head}
                     cells={cells}
-                    data={(isFetching|| !isSuccess || data.length <= 0) ? skeleton : data}
+                    data={(isFetching || !isSuccess || data.length <= 0) ? skeleton : data}
                 />
             </Hidden>
             <Hidden mdUp>

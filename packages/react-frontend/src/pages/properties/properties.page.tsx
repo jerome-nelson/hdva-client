@@ -5,7 +5,7 @@ import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
 import { LoginContext } from "components/login-form/login.context";
 import { GenericTable } from "components/table/generic-table";
-import { postAPI } from "hooks/useAPI";
+import { getDownload, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { usePropertyStyles } from "pages/properties/properties.page.style";
 import React, { useContext, useReducer, useState } from "react";
@@ -53,8 +53,9 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
   const { user } = useContext(LoginContext);
   const classes = usePropertyStyles();
   const [amountTxt, updateAmount] = useReducer(reducer, initialState);
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const location = useLocation<{ propertyName: string; propertyId: string; }>();
-  const [currentMedia, setCurrentMedia] = useState<Record<string, any>>();
+  const [currentMedia, _] = useState<Record<string, any>>();
   const [propertyData, setPropertyData] = useState<any>([]);
 
   const { isLoading, isSuccess } = useQuery({
@@ -84,7 +85,14 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         data: <Typography noWrap>{new Date(row.modifiedOn).toDateString()}</Typography>
       },
       extra: {
-        data: <CloudDownloadOutlinedIcon />
+        data: <CloudDownloadOutlinedIcon onClick={async () => {
+          const image = await postAPI<string>('/image/download', {
+            path: [`${location.state.propertyName}/${row.resource}`],
+          }, {
+            token: user!.token
+          })
+          await getDownload(image as unknown as string, row.resource);
+        }} />
       },
     }
   ));
@@ -124,6 +132,19 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
           {currentMedia ? currentMedia.title : <Skeleton className={classes.variantBG} animation={false} variant="rect" height={20} width={400} />}
           <div className={`${classes.variantBG} ${classes.photoBG}`} />
           <CTAButton
+            onClick={async () => {
+              if (!selectedRows.length) {
+                return;
+              }
+              for (let i = 0; i < selectedRows.length; i += 1) {
+                const image = await postAPI<string>('/image/download', {
+                  path: [`${location.state.propertyName}/${propertyData[selectedRows[i]].resource}`],
+                }, {
+                  token: user!.token
+                })
+                await getDownload(image as unknown as string, propertyData[selectedRows[i]].resource);
+              }
+            }}
             size="small"
             variant="contained"
             color="primary"
@@ -158,9 +179,9 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
               onClick={async () => {
                 await postAPI<any>('/generate-download', {
                   pid: [location.state.propertyId],
-              }, {
+                }, {
                   token: user!.token
-              })
+                })
               }}
               size="small"
               variant="contained"
@@ -173,7 +194,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
               <GenericTable
                 selectable
                 onSelect={items => {
-
+                  setSelectedRows(items);
                   updateAmount({ amount: items.length })
                 }}
                 head={[

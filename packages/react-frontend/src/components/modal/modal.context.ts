@@ -1,10 +1,10 @@
-import React, { createContext } from "react";
+import { createContext } from "react";
 
 interface IModalContext {
     updateMessage: any;
     setModal: any;
     shouldDismiss: any;
-    message: React.ReactNode;
+    message: string;
     dismissable: boolean;
     flashModal: boolean;
 }

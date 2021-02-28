@@ -1,6 +1,8 @@
 import { Grid, Hidden } from "@material-ui/core";
+import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
+import AddProperty from "components/property/add-property";
 import { PropertyTable } from "components/property/property-table";
 import { LIMITS } from "config/data";
 import { ReactComponent as LogoSVG } from "media/logo.svg";
@@ -13,6 +15,7 @@ const DashboardPage = () => {
     const history = useHistory();
     return (
         <React.Fragment>
+            <AddProperty />
             <Hidden mdUp>
                 <HeaderTitle
                     disableBack
@@ -25,30 +28,37 @@ const DashboardPage = () => {
             <Grid className={classes.container}>
                 <HeaderTitle
                     disableBack
-                    title="Overview"
+                    title="Recently uploaded"
                     alignText="left"
                     color="secondary"
                     variant="h5"
                 />
-                <Grid className={classes.infoText} container>
-                    <Grid item>
-                        <p>The most recently uploaded properties are shown here</p>
-                    </Grid>
-                    <Grid item className={classes.moreLink}>
-                        <CTAButton
-                            onClick={() => history.push("/properties")}
-                            variant="outlined"
-                            color="primary"
-                            loading={false}
-                            type="button"
-                        >
-                            View More Properties
-                    </CTAButton>
-                    </Grid>
-                </Grid>
             </Grid>
             <Grid className={classes.table}>
+                <Grid item className={classes.btnNav}>
+                    <CTAButton
+                        size="small"
+                        variant="contained"
+                        color="primary"
+                        type="button"
+                        startIcon={<CreateNewFolderIcon />}
+                    >
+                        Add New Property
+                </CTAButton>
+                </Grid>
                 <PropertyTable selectable show={LIMITS.home} />
+                <Grid item className={classes.moreLink}>
+                    <CTAButton
+                        fullWidth
+                        size="small"
+                        onClick={() => history.push("/properties")}
+                        variant="outlined"
+                        color="primary"
+                        type="button"
+                    >
+                        View More Properties
+                    </CTAButton>
+                </Grid>
             </Grid>
         </React.Fragment>
     )

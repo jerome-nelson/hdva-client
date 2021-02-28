@@ -5,6 +5,7 @@ import querystring from "querystring";
 import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 
 interface ApiOptions {
+  download?: boolean;
   prevent: boolean,
   useToken: boolean,
   token?: string | null,
@@ -206,8 +207,29 @@ export const getAPI = async <T>(
   endpoint: string, 
   options?: Partial<ApiOptions>,
 ): Promise<T[]> => {
-  const { data: { data } } = await axios(`${process.env.REACT_APP_API}${endpoint}`, { headers: {
+  const { data: { data } } = await axios(`${process.env.REACT_APP_API}${endpoint}`, { 
+    ...(options && options.download) ? { responseType: "blob" } : {},
+    headers: {
     'Authorization': options!.token, 
   }})
   return data;
+}
+
+export const getDownload = async <T>(
+  endpoint: string, 
+  filename: string
+): Promise<void> => {
+  const { data } = await axios(endpoint, { 
+    method: "GET",
+    responseType: "blob"
+})
+
+
+  const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+    return;
 }

@@ -6,21 +6,30 @@ import React, { useEffect, useState } from "react";
 import { COLOR_OVERRIDES } from 'theme';
 
 interface GenericTableProps {
+    color?: 'primary' | 'secondary';
     className?: string;
     onSelect?(items: number[]): void;
     selectable?: boolean;
     head?: any[];
     cells: any[];
     data: any[];
+    mini?: boolean;
     showCols?: {
         onMobile?: number;
     };
 }
 
-export const useGenericTableStyles = makeStyles((theme: Theme) => (
+export const useGenericTableStyles = makeStyles<Theme, Partial<GenericTableProps>>((theme: Theme) => (
     createStyles({
+        secondary: {
+            borderColor: `rgba(0,0,0, 0.23)`,
+            color: COLOR_OVERRIDES.hdva_black
+        },
+        mini: {
+            padding: `${theme.spacing(0.5)}px`,
+            fontSize: `0.9rem`
+        },
         cellStyle: {
-            borderLeft: `2px solid ${COLOR_OVERRIDES.hdva_black_bg}`,
             "tr > & ~ &": {
                 borderLeftColor: `transparent`
             },
@@ -44,9 +53,9 @@ export const useGenericTableStyles = makeStyles((theme: Theme) => (
 ));
 
 
-export const GenericTable: React.FC<GenericTableProps> = ({ className, head, selectable, cells, data, onSelect }) => {
+export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mini, head, selectable, cells, data, onSelect }) => {
 
-    const classes = useGenericTableStyles();
+    const classes = useGenericTableStyles({ mini });
     const [itemsSelected, setSelected] = useState<number[]>([]);
     const [toggleCheckbox, setToggle] = useState<number | null>(null);
 
@@ -59,6 +68,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
         if (onSelect) {
             onSelect(itemsSelected);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [itemsSelected]);
 
     const headerSelect = (checked: boolean) => {
@@ -96,7 +106,14 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                             <TableCell
                                 onMouseOver={() => setToggle(-1)}
                                 onMouseOut={() => setToggle(null)}
-                                className={`${classes.noBg} ${classes.hideCheckbox}`}
+                                classes={{
+                                    root: mini ? classes.mini : ""
+                                }}
+                                className={classNames({
+                                    [classes.noBg]: true,
+                                    [classes.hideCheckbox]: true,
+                                    [classes.secondary]: color === "secondary"
+                                })}
                                 padding="checkbox"
                             >
                                 <Checkbox
@@ -110,7 +127,8 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                 />
                             </TableCell>
                         )}
-                        {(head || []).map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
+                        {(head || []).filter(head => !Boolean(head.hide))
+                            .map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -127,13 +145,20 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                     <TableCell
                                         onMouseOver={() => setToggle(rowIndex)}
                                         onMouseOut={() => setToggle(null)}
-                                        className={`${classes.noBg} ${classes.hideCheckbox}`}
+                                        classes={{
+                                            root: mini ? classes.mini : ""
+                                        }}
+                                        className={classNames({
+                                            [classes.noBg]: true,
+                                            [classes.hideCheckbox]: true,
+                                            [classes.secondary]: color === "secondary"
+                                        })}
                                         padding="checkbox"
                                     >
                                         <Checkbox
-                                            className={classNames({ 
+                                            className={classNames({
                                                 // [classes.hideCheckbox]: shouldHideCheckbox 
-                                                [classes.hideCheckbox]: true 
+                                                [classes.hideCheckbox]: true
                                             })}
                                             checked={isItemSelected}
                                             onChange={({ target: { checked } }) => rowSelect(checked, rowIndex)}
@@ -141,14 +166,18 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                     </TableCell>
                                 )}
                                 {Object.keys(row).map((item, index) => {
-                                    return (
+                                    return !Boolean(row[item].hide) && (
                                         <TableCell
                                             key={`cell-${index}`}
                                             {...cells[index]}
+                                            classes={{
+                                                root: mini ? classes.mini : ""
+                                            }}
                                             className={classNames({
-                                                ...(cells[index] && cells[index].className ?{ [cells[index].className]: true } : null),
+                                                ...(cells[index] && cells[index].className ? { [cells[index].className]: true } : null),
                                                 [classes.cellStyle]: true,
-                                                [classes.trSelected]: isItemSelected
+                                                [classes.trSelected]: isItemSelected,
+                                                [classes.secondary]: color === "secondary"
                                             })}
                                         >
                                             {row[item].data}

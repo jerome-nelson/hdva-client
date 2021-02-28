@@ -26,6 +26,9 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
                 flexGrow: 1,
             }
         },
+        btnNav: {
+            padding: `${theme.spacing(2)}px 0`
+        },
         moreLink: {
             padding: `${theme.spacing(1)}px 0`,
             textAlign: "right"

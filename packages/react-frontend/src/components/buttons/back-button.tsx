@@ -8,7 +8,7 @@ export const BackButton: React.SFC<{ color?: 'primary' | 'secondary'; }> = ({ co
     const history = useHistory();
 
     return (
-        <IconButton edge="start" color={color || "inherit"} aria-label="menu" component="span" onClick={() => history.goBack()}>
+        <IconButton edge="start" color={color || "inherit"} aria-label="menu" component="span" onClick={() => history.back()}>
             <ArrowBackIos />
         </IconButton>
     );
