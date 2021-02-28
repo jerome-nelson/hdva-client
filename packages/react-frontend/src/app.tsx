@@ -1,5 +1,5 @@
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
-// import { ErrorBoundary as SentryErrorBoundary } from '@sentry/react';
+import { withProfiler } from '@sentry/react';
 import { gtmOverview } from 'config/analytics';
 import { RoleTypes } from 'hooks/useRoles';
 import React, { useEffect, useState } from 'react';
@@ -14,8 +14,6 @@ import { ModalContext } from './components/modal/modal.context';
 import { ROUTES } from "./routing";
 import { theme } from "./theme";
 import { PrivateRoute } from "./utils/protected-route";
-
-
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -38,9 +36,9 @@ export const AppComponent = () => (
     </Router>
 );
 
-export const App = () => {
+const _App = () => {
 
-    const [message, setMsg] = useState("<a href='http://google.com' rel='_blank'>External Link Test</a>");
+    const [message, setMsg] = useState("");
     const [showModal, setModal] = useState(false);
     const [userDetails, setUserDetails] = useState<User | null>(getCurrentUser());
     const [dismissable, shouldDismiss] = useState(false);
@@ -54,7 +52,7 @@ export const App = () => {
             }
         });
     }, 
-    [dismissable, showModal, setMsg]
+    [dismissable, showModal, setMsg, userDetails]
     );
 
     useEffect(() => {
@@ -80,7 +78,7 @@ export const App = () => {
                         value={{
                             dismissable: false,
                             message: message,
-                            flashModal: true,
+                            flashModal: showModal,
                             shouldDismiss: shouldDismiss,
                             updateMessage: setMsg,
                             setModal: setModal
@@ -94,6 +92,7 @@ export const App = () => {
             </ThemeProvider>
             <ReactQueryDevtools />
         </QueryClientProvider>
-        // </SentryErrorBoundary>
     );
 }
+
+export const App = withProfiler(_App);

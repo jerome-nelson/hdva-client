@@ -1,4 +1,4 @@
-import { Button, Divider, Paper } from '@material-ui/core';
+import { Button, Divider, Hidden, Paper } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -24,7 +24,7 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
-  const clickHandler = (page, type) => {
+  const clickHandler = (page: number, type: string) => {
     if (type === "previous") {
       setCurrentPage(page - 1);
     }
@@ -42,7 +42,6 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
     <Paper className={classes.root} elevation={3}>
       <ul>
         {items.map(({ page, type, selected, ...item }, index) => {
-          console.log(page);
           let children = null;
 
           if (type === 'start-ellipsis' || type === 'end-ellipsis') {
@@ -78,16 +77,57 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
                   item.onClick(event);
                 }}>
                 {(type === "previous" && <ChevronLeftIcon width="100%" height="100%" color={item.disabled ? "disabled" : "primary"} />)}
-                {(type === "next" && <ChevronRightIcon  width="100%" height="100%" color={item.disabled ? "disabled" : "primary"} />)}
+                {(type === "next" && <ChevronRightIcon width="100%" height="100%" color={item.disabled ? "disabled" : "primary"} />)}
               </IconButton>
             );
           }
 
-          return <React.Fragment>
-            {(type === "next" && <Divider light orientation="vertical" flexItem />)}
-            <li key={index}>{children}</li>
-            {(type === "previous" && <Divider light orientation="vertical" flexItem />)}
-          </React.Fragment>
+          return (
+            <React.Fragment>
+              <Hidden smDown>
+                {(type === "next" && <Divider light orientation="vertical" flexItem />)}
+                <li key={index}>{children}</li>
+                {(type === "previous" && <Divider light orientation="vertical" flexItem />)}
+              </Hidden>
+              <Hidden mdUp>
+                {(type === "next" && (
+                  <IconButton
+                    {...item}
+                    // className={classNames({
+                    //   [classes.button]: true,
+                    //   [classes.iconBtn]: true,
+                    //   [classes.btnSelected]: selected
+                    // })}
+                    // type="button"
+                    onClick={event => {
+                      clickHandler(page, type)
+                      item.onClick(event);
+                    }}>
+                    <ChevronRightIcon width="100%" height="100%" color={item.disabled ? "disabled" : "primary"} />
+                  </IconButton>
+                ))}
+                {(type === "next" && <Divider light orientation="vertical" flexItem />)}
+                {selected && (<li><div className={classes.seperator}>{`${page} of ${count}`}</div></li>)}
+                {(type === "previous" && <Divider light orientation="vertical" flexItem />)}
+                {(type === "previous" && (
+                  <IconButton
+                    {...item}
+                    // className={classNames({
+                    //   [classes.button]: true,
+                    //   [classes.iconBtn]: true,
+                    //   [classes.btnSelected]: selected
+                    // })}
+                    // type="button"
+                    onClick={event => {
+                      clickHandler(page, type)
+                      item.onClick(event);
+                    }}>
+                    <ChevronLeftIcon width="100%" height="100%" color={item.disabled ? "disabled" : "primary"} />
+                  </IconButton>
+                ))}
+              </Hidden>
+            </React.Fragment>
+          );
         })}
       </ul>
     </Paper>

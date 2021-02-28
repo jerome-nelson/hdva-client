@@ -8,7 +8,7 @@ import { messages } from "../../config/en";
 import { useLoginPageStyles } from "./login.page.style";
 
 
-export const LoginPage = () => {
+const LoginPage = () => {
     const classes = useLoginPageStyles();
     const genericClasses = useGenericStyle();
     return (
@@ -48,3 +48,5 @@ export const LoginPage = () => {
         </React.Fragment>
     );
 }
+
+export default LoginPage;

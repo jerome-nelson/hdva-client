@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import React from "react";
-import { PasswordResetPage } from "./password-reset.page";
+import PasswordResetPage from "./password-reset.page";
 
 
 describe("Password Reset Page", () => {

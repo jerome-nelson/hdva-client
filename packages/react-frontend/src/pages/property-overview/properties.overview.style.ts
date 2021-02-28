@@ -2,6 +2,11 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
 export const usePropertyOverviewStyles = makeStyles((theme: Theme) =>
     createStyles({
+        container: {
+            [theme.breakpoints.down("md")]: {
+                marginTop: `70px`
+            },
+        },
         navigationSelected: {
             // TODO: Is rgbToHex needed?
             backgroundColor: `rgba(0, 0, 0, 0.08)`

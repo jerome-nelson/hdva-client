@@ -8,7 +8,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { useDashboardStyles } from "./dashboard.page.style";
 
-export const DashboardPage = () => {
+const DashboardPage = () => {
     const classes = useDashboardStyles();
     const history = useHistory();
     return (
@@ -53,3 +53,5 @@ export const DashboardPage = () => {
         </React.Fragment>
     )
 }
+
+export default DashboardPage;

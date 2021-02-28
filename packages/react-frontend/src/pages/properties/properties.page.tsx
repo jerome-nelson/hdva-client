@@ -20,34 +20,6 @@ interface PropertyProps {
   propertyName: string;
 }
 
-// const initialState = {
-//   photo: [],
-//   floorplan: [],
-//   vt: ""
-// };
-
-// function mediaReducer(state, action) {
-//   switch (action.type) {
-//     case 'increment':
-//       return {count: state.count + 1};
-//     case 'decrement':
-//       return {count: state.count - 1};
-//     default:
-//       throw new Error();
-//   }
-// }
-
-// TODO: Type correctly
-// const getMediaIcon = (type: string) => {
-// if (type === "floorplan") {
-//   return <FloorplanSVG />
-// }
-
-// if (type === "photo") {
-//   return <PhotoSVG />;
-// }
-// }
-
 const getThumbnailUrl = (url: string, type: string): string => {
   let fileName = url.replace(/ /g, "+");
   const seperator = fileName.split(".");
@@ -77,7 +49,7 @@ function reducer(_: Record<string, any>, action: { amount: number }) {
     };
 }
 
-export const PropertiesPage: React.SFC<PropertyProps> = () => {
+const PropertiesPage: React.SFC<PropertyProps> = () => {
   const { user } = useContext(LoginContext);
   const classes = usePropertyStyles();
   const [amountTxt, updateAmount] = useReducer(reducer, initialState);
@@ -141,7 +113,7 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
     sample,
     sample
   ];
-  console.log(amountTxt.amount);
+
   return (
     <React.Fragment>
       <Hidden smDown>
@@ -180,7 +152,7 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
         <Hidden mdUp>
           <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={location.state.propertyName} />
         </Hidden>
-        <Grid container>
+        <Grid container className={classes.container}>
           <Grid item md={7} xs={12}>
             <CTAButton
               onClick={async () => {
@@ -218,3 +190,5 @@ export const PropertiesPage: React.SFC<PropertyProps> = () => {
     </React.Fragment>
   );
 }
+
+export default PropertiesPage;

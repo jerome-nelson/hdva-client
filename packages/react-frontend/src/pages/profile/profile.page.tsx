@@ -11,11 +11,11 @@ import { useGenericStyle } from "utils/generic.style";
 import { Permissions } from "utils/permissions";
 import { useProfileStyles } from "./profile.page.style";
 
-export const ProfilePage: React.SFC = () => {
+const ProfilePage: React.SFC = () => {
 
   const { user } = useContext(LoginContext);
   
-  const { isLoading, isSuccess, data: userData, refetch } = useQuery({
+  const { isLoading, data: userData, refetch } = useQuery({
     queryKey: "profile",
     enabled: false,
     queryFn: () => getAPI<User>(`/get-user`, { token: user && user.token })
@@ -74,3 +74,5 @@ export const ProfilePage: React.SFC = () => {
     </React.Fragment>
   );
 }
+
+export default ProfilePage;

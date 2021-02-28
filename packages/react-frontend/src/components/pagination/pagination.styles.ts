@@ -17,10 +17,6 @@ export const usePaginationStyles = makeStyles((theme: Theme) => createStyles({
                 "&:last-child": {
                     marginRight: 0
                 }
-
-
-                // height: `${STYLE_OVERRIDES.thumbnail/2}px`,
-                // width: `${STYLE_OVERRIDES.thumbnail/2}px`
             }
         }
     },

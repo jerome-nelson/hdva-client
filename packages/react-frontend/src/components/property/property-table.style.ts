@@ -7,7 +7,10 @@ export const useTableStyles = makeStyles((theme: Theme) => createStyles({
         left: `55%`,
         bottom: `0%`,
         transform: `translate(-50%, -10%)`,
-        zIndex: 1
+        zIndex: 1,
+        [theme.breakpoints.down("sm")]: {
+            bottom: `50px`,
+        }
     },
     media: {
         "& > div": {

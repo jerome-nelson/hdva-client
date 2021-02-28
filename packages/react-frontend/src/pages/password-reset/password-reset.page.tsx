@@ -14,7 +14,7 @@ interface Validation {
 
 // TODO: Needs db and api to store strings
 // Generate and send JWT token, this will be used to reset password in admin -> new JWT is sent and then logged in
-export const PasswordResetPage: React.FC = () => {
+const PasswordResetPage: React.FC = () => {
     const query = useQuerySelector();
     const history = useHistory();
     const [password, setPassword] = useState("");
@@ -136,3 +136,5 @@ export const PasswordResetPage: React.FC = () => {
         </React.Fragment>
     );
 };
+
+export default PasswordResetPage;

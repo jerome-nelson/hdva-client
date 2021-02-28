@@ -1,11 +1,13 @@
-import { Grid, Hidden } from "@material-ui/core";
+import { CircularProgress, Grid, Hidden } from "@material-ui/core";
 import { LoginContext } from "components/login-form/login.context";
-import React, { useContext } from "react";
+import React, { Suspense, useContext } from "react";
 import { Redirect, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ModalContext } from "../components/modal/modal.context";
 import { BottomNav } from "../components/navigation/bottom.nav";
 import { SideNav } from "../components/navigation/side.nav";
 import { RoleTypes, useRoles } from "../hooks/useRoles";
+
+
 
 export interface RouterProps extends RouteProps {
   fullWidth?: boolean;
@@ -20,7 +22,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
   const history = useHistory();
   const modalSettings = useContext(ModalContext);
   const permissions = rest && rest.allowed;
-  
+
   const location = useLocation();
   const [, canAccess, isError] = useRoles(permissions);
 
@@ -43,7 +45,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
     modalSettings.updateMessage("Error Occurred");
     modalSettings.setModal(true);
     if (!canAccess) {
-      history.goBack();
+      history.back();
     }
     // return null;
   }
@@ -62,12 +64,16 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
             <SideNav />
           </Grid>)}
           <Grid item md={!fullWidth ? 10 : 12}>
-            <DynamicComponent />
+            <Suspense fallback={<CircularProgress color="secondary"/>}>
+              <DynamicComponent />
+            </Suspense>
           </Grid>
         </Grid>
       </Hidden>
       <Hidden mdUp>
-        <DynamicComponent />
+        <Suspense fallback={<CircularProgress color="secondary"/>}>
+          <DynamicComponent />
+        </Suspense>
         <BottomNav />
       </Hidden>
     </React.Fragment>

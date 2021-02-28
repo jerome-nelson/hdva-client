@@ -5,7 +5,7 @@ import React from "react";
 // TODO: Fix onClick typing
 type CTAProps = ExtendButtonBaseTypeMap<ButtonTypeMap<{ type: "button" | "reset" | "submit" | undefined; }>>["props"] & { 
     onClick?(e?: any): void;
-    loading: boolean;
+    loading?: boolean;
     className?: string; };
 
 export const CTAButton: React.FC<CTAProps> = props => {

@@ -3,6 +3,11 @@ import { STYLE_OVERRIDES } from "theme";
 
 export const usePropertyStyles = makeStyles((theme: Theme) =>
     createStyles({
+        container: {
+            [theme.breakpoints.down("md")]: {
+                marginTop: `70px`
+            },
+        },
         tableHeadCell: {
             fontSize: `0.8rem`,
             fontWeight: `bolder`,

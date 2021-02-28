@@ -1,4 +1,4 @@
-import { BottomNavigation, BottomNavigationAction, Breadcrumbs, CircularProgress, Hidden, Link } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, CircularProgress, Hidden, Link } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
@@ -94,7 +94,7 @@ const ChildOption: React.FC<{ link: string; pid: number; checked: boolean; setCh
     );
 }
 
-export const PropertiesOverviewPage: React.FC = () => {
+const PropertiesOverviewPage: React.FC = () => {
     const genericClasses = useGenericStyle();
     const classes = usePropertyOverviewStyles();
 
@@ -124,76 +124,13 @@ export const PropertiesOverviewPage: React.FC = () => {
                     </Link>
                 </Breadcrumbs>
             </Hidden>
-            {
-                <PropertyTable selectable show={LIMITS.property} showPagination />
-                // properties && properties.length === 0 ? (
-                // <Placeholder
-                //     subtitle={messages["placeholder.properties.subtitle"]}
-                //     title={messages["placeholder.properties.title"]}
-                // >
-                //     <HomeWorkIcon />
-                // </Placeholder>
-                // ) : (
-                // properties.isLoading ?
-                // <CircularProgress size="1.5rem" color="secondary" /> 
-                // :
-                // <CustomTable user={user as User} headers={headCells} data={propertyData.map(property => ({
-                //     ...property,
-                //     collapsedTab: ChildOption
-                // }))}>
-                //     {/* TODO: Add a dismiss when button is clicked and api is called */}
-                //     {(hasSelected: string[] | undefined) => (
-                //         <React.Fragment>
-                //             <Hidden only={["md", "lg", "xl"]}>
-                //                 <CTAButton
-                //                     loading={false}
-                //                     type="submit"
-                //                     onClick={() => alert(`Should download properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
-                //                     fullWidth
-                //                     className={`${genericClasses.actionButton} ${classes.mobileBtn}`}
-                //                     disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                //                     size="large" variant="contained" color="secondary"
-                //                 >
-                //                     Download Selected
-                //                 </CTAButton>
-                //             </Hidden>
-                //             <Hidden only={["xs", "sm"]}>
-                //                 <Grid container xs={10} spacing={1}>
-                //                     <Grid item>
-                //                         <CTAButton
-                //                             loading={false}
-                //                             onClick={() => alert(`Should download properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
-                //                             fullWidth
-                //                             className={genericClasses.actionButton}
-                //                             disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                //                             size="medium"
-                //                             variant="contained"
-                //                             color="primary"
-                //                             type="submit"
-                //                         >
-                //                             Download Selected
-                //                         </CTAButton>
-                //                     </Grid>
-                //                     <Grid item>
-                //                         <CTAButton
-                //                             loading={false}
-                //                             onClick={() => alert(`Should de;ete properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
-                //                             fullWidth
-                //                             className={genericClasses.actionButton}
-                //                             disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                //                             size="medium" variant="contained" color="primary" type="submit"
-                //                         >
-                //                             Delete Selected
-                //                         </CTAButton>
-                //                     </Grid>
-                //                 </Grid>
-                //             </Hidden>
-                //         </React.Fragment>
-                //     )}
-                // </CustomTable>
-                // )}
-                // )
-            }
+            <Box className={classes.container}>
+                {
+                    <PropertyTable selectable show={LIMITS.property} showPagination />
+                }
+            </Box>
         </React.Fragment>
     )
 }
+
+export default PropertiesOverviewPage;

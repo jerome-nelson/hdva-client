@@ -5,7 +5,10 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
     createStyles({
         container: {
             width: "90%",
-            margin: `75px auto 0`
+            margin: `75px auto 0`,
+            [theme.breakpoints.down("md")]: {
+                marginTop: `70px`
+            },
         },
         table: {
             width: "90%",

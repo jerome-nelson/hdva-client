@@ -1,4 +1,6 @@
-import { init } from "@sentry/react";
+import { ErrorBoundary, init } from "@sentry/react";
+// import { createBrowserHistory } from "history";
+// import { Integrations } from '@sentry/tracing';
 import { gtmOverview } from 'config/analytics';
 import 'fontsource-roboto';
 import React from 'react';
@@ -8,13 +10,15 @@ import { App } from "./app";
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
+// export const browserHistory = createBrowserHistory();
+
 // TODO: Setup Releases and Commit Logging
 init({
   dsn: process.env.REACT_APP_SENTRY_ID,
   environment: process.env.REACT_APP_ENV || "development",
   // integrations: [
   //   new Integrations.BrowserTracing({
-  //     routingInstrumentation: reactRouterV5Instrumentation(),
+  //     routingInstrumentation: reactRouterV5Instrumentation(browserHistory),
   //   })
   // ],
   debug: Boolean(process.env.REACT_APP_DEBUG),
@@ -32,7 +36,9 @@ TagManager.initialize({
 // TODO: Integrate all theme colours into theme override
 ReactDOM.render(
   <React.StrictMode>
-          <App />
+    <ErrorBoundary showDialog fallback={"An error has occurred"}>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>,
   document.getElementById('root')
 );

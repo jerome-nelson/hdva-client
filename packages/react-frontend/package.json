@@ -21,6 +21,7 @@
     "axios": "^0.19.2",
     "classnames": "^2.2.6",
     "fontsource-roboto": "^3.0.3",
+    "history": "^5.0.0",
     "http-server": "^0.12.3",
     "pure-react-carousel": "^1.27.6",
     "react": "^16.13.1",

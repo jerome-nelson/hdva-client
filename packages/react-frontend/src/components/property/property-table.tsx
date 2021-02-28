@@ -1,8 +1,6 @@
-import { BottomNavigation, BottomNavigationAction, Button, Hidden, Typography } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Hidden, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { LoginContext } from "components/login-form/login.context";
 import { CustomPagination } from "components/pagination/pagination";
@@ -56,7 +54,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
             }),
         enabled: Boolean(user && groups)
     });
-    const { data: propertyData, isLoading, isSuccess } = useQuery({
+    const { data: propertyData, isLoading, isFetching, isSuccess } = useQuery({
         queryKey: [`properties`, user!.group, show || 0, pageNumber],
         queryFn: () => postAPI<Properties>('/properties', {
             group: user!.group > 1 ? user!.group : null,
@@ -68,6 +66,8 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
         keepPreviousData: true,
         enabled: Boolean(total && user && groups)
     });
+
+    console.log(isFetching);
 
     useEffect(() => {
 
@@ -169,24 +169,13 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                                     icon={<BurstModeIcon />}
                                     label="View Images" />
                                 <BottomNavigationAction
-                                    // classes={
-                                    //     checked ? {
-                                    //         root: classes.navigationSelected
-                                    //     } : {}
-                                    // }
-                                    label="Select Folder"
-                                    // onClick={() => setChecked(!checked)}
-                                    // checked ? <CreateNewFolderIcon /> : 
-                                    icon={<CreateNewFolderOutlinedIcon />}
-                                />
-                                <BottomNavigationAction
                                     onClick={async () => {
                                         // generate-download
                                         analytics.onAction({
                                             eventAction: "Download Property",
                                             eventLabel: name
                                         });
-    
+
                                         await postAPI<any>('/generate-download', {
                                             pid: [id],
                                         }, {
@@ -198,24 +187,6 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
                                         // processing.downloading ?
                                         //     <CircularProgress variant="indeterminate" size="1.2rem" /> :
                                         <CloudDownloadIcon />
-                                    }
-                                />
-                                {/* Only available to admin users */}
-                                <BottomNavigationAction
-                                    label="Delete Folder"
-                                    // onClick={() => {
-                                    //     setStatus({
-                                    //         ...processing,
-                                    //         deleting: response.isLoading
-                                    //     });
-                                    //     callAPI({
-                                    //         pids: [pid]
-                                    //     });
-                                    // }}
-                                    icon={
-                                        // processing.deleting ?
-                                        //     <CircularProgress variant="indeterminate" size="1.2rem" /> :
-                                        <DeleteForeverIcon />
                                     }
                                 />
                             </BottomNavigation>
@@ -291,46 +262,27 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, show, 
         <React.Fragment>
             <Hidden smDown>
                 <GenericTable
-                    onSelect={onSelect}
-                    // onSelected={() => {
-                    //     <Grid container xs={10} spacing={1}>
-                    //         <Grid item>
-                    //             <CTAButton
-                    //                 loading={false}
-                    //                 onClick={() => alert(`Should download properties from pids:  ${hasSelected && hasSelected.join(",")}`)}
-                    //                 fullWidth
-                    //                 className={genericClasses.actionButton}
-                    //                 disabled={!hasSelected || hasSelected && hasSelected.length <= 0}
-                    //                 size="medium"
-                    //                 variant="contained"
-                    //                 color="primary"
-                    //                 type="submit"
-                    //             >
-                    //                 Download Selected
-                    //                     </CTAButton>
-                    //         </Grid>
-                    // }}
-                    selectable={selectable}
                     head={head}
                     cells={cells}
-                    data={(isLoading || !isSuccess || data.length <= 0) ? skeleton : data}
+                    data={(isFetching|| !isSuccess || data.length <= 0) ? skeleton : data}
                 />
-                {!(isLoading || !isSuccess || data.length <= 0) && showPagination && show && !isNaN(total as unknown as number) && (
-                    <div className={classes.pagination}>
-                        <CustomPagination
-                            count={Math.floor((total as unknown as number) / show)}
-                            onChange={pagenumber => { setPageNumber(pagenumber) }}
-                        />
-                    </div>
-                )}
             </Hidden>
             <Hidden mdUp>
-                <MobileTable
-                    cellStyles={[cells[0]]}
-                    selectable={selectable}
-                    data={data}
-                />
+                {(isFetching || !isSuccess || data.length <= 0) ?
+                    <CircularProgress size="1.5rem" color="secondary" /> :
+                    <MobileTable
+                        cellStyles={[cells[0]]}
+                        data={data}
+                    />}
             </Hidden>
+            {!(isLoading || !isSuccess || data.length <= 0) && showPagination && show && !isNaN(total as unknown as number) && (
+                <div className={classes.pagination}>
+                    <CustomPagination
+                        count={Math.floor((total as unknown as number) / show)}
+                        onChange={pagenumber => { setPageNumber(pagenumber) }}
+                    />
+                </div>
+            )}
         </React.Fragment>
     );
 }
