@@ -10,7 +10,7 @@ interface ApiOptions {
   useToken: boolean,
   token?: string | null,
   initialDataType: any,
-  extraHeaders: Record<string, string>
+  extraHeaders: Record<string, string>;
 }
 
 interface APIResponse<T> {
@@ -52,6 +52,7 @@ export const useAPI = <T>(
   const [payload, addPayload] = useState(settings.initialDataType);
 
   const [status, setStatus] = useState({
+    code: 200,
     done: false,
     error: false,
     loading: false,
@@ -66,7 +67,7 @@ export const useAPI = <T>(
       ...status,
       empty
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, [payload])
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export const useAPI = <T>(
         'Authorization': user.token
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, [])
 
   const enoughTries = Boolean(status.attempts === 3);
@@ -104,12 +105,14 @@ export const useAPI = <T>(
       setStatus({
         ...status,
         empty,
+        code: result.status,
         fatal: [500, 401, 404].includes(result.status)
       });
       if (!empty) {
         addPayload(result.data.data);
       }
     } catch (error) {
+      
       modal.updateMessage("Unable to connect to API");
       modal.setModal(true);
       modal.shouldDismiss(false);
@@ -134,7 +137,7 @@ export const useAPI = <T>(
     if (settings.useToken && user && user.token && headers && headers.Authorization) {
       fetchData(); 
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [headers]);
 
   const callAPI = useCallback(payload => {
@@ -159,7 +162,6 @@ export const useAPI = <T>(
         loading: false
       });
     }).catch((error: Error) => {
-      console.log(error);
       setStatus({
         ...status,
         empty: true,
@@ -182,6 +184,23 @@ export const useAPI = <T>(
     setUrl,
     callAPI
   ];
+}
+
+export const putAPI = async <T>(
+  endpoint: string, 
+  payload?: any, 
+  options?: Partial<ApiOptions>,
+): Promise<T[]> => {
+  const { data: { data } } = await axios({
+    method: 'put',
+    url: `${process.env.REACT_APP_API}${endpoint}`,
+    data: payload,
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      ...options?.extraHeaders
+    }
+  });
+  return data;
 }
 
 export const postAPI = async <T>(

@@ -1,10 +1,7 @@
 import { Box, Breadcrumbs, Hidden, Link } from "@material-ui/core";
-import { LoginContext } from "components/login-form/login.context";
 import { messages } from "config/en";
-import { getAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
-import React, { useContext } from "react";
-import { useQuery } from "react-query";
+import React from "react";
 import { HeaderTitle } from "../../components/header/header";
 import { useGroupStyle } from "./group-management.page.style";
 
@@ -19,11 +16,11 @@ export interface Groups {
 }
 
 const GroupPage: React.FC = () => {
-    const { user } = useContext(LoginContext);
-    const { data: groups, isLoading } = useQuery({
-        queryKey: "groups",
-        queryFn: () => getAPI<Groups>(`/groups`, { token: user && user.token })
-    });
+    // const { user } = useContext(LoginContext);
+    // const { data: groups, isLoading } = useQuery({
+    //     queryKey: "groups",
+    //     queryFn: () => getAPI<Groups>(`/groups`, { token: user && user.token })
+    // });
     const classes = useGroupStyle();
     // const genericClasses = useGenericStyle();
     // const headCells: Record<string, unknown>[] = [

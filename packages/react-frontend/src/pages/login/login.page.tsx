@@ -15,10 +15,10 @@ const LoginPage = () => {
         <React.Fragment>
             <Grid container className={classes.formHeader}>
                 <Hidden mdDown>
-                    <Grid className={classes.logo} item md={6}>
-                        <div><LogoSVG /></div>
+                    <Grid item md={6}>
                     </Grid>
                     <Grid item md={6}>
+                        <div className={classes.logo} ><LogoSVG /></div>
                         <LoginForm className={classes.formMaxWidth} />
                     </Grid>
                 </Hidden>

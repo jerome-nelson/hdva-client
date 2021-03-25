@@ -57,7 +57,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
 
     const classes = useGenericTableStyles({ mini });
     const [itemsSelected, setSelected] = useState<number[]>([]);
-    const [toggleCheckbox, setToggle] = useState<number | null>(null);
+    const [, setToggle] = useState<number | null>(null);
 
     const indeterminate = React.useMemo(
         () => itemsSelected.length > 0 && itemsSelected.length !== data.length,
@@ -68,7 +68,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
         if (onSelect) {
             onSelect(itemsSelected);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        
     }, [itemsSelected]);
 
     const headerSelect = (checked: boolean) => {
@@ -134,7 +134,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
                 <TableBody>
                     {data.map((row, rowIndex) => {
                         const isItemSelected = itemsSelected.includes(rowIndex);
-                        const shouldHideCheckbox = !isItemSelected && !indeterminate && (toggleCheckbox !== rowIndex && toggleCheckbox !== -1);
+                        // const shouldHideCheckbox = !isItemSelected && !indeterminate && (toggleCheckbox !== rowIndex && toggleCheckbox !== -1);
                         return (
                             <TableRow
                                 key={`row-${rowIndex}`}

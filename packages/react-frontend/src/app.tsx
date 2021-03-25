@@ -1,9 +1,6 @@
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
-import { withProfiler } from '@sentry/react';
-import { gtmOverview } from 'config/analytics';
 import { RoleTypes } from 'hooks/useRoles';
-import React, { useEffect, useState } from 'react';
-import TagManager from "react-gtm-module";
+import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Switch } from "react-router-dom";
@@ -36,34 +33,12 @@ export const AppComponent = () => (
     </Router>
 );
 
-const _App = () => {
+export const App = () => {
 
     const [message, setMsg] = useState("");
     const [showModal, setModal] = useState(false);
     const [userDetails, setUserDetails] = useState<User | null>(getCurrentUser());
-    const [dismissable, shouldDismiss] = useState(false);
-
-    useEffect(() => {
-        TagManager.initialize({
-            gtmId: gtmOverview.id,
-            dataLayer: {
-                brand: gtmOverview.brand,
-                user_id: userDetails?._id
-            }
-        });
-    }, 
-    [dismissable, showModal, setMsg, userDetails]
-    );
-
-    useEffect(() => {
-        TagManager.initialize({
-            gtmId: gtmOverview.id,
-            dataLayer: {
-                brand: gtmOverview.brand,
-                user_id: userDetails?._id
-            }
-        });
-    }, [userDetails]);
+    const [, shouldDismiss] = useState(false);
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -94,5 +69,3 @@ const _App = () => {
         </QueryClientProvider>
     );
 }
-
-export const App = withProfiler(_App);

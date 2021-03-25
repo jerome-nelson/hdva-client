@@ -1,4 +1,6 @@
 export const messages: Record<string, string> = {
+    "upload.button.cta": "Add New Property",
+    "view.more.cta": "View More Properties",
     "roles.super": "As a Super User you can see more information than any other users. You can: add, edit and delete properties/users/groups",
     "roles.owner": "As a owner of your group - you can add more users if you wish to do so",
     "roles.uploader": "As an uploader you are able to add/edit and delete groups/users and properties",

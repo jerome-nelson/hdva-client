@@ -54,7 +54,7 @@ const SetRow: React.FC<{ isChecked: boolean; onSelect: any; row: any }> = ({ isC
 
     useEffect(() => {
         onSelect(selected);
-    }, [onSelect, selected]);
+    }, [selected]);
 
     const ChildC = row.collapsedTab;
     return (
@@ -271,7 +271,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({ ariaList, children, he
                             return (
                                 <SetRow
                                     onSelect={(select: boolean) => {
-                                        let newRow = select ? [...selectedRows, row.propertyId] : selectedRows.filter(pid => pid != row.propertyId)
+                                        let newRow = select ? [...selectedRows, row.propertyId] : selectedRows.filter(pid => pid !== row.propertyId)
                                         setSelectedRows(newRow)
                                     }}
                                     row={row}

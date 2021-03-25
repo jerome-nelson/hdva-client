@@ -15,7 +15,7 @@ export const Modal: React.FC<ModalProps> = ({ children }) => {
     const classes = useModalProviderStyles();
     const modalOptions = useContext(ModalContext);
     const [showModal, setModalState] = useState(false);
-    
+
     useEffect(() => {
         if (modalOptions.flashModal) {
             setModalState(modalOptions.flashModal);
@@ -27,21 +27,23 @@ export const Modal: React.FC<ModalProps> = ({ children }) => {
 
     return (
         <React.Fragment>
-            <div className={classes.root}>
-                <div className={classNames({
-                    [classes.modal]: true,
-                    [classes.modalHidden]: !showModal
-                })}>
-                    <ErrorPopup rounded show={showModal}>
-                        <Grid className={classes.gridTxtAlignment} container alignItems="center">
-                            <Grid sm={11} item><span dangerouslySetInnerHTML={{ __html: modalOptions.message }} /></Grid>
-                            <Grid className={classes.lastItem} item>
-                                <CancelIcon className={classes.closeIcon} onClick={() => setModalState(false)} />
+            {!children && (
+                <div className={classes.root}>
+                    <div className={classNames({
+                        [classes.modal]: true,
+                        [classes.modalHidden]: !showModal
+                    })}>
+                        <ErrorPopup rounded show={showModal}>
+                            <Grid className={classes.gridTxtAlignment} container alignItems="center">
+                                <Grid sm={11} item><span dangerouslySetInnerHTML={{ __html: modalOptions.message }} /></Grid>
+                                <Grid className={classes.lastItem} item>
+                                    <CancelIcon className={classes.closeIcon} onClick={() => setModalState(false)} />
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </ErrorPopup>
+                        </ErrorPopup>
+                    </div>
                 </div>
-            </div>
+            )}
             {children}
         </React.Fragment>
     );

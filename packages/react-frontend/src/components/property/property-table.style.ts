@@ -9,6 +9,12 @@ export const useMiniTableStyles = makeStyles<Theme, PropertyMiniTableProps>((the
         "&:focus": {
             boxShadow: `0 0 0 3px #99c6f3`,
         }
+    },
+    thumbnailWidth: {
+        width: `40px`
+    },
+    lastTd: {
+        textAlign: `right`
     }
 }));
 

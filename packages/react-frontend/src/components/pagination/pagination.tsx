@@ -21,7 +21,6 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
 
   useEffect(() => {
     onChange(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const clickHandler = (page: number, type: string) => {

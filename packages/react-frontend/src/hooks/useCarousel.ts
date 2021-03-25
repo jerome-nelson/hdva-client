@@ -1,5 +1,5 @@
-import { useReducer, useEffect, useState } from 'react';
-import { useSwipeable, SwipeableHandlers } from 'react-swipeable';
+import { useEffect, useReducer, useState } from 'react';
+import { SwipeableHandlers, useSwipeable } from 'react-swipeable';
 
 // defines the time for the animation between slides in milliseconds
 const transitionTime = 400;

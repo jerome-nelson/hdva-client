@@ -12,7 +12,6 @@ import { CTAButton } from "../buttons/cta";
 import { ErrorPopup } from "../error-popup/error-popup";
 import { HeaderTitle } from "../header/header";
 import { useLoginStyles } from "./login-form.style";
-import { LoginGTM } from "./login-gtm";
 import { LoginContext } from "./login.context";
 
 
@@ -44,18 +43,7 @@ const LoginComponent = (props: any) => {
         password: '',
         showPassword: false
     });
-
-    // const trackingLogin = (obj: any) => {
-    //     TagManager.dataLayer({
-    //         dataLayer: {
-    //             brand: gtmOverview.brand,
-    //             ...obj
-    //         },
-    //         dataLayerName: "Login",
-    //     })
-    // }
     
-    const analytics = LoginGTM();
     useEffect(() => {
         if (isSuccess && Array.isArray(details)) {
             setButtonLoading(false);
@@ -68,30 +56,17 @@ const LoginComponent = (props: any) => {
                 history.push("/");
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSuccess]);
 
     const handleChange = (fieldname: keyof LoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        analytics.onFocus({
-            eventAction: "Changed",
-            eventLabel: `${fieldname}`
-        });
         setValues({ ...values, [fieldname]: event.target.value });
     };
 
     const handleClickShowPassword = () => {
-        analytics.onFocus({
-            eventAction: "Toggled Password",
-            eventLabel: `password`
-        });
         setValues({ ...values, showPassword: !values.showPassword });
     };
 
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-        analytics.onFocus({
-            eventAction: "Mousedown Password",
-            eventLabel: `password`
-        });
         event.preventDefault();
     };
 
@@ -109,9 +84,6 @@ const LoginComponent = (props: any) => {
             <form
                 onSubmit={event => {
                     event.preventDefault();
-                    analytics.onFocus({
-                        eventAction: "Submit"
-                    });
                     setValues(values);
                     setButtonLoading(true);
                     // UX Change - delayed on purpose
@@ -131,10 +103,6 @@ const LoginComponent = (props: any) => {
                     id="username"
                     type="text"
                     value={values.username}
-                    onFocus={() => analytics.onFocus({
-                        eventAction: "Focused",
-                        eventLabel: "username"
-                    })}
                     onChange={handleChange('username')}
                 />
                 <Input
@@ -146,10 +114,6 @@ const LoginComponent = (props: any) => {
                     id="standard-adornment-password"
                     type={values.showPassword ? 'text' : 'password'}
                     value={values.password}
-                    onFocus={() => analytics.onFocus({
-                        eventAction: "Focused",
-                        eventLabel: "password"
-                    })}
                     onChange={handleChange('password')}
                     placeholder={messages["login.form.password"]}
                     endAdornment={
@@ -169,7 +133,7 @@ const LoginComponent = (props: any) => {
                         <Grid md={5} item className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
-                                loading={buttonLoading || isLoading} type="submit" fullWidth size="small" variant="contained" color="primary">
+                                loading={buttonLoading || isLoading} type="submit" fullWidth size="medium" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>
@@ -181,7 +145,7 @@ const LoginComponent = (props: any) => {
                         <Grid item xs={12} className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
-                                loading={buttonLoading || isLoading} type="submit" fullWidth size="small" variant="contained" color="primary">
+                                loading={buttonLoading || isLoading} type="submit" fullWidth size="medium" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>

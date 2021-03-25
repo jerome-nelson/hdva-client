@@ -2,20 +2,28 @@ import { Grid, Hidden } from "@material-ui/core";
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
-import AddProperty from "components/property/add-property";
 import { PropertyTable } from "components/property/property-table";
 import { LIMITS } from "config/data";
+import { messages } from 'config/en';
 import { ReactComponent as LogoSVG } from "media/logo.svg";
-import React from "react";
+import React, { Suspense, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useDashboardStyles } from "./dashboard.page.style";
 
+
 const DashboardPage = () => {
+    const [showPopup, setPopup] = useState(false);
     const classes = useDashboardStyles();
     const history = useHistory();
+    
+    // TODO: Fix Typing
+    const AddProperty = React.lazy(() => import("../../components/property/add-property"));
+
     return (
         <React.Fragment>
-            <AddProperty />
+            <Suspense fallback={false}>
+                {showPopup && <AddProperty onClose={() => setPopup(() => !showPopup)} />}
+            </Suspense>
             <Hidden mdUp>
                 <HeaderTitle
                     disableBack
@@ -37,26 +45,29 @@ const DashboardPage = () => {
             <Grid className={classes.table}>
                 <Grid item className={classes.btnNav}>
                     <CTAButton
-                        size="small"
+                        size="medium"
                         variant="contained"
                         color="primary"
                         type="button"
+                        disableElevation
                         startIcon={<CreateNewFolderIcon />}
+                        onClick={() => setPopup(() => !showPopup)}
                     >
-                        Add New Property
+                       {messages["upload.button.cta"]}
                 </CTAButton>
                 </Grid>
                 <PropertyTable selectable show={LIMITS.home} />
                 <Grid item className={classes.moreLink}>
                     <CTAButton
                         fullWidth
-                        size="small"
+                        size="medium"
+                        disableElevation
                         onClick={() => history.push("/properties")}
                         variant="outlined"
                         color="primary"
                         type="button"
                     >
-                        View More Properties
+                        {messages["view.more.cta"]}
                     </CTAButton>
                 </Grid>
             </Grid>

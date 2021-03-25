@@ -1,9 +1,11 @@
 import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Grid, Hidden, LinearProgress, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { LoginContext } from "components/login-form/login.context";
 import { CustomPagination } from "components/pagination/pagination";
+import { Placeholder } from "components/placeholder/placeholder";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
 import { getAPI, getDownload, postAPI } from "hooks/useAPI";
@@ -38,13 +40,11 @@ export interface PropertyMiniTableProps {
     className?: string;
     color?: "primary" | "secondary";
     filter?: string;
-    onResult?(data: number): void;
+    onFetch?(hasResults: boolean): void;
 }
 
-export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className, color, filter, onResult }) => {
+export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className, color, filter, onFetch }) => {
     const [pageNumber, setPageNumber] = useState(1);
-    const [propertyData, setPropertyData] = useState<any>([]);
-    const [searchTerm, setSearchTerm] = useState(filter || "");
     const { user } = useContext(LoginContext);
     const classes = useMiniTableStyles({ filter });
     const { data: groups } = useQuery({
@@ -53,38 +53,25 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
         enabled: Boolean(user)
     });
 
-
-    useEffect(() => {
-        if (onResult) {
-            onResult(propertyData.length)
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [propertyData]);
-
     const debounce = (func: any, delay: number) => {
         let inDebounce: any;
-        return function() {
-          const context = this as any;
-          const args = arguments
-          clearTimeout(inDebounce)
-          inDebounce = setTimeout(() => func.apply(context, args), delay)
+        return function () {
+            const args = arguments;
+            clearTimeout(inDebounce)
+            inDebounce = setTimeout(() => func.apply(null, args), delay)
         }
-      }
-      const debouncedSave = useRef(debounce((nextFilter: any) => {
-          setSearchTerm(nextFilter || "")
-          results[0].refetch();
-          results[1].refetch();
-
-        }, 1000))
-      .current;
+    }
+    const debouncedSave = useRef(debounce(() => {
+        results.forEach(query => query.refetch());
+    }, 1000)).current;
     const results = useQueries([
         {
-            queryKey: [`properties`, user!.group, 'total'],
+            queryKey: [`properties`, `filter`, user!.group, 'total'],
             queryFn: () => postAPI<number>(
                 '/properties-count',
-                { 
+                {
                     filter,
-                    group: user!.group > 1 ? user!.group : null 
+                    group: user!.group > 1 ? user!.group : null
                 },
                 { token: user!.token }
             ),
@@ -104,33 +91,77 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
                 token: user!.token
             }),
             retry: 3,
-            select: (data: any) => {
-                const refined = data.map((el: any) => ({
-                    image: {
-                        data: <FolderSVG />
-                    },
-                    name: {
-                        data: el.name
-                    }
-                }));
-                setPropertyData(refined);
-                return;
-            },
             keepPreviousData: true,
             enabled: Boolean(user && groups)
         }
     ]);
-    const isFetching = useMemo(() => results[0].isFetching || results[0].isLoading || results[1].isLoading || results[1].isFetching, [results]);
+    const cells = [
+        { className: classes.thumbnailWidth },
+        {},
+        { className: classes.lastTd }
+    ];
+    const isFetching = useMemo(
+        () => results.reduce((state, curr) =>
+            (state ? state : curr.isLoading || curr.isIdle || curr.isFetching),
+            false),
+        [results]);
+    const isEmpty = useMemo(() =>
+        results.reduce((state, curr) =>
+            (state ? state : curr.isSuccess && !Boolean(curr.data)),
+            false),
+        [results]);
+
+        const propertyData = useMemo(() => {
+            
+            if (isFetching || isEmpty) {
+                return [];
+            }
+
+            const data = results[1].data as any[];
+            const refined = data.map((el: any) => ({
+                image: {
+                    data: <FolderSVG height={`40px`} />
+                },
+                name: {
+                    data: el.name
+                },
+                download: {
+                    data: (
+                        <Button size="small" variant="outlined" color="secondary">
+                            Edit Uploads
+                        </Button>
+                    )
+                }
+            }));
+            return refined;
+        }, [results]);
+
     useEffect(() => {
         if (!!filter) {
-            debouncedSave(filter);
+            debouncedSave();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter]);
+
+    useEffect(() => {
+        if (onFetch) {
+            const hasOption = propertyData.filter((property: any) => property.name.data.trim().toLowerCase() === (filter || "").trim().toLowerCase());
+            console.log(isFetching || Boolean(hasOption.length));
+            onFetch(isFetching || Boolean(hasOption.length));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [propertyData, filter]);
+
     return (
         <Grid container className={className}>
             <Grid className={classes.root} xs={12} item>
-                {isFetching ? <LinearProgress color="secondary" /> : <GenericTable color={color} data={propertyData} cells={[]} mini />}
+                {isFetching ? <LinearProgress color="secondary" /> : (
+                    isEmpty ? (
+                        <Placeholder title="No Properties Found" subtitle="Create the Property and assign images to it">
+                            <NotInterestedIcon />
+                        </Placeholder>
+                    ) : <GenericTable color={color} data={propertyData} cells={cells} mini />
+                )}
             </Grid>
         </Grid>
     )

@@ -1,5 +1,6 @@
-import { Box, Breadcrumbs, Card, Grid, Hidden, Link, Paper, Typography } from "@material-ui/core";
+import { Box, Breadcrumbs, Card, Grid, Hidden, IconButton, Input, InputAdornment, Link, Paper, Typography } from "@material-ui/core";
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
@@ -8,9 +9,10 @@ import { GenericTable } from "components/table/generic-table";
 import { getDownload, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { usePropertyStyles } from "pages/properties/properties.page.style";
-import React, { useContext, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
+import { convertToSlug } from "utils/auth";
 
 interface Media {
 
@@ -55,19 +57,30 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
   const [amountTxt, updateAmount] = useReducer(reducer, initialState);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const location = useLocation<{ propertyName: string; propertyId: string; }>();
-  const [currentMedia, _] = useState<Record<string, any>>();
+  const [currentMedia] = useState<Record<string, any>>();
   const [propertyData, setPropertyData] = useState<any>([]);
+  const [vtLink, setVTLink] = useState<any>(null);
 
-  const { isLoading, isSuccess } = useQuery({
+  const { data, isLoading, isSuccess } = useQuery({
     queryKey: [`properties`, user!.group, location.state.propertyId],
     queryFn: () => postAPI<any>('/get-media', {
       pids: [location.state.propertyId],
     }, {
       token: user!.token
     }),
-    select: setPropertyData,
     enabled: Boolean(user && user.group && location.state.propertyId)
   });
+
+  useEffect(() => {
+      if (!data?.length) {
+        return;
+      }
+
+      const nonVt = data.filter((el: any) => el.type !== "vt");
+      const vt = data.filter((el: any) => el.type === "vt");
+      setPropertyData(nonVt);
+      setVTLink(vt[0]);
+  }, [data]);
 
   const tableStylesData = (data: any[]) => data.map(row => (
     {
@@ -145,7 +158,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                 await getDownload(image as unknown as string, propertyData[selectedRows[i]].resource);
               }
             }}
-            size="small"
+            size="medium"
             variant="contained"
             color="primary"
             disabled={!amountTxt.amount}
@@ -153,6 +166,37 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
             type="button">
             Download {amountTxt.txt}
           </CTAButton>
+
+          {vtLink && (
+            <React.Fragment>
+              <div className={classes.inputTest}>
+                <Typography display="block" variant={"h6"} color="primary">
+                  Virtual Tour Link (click to copy link)
+              </Typography>
+                <Input
+
+                  disabled
+                  color="secondary"
+                  fullWidth={true}
+                  id="standard-adornment-password"
+                  type='text'
+                  value={vtLink.resource}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => {
+                          navigator.clipboard.writeText(vtLink.resource);
+                        }}
+                      >
+                        <FileCopyIcon color="secondary" />
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </div>
+            </React.Fragment>
+          )}
+
         </Card>
       </Hidden>
       <Box>
@@ -177,13 +221,14 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
           <Grid item md={7} xs={12}>
             <CTAButton
               onClick={async () => {
-                await postAPI<any>('/generate-download', {
+                const zip = await postAPI<any>('/generate-download', {
                   pid: [location.state.propertyId],
                 }, {
                   token: user!.token
                 })
+                await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
               }}
-              size="small"
+              size="medium"
               variant="contained"
               color="primary"
               loading={false}

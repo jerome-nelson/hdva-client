@@ -8,6 +8,9 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
                 marginTop: `70px`
             },
         },
+        inputTest: {
+            cursor: `pointer`,
+        },
         tableHeadCell: {
             fontSize: `0.8rem`,
             fontWeight: `bolder`,

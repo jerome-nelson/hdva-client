@@ -66,7 +66,7 @@ const ForgottenEmailPage: React.FC = () => {
                                     loading={inProgress}
                                     type="submit"
                                     fullWidth
-                                    size="small"
+                                    size="medium"
                                     variant="contained"
                                     color="secondary"
                                 >
@@ -99,7 +99,7 @@ const ForgottenEmailPage: React.FC = () => {
                                     loading={inProgress}
                                     type="submit"
                                     fullWidth
-                                    size="small"
+                                    size="medium"
                                     variant="contained"
                                     color="secondary"
                                 >

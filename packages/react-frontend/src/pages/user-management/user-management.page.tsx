@@ -1,8 +1,15 @@
-import { Avatar, Box, Breadcrumbs, Button, Dialog, DialogActions, DialogTitle, Grid, Hidden, InputAdornment, Link, List, ListItem, ListItemIcon, ListItemText, Paper, TextField, Typography } from "@material-ui/core";
+import { Avatar, Box, Breadcrumbs, Button, Dialog, DialogActions, DialogTitle, Grid, Hidden, InputAdornment, LinearProgress, Link, List, ListItem, ListItemIcon, ListItemText, Paper, TextField, Typography } from "@material-ui/core";
+import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import SearchIcon from '@material-ui/icons/Search';
 import { CTAButton } from "components/buttons/cta";
+import { LoginContext } from "components/login-form/login.context";
+import { Placeholder } from "components/placeholder/placeholder";
+import { getAPI, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
-import React, { useState } from "react";
+import { Groups } from "pages/group-management/group-management.page";
+import React, { useContext, useMemo, useState } from "react";
+import { useQuery } from "react-query";
+import { User } from "services/auth.service";
 import { HeaderTitle } from "../../components/header/header";
 import { messages } from "../../config/en";
 import { useUserStyles } from "./user-management.page.style";
@@ -11,6 +18,19 @@ interface UserInputProps {
     placeholder: string;
     value: string;
     onUpdate?(value: string): void;
+}
+
+// TODO: Combine with others
+interface Users {
+    createdOn: Date;
+    email: string;
+    group: number;
+    modifiedOn: Date;
+    name: string;
+    password: string;
+    role: number;
+    userId: string;
+    _id: string;
 }
 
 
@@ -75,6 +95,7 @@ const UserForm: React.FC = () => {
     const notAllFieldsFilled = noOfFields.filter(elem => elem !== "lastName" && !!details[elem]).length !== noOfFields.length - 1;
     const classes = useUserStyles();
     const name = !!details.firstName || !!details.lastName ? `${details.firstName} ${details.lastName}` : "";
+
     return (
         <form>
             <div className={classes.inputMargin} >
@@ -120,7 +141,7 @@ const UserForm: React.FC = () => {
                 disabled={notAllFieldsFilled}
                 type="submit"
                 fullWidth
-                size="small"
+                size="medium"
                 variant="contained"
                 color="secondary"
             >
@@ -156,31 +177,67 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ open, onClose }) => {
 }
 
 interface UserListProps {
+    filter?: string;
     handleDeletion(event: any): void;
 }
 
-const UserList: React.FC<UserListProps> = ({ handleDeletion }) => {
+const UserList: React.FC<UserListProps> = ({ filter, handleDeletion }) => {
     const classes = useUserStyles();
-    return (
-        <ListItem button>
-            <ListItemIcon>
-                <Avatar className={classes.avatarLarge}>J</Avatar>
-            </ListItemIcon>
-            <ListItemText className={classes.listItem} primary="Jerome Nelson" secondary="Group 1" />
-            <CTAButton
-                className={classes.btnOverride}
-                loading={false}
-                size="small"
-                variant="contained"
-                color="secondary"
-                type="button">Edit</CTAButton>
-            <CTAButton loading={false}
-                className={classes.btnOverride}
-                onClick={handleDeletion}
-                size="small"
-                variant="contained"
-                type="button">Delete</CTAButton>
-        </ListItem>
+    const { user } = useContext(LoginContext);
+    const [pageNumber, setPageNumber] = useState(1);
+    const groupData = useQuery({
+        queryKey: "groups",
+        queryFn: () => getAPI<Groups>(`/groups`, { token: user!.token })
+    });
+    const getUsers = useQuery({
+        queryKey: [`users`, user!.group, filter],
+        queryFn: () => postAPI<User>(
+            '/users',
+            {
+                filter,
+                group: user!.group > 1 ? user!.group : null,
+                limit: 3,
+                offset: pageNumber > 1 ? 3 * (pageNumber - 1) : null
+            }, {
+            token: user!.token
+        }),
+        enabled: Boolean(user)
+    });
+
+    const isFetching = useMemo(() => groupData.isLoading || getUsers.isLoading || getUsers.isIdle || groupData.isIdle || groupData.isFetching || getUsers.isFetching, [groupData, getUsers]);
+    const isEmpty = useMemo(() => getUsers.isSuccess && groupData.isSuccess && !Boolean(getUsers.data), [getUsers]);
+
+    return isFetching ? <LinearProgress color="secondary" /> : (
+        isEmpty ? (
+            <Placeholder title="No Users Found" subtitle="Add a user first">
+                <NotInterestedIcon />
+            </Placeholder>
+        ) : (
+                ((getUsers || []).data as any).map((user: Users) => (
+                    <ListItem button>
+                        <ListItemIcon>
+                            <Avatar className={classes.avatarLarge}>{user.name.slice(0, 1)}</Avatar>
+                        </ListItemIcon>
+                        <ListItemText className={classes.listItem} primary={user.name} secondary={((groupData || []).data as any).filter(
+                            (group: Groups) => String(user.group) === String(group.groupId))[0].name || "No Group"} />
+                        <CTAButton
+                            disableElevation
+                            className={classes.btnOverride}
+                            loading={false}
+                            size="medium"
+                            variant="contained"
+                            color="secondary"
+                            type="button">Edit</CTAButton>
+                        <CTAButton loading={false}
+                            disableElevation
+                            className={classes.btnOverride}
+                            onClick={handleDeletion}
+                            size="medium"
+                            variant="contained"
+                            type="button">Delete</CTAButton>
+                    </ListItem>
+                ))
+        )
     );
 }
 
@@ -188,6 +245,7 @@ const UserPage: React.FC = () => {
     const classes = useUserStyles();
     const [open, setOpen] = useState(false);
     const [email, setEmail] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
     const notAllFieldsFilled = !email;
     const handleClickOpen = () => {
         setOpen(true);
@@ -216,11 +274,11 @@ const UserPage: React.FC = () => {
                         <PaperReplacement
                             footer={(
                                 <List component="nav" disablePadding>
-                                    <UserList handleDeletion={handleClickOpen} />
+                                    <UserList filter={searchTerm} handleDeletion={handleClickOpen} />
                                 </List>
                             )}
                         >
-                            <UserInput value="test" placeholder="Search for a user">
+                            <UserInput value={searchTerm} onUpdate={setSearchTerm} placeholder="Search for a user">
                                 <SearchIcon color="secondary" />
                             </UserInput>
                             <Typography color="primary" variant="h6">{messages["user.recent.title"]}</Typography>
@@ -242,7 +300,7 @@ const UserPage: React.FC = () => {
                                         loading={false}
                                         type="submit"
                                         fullWidth
-                                        size="small"
+                                        size="medium"
                                         variant="contained"
                                         color="secondary"
                                     >

@@ -45,7 +45,19 @@
     "@types/react-router-dom": "^5.1.6"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/src/**"
+        ],
+        "rules": {
+          "react-hooks/exhaustive-deps": "off"
+        }
+      }
+    ]
   },
   "name": "@jerome-nelson/react-frontend",
   "private": true,
