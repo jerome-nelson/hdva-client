@@ -2,6 +2,7 @@ import { createStyles, FormControl, Grid, InputAdornment, InputLabel, Link, make
 import Modal from '@material-ui/core/Modal';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import CloseIcon from '@material-ui/icons/Close';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
 import { CTAButton } from "components/buttons/cta";
@@ -18,6 +19,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 
 // TODO: Alert Popup on close button press
+export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
+    title: {
+
+    },
+    subline: {
+        margin: `0`
+    }
+}));
 export const useAddPropertyStyles = makeStyles((theme: Theme) => createStyles({
     searchField: {
         marginBottom: `10px`,
@@ -33,9 +42,7 @@ export const useAddPropertyStyles = makeStyles((theme: Theme) => createStyles({
         textAlign: `right`,
     },
     modalWidth: {
-        // Test styles
-        marginTop: `50px`,
-        width: `700px`
+        width: `1000px`
     },
     modal: {
         display: 'flex',
@@ -64,6 +71,7 @@ interface UploadPanelProps {
 }
 
 export const UploadPanel: React.FC<UploadPanelProps> = ({ onUpload }) => {
+    const classes = useUploadPanelStyles();
     const [showBtn, shouldBtnShow] = useState(false);
     const [files, setFileList] = useState<any[]>([]);
     useEffect(() => {
@@ -73,21 +81,21 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ onUpload }) => {
     }, [showBtn, files]);
 
     return (
-        <React.Fragment>
+        <Grid container justify="space-evenly">
             {[{ name: "Upload Images", type: "photo", component: <PhotoSVG />  }, { name: "Upload Floorplans", type: "floorplan", component: <FloorplanSVG /> }].map((obj, index) => (
-                <Grid item xs={12} key={`${obj.name}-${index}`}>
-                    <DragAndDrop hasFiles={shouldBtnShow} onFiles={(newFiles: any) => {
+                <Grid item key={`${obj.name}-${index}`}>
+                    <DragAndDrop name={obj.name} hasFiles={shouldBtnShow} onFiles={(newFiles: any) => {
                         const flatList = files.concat(newFiles.map((el: any) => ({
                             file: el,
                             resourceType: obj.type
                         })));
                         setFileList(flatList);
                     }}>
-                         {obj.component}
+                        <CloudUploadIcon />
                     </DragAndDrop>
                 </Grid>
             ))}
-        </React.Fragment >
+        </Grid>
     );
 };
 
@@ -169,7 +177,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                     <OutlinedInput
                                         className={classes.searchField}
                                         color="secondary"
-                                        placeholder={messages["property.modal.search"]}
+                                        placeholder={messages["property.table.search"]}
                                         fullWidth={true}
                                         id="property_name"
                                         type="text"
@@ -203,9 +211,6 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                         color="primary"
                                         variant="h5"
                                     />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <strong>Choose a file</strong> <span> or drag it here</span>
                                 </Grid>
                             </Grid>
                             <UploadPanel

@@ -144,6 +144,7 @@ const LoginComponent = (props: any) => {
                     <Hidden mdUp>
                         <Grid item xs={12} className={classes.mdUpMargin}>
                             <CTAButton
+                                disableElevation
                                 disabled={notAllFieldsFilled}
                                 loading={buttonLoading || isLoading} type="submit" fullWidth size="medium" variant="contained" color="primary">
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}

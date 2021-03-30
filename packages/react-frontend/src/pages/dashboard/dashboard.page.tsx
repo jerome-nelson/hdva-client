@@ -5,9 +5,11 @@ import { HeaderTitle } from "components/header/header";
 import { PropertyTable } from "components/property/property-table";
 import { LIMITS } from "config/data";
 import { messages } from 'config/en';
+import { Roles } from "hooks/useRoles";
 import { ReactComponent as LogoSVG } from "media/logo.svg";
 import React, { Suspense, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { Permissions } from "utils/permissions";
 import { useDashboardStyles } from "./dashboard.page.style";
 
 
@@ -15,15 +17,17 @@ const DashboardPage = () => {
     const [showPopup, setPopup] = useState(false);
     const classes = useDashboardStyles();
     const history = useHistory();
-    
+
     // TODO: Fix Typing
     const AddProperty = React.lazy(() => import("../../components/property/add-property"));
 
     return (
         <React.Fragment>
-            <Suspense fallback={false}>
-                {showPopup && <AddProperty onClose={() => setPopup(() => !showPopup)} />}
-            </Suspense>
+            <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
+                <Suspense fallback={false}>
+                    {showPopup && <AddProperty onClose={() => setPopup(() => !showPopup)} />}
+                </Suspense>
+            </Permissions>
             <Hidden mdUp>
                 <HeaderTitle
                     disableBack
@@ -53,8 +57,8 @@ const DashboardPage = () => {
                         startIcon={<CreateNewFolderIcon />}
                         onClick={() => setPopup(() => !showPopup)}
                     >
-                       {messages["upload.button.cta"]}
-                </CTAButton>
+                        {messages["upload.button.cta"]}
+                    </CTAButton>
                 </Grid>
                 <PropertyTable selectable show={LIMITS.home} />
                 <Grid item className={classes.moreLink}>

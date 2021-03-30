@@ -1,13 +1,15 @@
-import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Grid, Hidden, LinearProgress, Typography } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Grid, Hidden, InputAdornment, LinearProgress, OutlinedInput, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
+import SearchIcon from '@material-ui/icons/Search';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { LoginContext } from "components/login-form/login.context";
 import { CustomPagination } from "components/pagination/pagination";
 import { Placeholder } from "components/placeholder/placeholder";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
+import { messages } from "config/en";
 import { getAPI, getDownload, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { Groups } from "pages/group-management/group-management.page";
@@ -31,6 +33,7 @@ export interface Properties {
 export interface PropertyTableProps {
     mini?: boolean;
     show?: number;
+    showSearch?: boolean;
     showPagination?: boolean;
     selectable?: boolean;
     onSelect?(items: number[]): void;
@@ -75,6 +78,7 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
                 },
                 { token: user!.token }
             ),
+            refetchOnMount: "always",
             retry: 3,
             enabled: Boolean(user && groups)
         },
@@ -91,6 +95,7 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
                 token: user!.token
             }),
             retry: 3,
+            refetchOnMount: "always",
             keepPreviousData: true,
             enabled: Boolean(user && groups)
         }
@@ -111,30 +116,30 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
             false),
         [results]);
 
-        const propertyData = useMemo(() => {
-            
-            if (isFetching || isEmpty) {
-                return [];
-            }
+    const propertyData = useMemo(() => {
 
-            const data = results[1].data as any[];
-            const refined = data.map((el: any) => ({
-                image: {
-                    data: <FolderSVG height={`40px`} />
-                },
-                name: {
-                    data: el.name
-                },
-                download: {
-                    data: (
-                        <Button size="small" variant="outlined" color="secondary">
-                            Edit Uploads
-                        </Button>
-                    )
-                }
-            }));
-            return refined;
-        }, [results]);
+        if (isFetching || isEmpty) {
+            return [];
+        }
+
+        const data = results[1].data as any[];
+        const refined = data.map((el: any) => ({
+            image: {
+                data: <FolderSVG height={`40px`} />
+            },
+            name: {
+                data: el.name
+            },
+            download: {
+                data: (
+                    <Button size="small" variant="outlined" color="secondary">
+                        Edit Uploads
+                    </Button>
+                )
+            }
+        }));
+        return refined;
+    }, [results]);
 
     useEffect(() => {
         if (!!filter) {
@@ -146,7 +151,6 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
     useEffect(() => {
         if (onFetch) {
             const hasOption = propertyData.filter((property: any) => property.name.data.trim().toLowerCase() === (filter || "").trim().toLowerCase());
-            console.log(isFetching || Boolean(hasOption.length));
             onFetch(isFetching || Boolean(hasOption.length));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,37 +171,43 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
     )
 }
 
-export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, mini, show, showPagination, onSelect }) => {
+export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSearch, mini, show, showPagination, onSelect }) => {
     const [data, setData] = useState<any>([]);
+    const [search, setSearch] = useState("");
     const history = useHistory();
     const [pageNumber, setPageNumber] = useState(1);
     const { user } = useContext(LoginContext);
     const analytics = PropertyGTM();
+
     const { data: groups } = useQuery({
         queryKey: [`groups`, user!.group],
         queryFn: () => getAPI<Groups>('/groups', { token: user!.token }),
         enabled: Boolean(user)
     });
-    const { data: total } = useQuery({
+    const { data: total, refetch: refetchTotal } = useQuery({
         queryKey: [`properties`, user!.group, 'total'],
         queryFn: () => postAPI<number>('/properties-count', {
             group: user!.group > 1 ? user!.group : null,
+            filter: search
         },
             {
                 token: user!.token
             }),
+        refetchOnMount: "always",
         retry: 3,
         enabled: Boolean(user && groups)
     });
-    const { data: propertyData, isLoading, isFetching, isSuccess } = useQuery({
+    const { data: propertyData, isLoading, isFetching, isSuccess, refetch: refetchProperty } = useQuery({
         queryKey: [`properties`, user!.group, show || 0, pageNumber],
         queryFn: () => postAPI<Properties>('/properties', {
             group: user!.group > 1 ? user!.group : null,
             limit: show || null,
+            filter: search,
             offset: show && pageNumber > 1 ? show * (pageNumber - 1) : null
         }, {
             token: user!.token
         }),
+        refetchOnMount: "always",
         retry: 3,
         keepPreviousData: true,
         enabled: Boolean(total && user && groups)
@@ -226,7 +236,27 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, mini, 
         });
         setData(newData);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [groups, propertyData])
+    }, [groups, propertyData]);
+
+    const debounce = (func: any, delay: number) => {
+        let inDebounce: any;
+        return function () {
+            const args = arguments;
+            clearTimeout(inDebounce)
+            inDebounce = setTimeout(() => func.apply(null, args), delay)
+        }
+    }
+    const debouncedSave = useRef(debounce(() => {
+        refetchTotal();
+        refetchProperty();
+    }, 1000)).current;
+
+    useEffect(() => {
+        if (!!search) {
+            debouncedSave();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]);
 
     const classes = useTableStyles({ mini });
     function createData(id: string, name: string, group: string, propertyDetails: Record<string, boolean>, updated: string) {
@@ -397,6 +427,25 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, mini, 
 
     return (
         <React.Fragment>
+            <Grid container>
+                <Grid xs={12} md={5} item>
+                    {showSearch && (
+                        <OutlinedInput
+                            className={classes.userField}
+                            fullWidth={true}
+                            value={search}
+                            placeholder={messages["property.table.search"]}
+                            onChange={({ target }) => { setSearch(target.value) }}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            }
+                            type="text"
+                        />
+                    )}
+                </Grid>
+            </Grid>
             <Hidden smDown>
                 <GenericTable
                     head={head}

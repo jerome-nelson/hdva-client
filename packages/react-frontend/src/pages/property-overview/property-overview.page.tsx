@@ -27,7 +27,7 @@ const PropertiesOverviewPage: React.FC = () => {
                 </Breadcrumbs>
             </Hidden>
             <Box className={classes.container}>
-                <PropertyTable show={LIMITS.property} showPagination />
+                <PropertyTable showSearch show={LIMITS.property} showPagination />
             </Box>
         </React.Fragment>
     )

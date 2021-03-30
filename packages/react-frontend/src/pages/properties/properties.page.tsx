@@ -72,14 +72,14 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
   });
 
   useEffect(() => {
-      if (!data?.length) {
-        return;
-      }
+    if (!data?.length) {
+      return;
+    }
 
-      const nonVt = data.filter((el: any) => el.type !== "vt");
-      const vt = data.filter((el: any) => el.type === "vt");
-      setPropertyData(nonVt);
-      setVTLink(vt[0]);
+    const nonVt = data.filter((el: any) => el.type !== "vt");
+    const vt = data.filter((el: any) => el.type === "vt");
+    setPropertyData(nonVt);
+    setVTLink(vt[0]);
   }, [data]);
 
   const tableStylesData = (data: any[]) => data.map(row => (
@@ -134,6 +134,8 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
     sample,
     sample
   ];
+
+  const isEmpty = isSuccess && !Boolean(data);
 
   return (
     <React.Fragment>
@@ -217,25 +219,25 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         <Hidden mdUp>
           <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={location.state.propertyName} />
         </Hidden>
-        <Grid container className={classes.container}>
-          <Grid item md={7} xs={12}>
-            <CTAButton
-              onClick={async () => {
-                const zip = await postAPI<any>('/generate-download', {
-                  pid: [location.state.propertyId],
-                }, {
-                  token: user!.token
-                })
-                await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
-              }}
-              size="medium"
-              variant="contained"
-              color="primary"
-              loading={false}
-              type="button">
-              Download All
+        {!isEmpty ? (
+          <Grid container className={classes.container}>
+            <Grid item md={7} xs={12}>
+              <CTAButton
+                onClick={async () => {
+                  const zip = await postAPI<any>('/generate-download', {
+                    pid: [location.state.propertyId],
+                  }, {
+                    token: user!.token
+                  })
+                  await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
+                }}
+                size="medium"
+                variant="contained"
+                color="primary"
+                loading={false}
+                type="button">
+                Download All
           </CTAButton>
-            {propertyData && (
               <GenericTable
                 selectable
                 onSelect={items => {
@@ -249,9 +251,9 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                 cells={cells}
                 data={(isLoading || !isSuccess) ? skeleton : tableStylesData(propertyData)}
               />
-            )}
+            </Grid>
           </Grid>
-        </Grid>
+        ) : ""}
       </Box>
     </React.Fragment>
   );

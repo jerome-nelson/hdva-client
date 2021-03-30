@@ -1,27 +1,43 @@
-import { createStyles, Grid, makeStyles, Theme } from "@material-ui/core";
+import { createStyles, Grid, IconButton, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
+import DescriptionIcon from '@material-ui/icons/Description';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
 import { COLOR_OVERRIDES } from "theme";
+import { bytesToSize } from "utils/conversion";
 
 interface DragAndDropProps {
   onFiles(files: any[]): void;
   hasFiles?(uploaded: boolean): void;
+  name: string;
 }
 
 export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
+  bottomBtn: {
+    position: `absolute`,
+    bottom: `0`,
+    margin: `${theme.spacing(1)}px 0`,
+    width: `100%`
+  },
+  txtAlign: {
+    paddingLeft: `${theme.spacing(1)}px`,
+    textAlign: "left",
+  },
   root: {
     margin: `${theme.spacing(1)}px 0`,
   },
+  title: {
+
+  },
+  subline: {
+    margin: `0`
+  },
   uploadIcon: {
-    border: `dotted 4px #000`,
-    padding: `${theme.spacing(1)}px`,
-    width: `30%`,
-    "& .MuiSvgIcon-root svg g": {
-      backgroundColor: "red"
+    minHeight: `300px`,
+    width: `420px`,
+    "&:active,&:focus": {
+      borderColor: `rgba(1,1,1,0.50)`,
     },
-    "& .MuiSvgIcon-root svg path": {
-      backgroundColor: "red"
-    }
   },
   gridLine: {
     border: `1px solid ${COLOR_OVERRIDES.hdva_grey}`,
@@ -33,7 +49,9 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
   },
   dragDropZone: {
     cursor: `pointer`,
-    padding: `2rem`,
+    border: `dashed 6px rgba(1,1,1,0.29)`,
+    borderRadius: `6px`,
+    position: `relative`,
     textAlign: `center`,
     "&.inside-drag-area": {
       opacity: `0.7`,
@@ -41,9 +59,9 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
   },
   droppedFiles: {
     border: `1px solid ${COLOR_OVERRIDES.hdva_grey}`,
-    maxHeight: `200px`,
-    overflowX: "hidden",
-    overflowY: "scroll",
+    height: `220px`,
+    overflowX: `hidden`,
+    overflowY: `scroll`,
     "& ul": {
       listStyle: "none",
       margin: `0`,
@@ -52,7 +70,7 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
   }
 }));
 
-export const DragAndDrop: React.FC<DragAndDropProps> = ({ children, hasFiles, onFiles }) => {
+export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFiles, onFiles }) => {
 
   const reducer = (state: any, action: any) => {
     switch (action.type) {
@@ -62,6 +80,11 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ children, hasFiles, on
         return { ...state, inDropZone: action.inDropZone };
       case 'ADD_FILE_TO_LIST':
         return { ...state, fileList: state.fileList.concat(action.files) };
+      case 'REMOVE_FILE_FROM_LIST':
+        return {
+          ...state,
+          fileList: action.files
+        };
       default:
         return state;
     }
@@ -132,38 +155,80 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ children, hasFiles, on
     }
   }
 
+  const removeFile = (position: number, name: any) => {
+    const files = data.fileList.filter((el: any, index: number) => el.name !== name && index !== position).map((f: any) => f.name);
+    dispatch({ type: 'REMOVE_FILE_FROM_LIST', files });
+  }
+
   useEffect(() => {
     onFiles(data.fileList);
   }, [data]);
 
   return (
-    <Grid container className={classes.root} spacing={1}>
+    <Paper className={classes.root} elevation={0}>
       <input type="file" accept='image/*' style={{ display: "none" }} ref={inputFile} onChange={onFieldUpdate} multiple />
-      <Grid
-        item
-        xs={data.fileList.length > 0 ? 5 : 12}
-        className={classNames({
-          [classes.uploadIcon]: true,
-          [classes.dragDropZone]: true,
-          "inside-drag-area": data.inDropZone
-        })}
-        onClick={onButtonClick}
-        onDrop={e => handleDrop(e)}
-        onDragOver={e => handleDragOver(e)}
-        onDragEnter={e => handleDragEnter(e)}
-        onDragLeave={e => handleDragLeave(e)}
-      >
-        {children}
-      </Grid>
-      {data.fileList.length > 0 && (<Grid className={classes.droppedFiles} item xs>
-        <ul>
-          {data.fileList.map((f: any) => {
-            return (
-              <li key={f.name}>{f.name}</li>
-            )
+      {!data.fileList.length ? (
+        <Grid
+          item
+          className={classNames({
+            [classes.uploadIcon]: true,
+            [classes.dragDropZone]: true,
+            "inside-drag-area": data.inDropZone
           })}
-        </ul>
-      </Grid>)}
-    </Grid>
+          onClick={onButtonClick}
+          onDrop={e => handleDrop(e)}
+          onDragOver={e => handleDragOver(e)}
+          onDragEnter={e => handleDragEnter(e)}
+          onDragLeave={e => handleDragLeave(e)}
+        >
+          {children}
+          <Typography className={classes.title} display="block" variant="h3">{name}</Typography>
+          <Typography className={classes.subline} display="block" variant="subtitle1">Drop your images here or <button>Click to Browse for Images</button></Typography>
+          <Typography className={classes.subline} display="block" variant="subtitle2">Supports: JPEG, PNG, PDF</Typography>
+        </Grid>
+      ) : (
+          <Grid
+            item
+            className={classNames({
+              [classes.uploadIcon]: true,
+              [classes.dragDropZone]: true,
+              "inside-drag-area": data.inDropZone
+            })}
+          >
+            <Grid className={classes.droppedFiles} item>
+              {data.fileList.map((f: any, index: number) => (
+                <Grid container justify="space-between">
+                  <Grid className={classes.txtAlign} item xs={8} key={f.name}>
+                    <DescriptionIcon />
+                   {f.name}
+                  </Grid>
+                  <Grid item xs={2} key={f.name}>
+                    <IconButton
+                      onClick={() => {
+                        removeFile(index, f.name);
+                      }}
+                      aria-label="delete">
+                      <HighlightOffIcon color="secondary" />
+                    </IconButton>
+                  </Grid>
+                  <Grid className={classes.txtAlign}  item xs={12}><Typography>{bytesToSize(f.size)}</Typography></Grid>
+                </Grid>
+              ))}
+            </Grid>
+            <Grid
+              className={classes.bottomBtn}
+              item
+              onClick={onButtonClick}
+              onDrop={e => handleDrop(e)}
+              onDragOver={e => handleDragOver(e)}
+              onDragEnter={e => handleDragEnter(e)}
+              onDragLeave={e => handleDragLeave(e)}
+            >
+              <Typography className={classes.subline} display="block" variant="subtitle1">Drop your images here or <button>Click to Browse for Images</button></Typography>
+              <Typography className={classes.subline} display="block" variant="subtitle2">Supports: JPEG, PNG, PDF</Typography>
+            </Grid>
+          </Grid>
+        )}
+    </Paper>
   );
 };
