@@ -53,7 +53,6 @@ const DashboardPage = () => {
                         variant="contained"
                         color="primary"
                         type="button"
-                        disableElevation
                         startIcon={<CreateNewFolderIcon />}
                         onClick={() => setPopup(() => !showPopup)}
                     >
@@ -65,7 +64,6 @@ const DashboardPage = () => {
                     <CTAButton
                         fullWidth
                         size="medium"
-                        disableElevation
                         onClick={() => history.push("/properties")}
                         variant="outlined"
                         color="primary"

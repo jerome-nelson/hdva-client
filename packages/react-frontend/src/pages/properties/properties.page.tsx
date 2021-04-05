@@ -14,8 +14,13 @@ import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import { convertToSlug } from "utils/auth";
 
-interface Media {
-
+export interface Media {
+  createdOn: Date;
+    type?: string;
+    modifiedOn: Date;
+    resource: string;
+    propertyId: number;
+    _id: string;
 }
 
 interface PropertyProps {

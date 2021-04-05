@@ -7,8 +7,9 @@ import { COLOR_OVERRIDES } from "theme";
 import { bytesToSize } from "utils/conversion";
 
 interface DragAndDropProps {
-  onFiles(files: any[]): void;
-  hasFiles?(uploaded: boolean): void;
+  fileData?: any;
+  onAdd(files: any[]): void;
+  onRemove(files: any[]): void;
   name: string;
 }
 
@@ -18,6 +19,38 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
     bottom: `0`,
     margin: `${theme.spacing(1)}px 0`,
     width: `100%`
+  },
+  centerVert: {
+    position: `relative`,
+    "& > div": {
+      top: `50%`,
+      left: `50%`,
+      position: `absolute`,
+      transform: "translate(-50%, -50%)"
+    }
+  },
+  fileContainer: {
+    padding: `12px 0`,
+  },
+  // TODO: Create Generic
+  btnStrip: {
+    overflow: "visible",
+    width: "auto",
+    background: "none",
+    margin: 0,
+    padding: 0,
+    border: "none",
+    cursor: "pointer",
+    color: `#f01656`,
+    fontWeight: `bold`,
+    fontSize: `1rem`,
+    textAlign: `left`,
+    fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`,
+    lineHeight: `1.43`,
+    letterSpacing: `0.01071em`,
+    "&:hover": {
+      textDecoration: "underline",
+    }
   },
   txtAlign: {
     paddingLeft: `${theme.spacing(1)}px`,
@@ -49,8 +82,8 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
   },
   dragDropZone: {
     cursor: `pointer`,
-    border: `dashed 6px rgba(1,1,1,0.29)`,
-    borderRadius: `6px`,
+    border: `dashed 3px rgba(1,1,1,0.29)`,
+    borderRadius: `3px`,
     position: `relative`,
     textAlign: `center`,
     "&.inside-drag-area": {
@@ -70,8 +103,7 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
   }
 }));
 
-export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFiles, onFiles }) => {
-
+export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd, onRemove, fileData }) => {
   const reducer = (state: any, action: any) => {
     switch (action.type) {
       case 'SET_DROP_DEPTH':
@@ -79,11 +111,14 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFil
       case 'SET_IN_DROP_ZONE':
         return { ...state, inDropZone: action.inDropZone };
       case 'ADD_FILE_TO_LIST':
-        return { ...state, fileList: state.fileList.concat(action.files) };
+        const data = state.fileList.concat(action.files);
+        return { ...state, fileList: data };
       case 'REMOVE_FILE_FROM_LIST':
+        const { file: newFile } = action;
+        const files = state.fileList.filter((el: any, index: number) => el.name !== newFile.name && index !== newFile.position);
         return {
           ...state,
-          fileList: action.files
+          fileList: files
         };
       default:
         return state;
@@ -92,7 +127,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFil
   const inputFile = useRef(null);
   const [data, dispatch] = React.useReducer(
     reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
-  )
+  );
 
   const classes = useUploadPanelStyles();
   const handleDragEnter = (e: any) => {
@@ -130,6 +165,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFil
       files = files.filter(f => !existingFiles.includes(f.name))
 
       dispatch({ type: 'ADD_FILE_TO_LIST', files });
+      onAdd(files);
       dispatch({ type: 'SET_DROP_DEPTH', dropDepth: 0 });
       dispatch({ type: 'SET_IN_DROP_ZONE', inDropZone: false });
     }
@@ -150,41 +186,50 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFil
       files = files.filter(f => !existingFiles.includes(f.name))
 
       dispatch({ type: 'ADD_FILE_TO_LIST', files });
+      onAdd(files);
       dispatch({ type: 'SET_DROP_DEPTH', dropDepth: 0 });
       dispatch({ type: 'SET_IN_DROP_ZONE', inDropZone: false });
     }
   }
 
-  const removeFile = (position: number, name: any) => {
-    const files = data.fileList.filter((el: any, index: number) => el.name !== name && index !== position).map((f: any) => f.name);
-    dispatch({ type: 'REMOVE_FILE_FROM_LIST', files });
+  const removeFile = (position: number, name: string) => {
+    const currentFile = data.fileList.filter((el: any, index: number) => el.name === name && index === position).map((f: any) => f.name);
+    dispatch({
+      type: 'REMOVE_FILE_FROM_LIST',
+      file: {
+        name: currentFile[0],
+        position
+      }
+    });
+    onRemove(currentFile[0]);
   }
 
-  useEffect(() => {
-    onFiles(data.fileList);
-  }, [data]);
+  useEffect(() => { dispatch({ type: 'ADD_FILE_TO_LIST', files: fileData }); }, [fileData]);
 
   return (
     <Paper className={classes.root} elevation={0}>
       <input type="file" accept='image/*' style={{ display: "none" }} ref={inputFile} onChange={onFieldUpdate} multiple />
-      {!data.fileList.length ? (
+      {!Boolean(data?.fileList?.length) ? (
         <Grid
           item
           className={classNames({
+            [classes.centerVert]: true,
             [classes.uploadIcon]: true,
             [classes.dragDropZone]: true,
             "inside-drag-area": data.inDropZone
           })}
-          onClick={onButtonClick}
+          onClick={e => onButtonClick(e)}
           onDrop={e => handleDrop(e)}
           onDragOver={e => handleDragOver(e)}
           onDragEnter={e => handleDragEnter(e)}
           onDragLeave={e => handleDragLeave(e)}
         >
-          {children}
-          <Typography className={classes.title} display="block" variant="h3">{name}</Typography>
-          <Typography className={classes.subline} display="block" variant="subtitle1">Drop your images here or <button>Click to Browse for Images</button></Typography>
-          <Typography className={classes.subline} display="block" variant="subtitle2">Supports: JPEG, PNG, PDF</Typography>
+          <div>
+            {children}
+            <Typography display="block" variant="h5">{name}</Typography>
+            <Typography className={classes.subline} display="block" variant="subtitle1">Drop your images here or <button className={classes.btnStrip}>Click to Browse</button></Typography>
+            <Typography className={classes.subline} display="block" variant="subtitle2">Supports: JPEG, PNG, PDF</Typography>
+          </div>
         </Grid>
       ) : (
           <Grid
@@ -196,22 +241,34 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFil
             })}
           >
             <Grid className={classes.droppedFiles} item>
-              {data.fileList.map((f: any, index: number) => (
-                <Grid container justify="space-between">
-                  <Grid className={classes.txtAlign} item xs={8} key={f.name}>
-                    <DescriptionIcon />
-                   {f.name}
+              {[...data.fileList, ...fileData].map((f: any, index: number) => (
+                <Grid key={f.name} className={classes.fileContainer} container justify="space-between">
+                  <Grid className={classes.txtAlign} item xs={2} container>
+                    <Grid item xs={12}><DescriptionIcon style={{ height: "100%", width: "100%" }} /></Grid>
                   </Grid>
-                  <Grid item xs={2} key={f.name}>
-                    <IconButton
-                      onClick={() => {
-                        removeFile(index, f.name);
-                      }}
-                      aria-label="delete">
-                      <HighlightOffIcon color="secondary" />
-                    </IconButton>
+                  <Grid className={classes.txtAlign} alignItems="center" item container xs={10}>
+                    <Grid className={classes.txtAlign} item xs={10} container>
+                      <Grid item xs={12}>
+                        {f.name}
+                      </Grid>
+                      {f.size && (
+                        <Grid item xs={12}>
+                          <Typography>{bytesToSize(f.size)}</Typography>
+                        </Grid>
+                      )}
+                    </Grid>
+                    <Grid item xs={2}>
+                      <IconButton
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeFile(index, f.name);
+                        }}
+                        aria-label="delete">
+                        <HighlightOffIcon color="secondary" style={{ height: "100%", width: "100%" }} />
+                      </IconButton>
+                    </Grid>
                   </Grid>
-                  <Grid className={classes.txtAlign}  item xs={12}><Typography>{bytesToSize(f.size)}</Typography></Grid>
                 </Grid>
               ))}
             </Grid>
@@ -224,7 +281,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, hasFil
               onDragEnter={e => handleDragEnter(e)}
               onDragLeave={e => handleDragLeave(e)}
             >
-              <Typography className={classes.subline} display="block" variant="subtitle1">Drop your images here or <button>Click to Browse for Images</button></Typography>
+              <Typography className={classes.subline} display="block" variant="subtitle1">Drop your images here or <button className={classes.btnStrip}>Click to Browse</button></Typography>
               <Typography className={classes.subline} display="block" variant="subtitle2">Supports: JPEG, PNG, PDF</Typography>
             </Grid>
           </Grid>

@@ -14,9 +14,6 @@ export const useUserStyles = makeStyles((theme: Theme) =>
     inputMargin: {
       margin: `10px 0`
     },
-    paperOverride: {
-      padding: `6px 0`
-    },
     avatarLarge: {
       width: theme.spacing(7),
       height: theme.spacing(7),

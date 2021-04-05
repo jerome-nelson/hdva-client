@@ -82,10 +82,10 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
           }
 
           return (
-            <React.Fragment>
+            <React.Fragment key={index}>
               <Hidden smDown>
                 {(type === "next" && <Divider light orientation="vertical" flexItem />)}
-                <li key={index}>{children}</li>
+                <li>{children}</li>
                 {(type === "previous" && <Divider light orientation="vertical" flexItem />)}
               </Hidden>
               <Hidden mdUp>

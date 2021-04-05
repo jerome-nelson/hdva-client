@@ -10,6 +10,7 @@ interface ApiOptions {
   useToken: boolean,
   token?: string | null,
   initialDataType: any,
+  extUrl?: boolean;
   extraHeaders: Record<string, string>;
 }
 
@@ -140,7 +141,7 @@ export const useAPI = <T>(
     
   }, [headers]);
 
-  const callAPI = useCallback(payload => {
+  const callAPI = useCallback(payload => {    
     setStatus({
       ...status,
       loading: true
@@ -191,9 +192,10 @@ export const putAPI = async <T>(
   payload?: any, 
   options?: Partial<ApiOptions>,
 ): Promise<T[]> => {
+  const uri = Boolean(options?.extUrl) ? endpoint : `${process.env.REACT_APP_API}${endpoint}`;
   const { data: { data } } = await axios({
     method: 'put',
-    url: `${process.env.REACT_APP_API}${endpoint}`,
+    url: uri,
     data: payload,
     headers: {
       'Content-Type': 'application/octet-stream',
@@ -208,7 +210,7 @@ export const postAPI = async <T>(
   payload?: any, 
   options?: Partial<ApiOptions>,
 ): Promise<T[]> => {
-  const { data: { data } } = await axios({
+  const data = await axios({
     method: 'post',
     url: `${process.env.REACT_APP_API}${endpoint}`,
     data: payload && querystring.stringify(payload),
@@ -216,10 +218,14 @@ export const postAPI = async <T>(
       'Content-Type': 'application/x-www-form-urlencoded',
       ...(options && options.token) ? {
         'Authorization': options && options.token, 
+        ...options?.extraHeaders
       } : {},
     },
   });
-  return data;
+
+  console.log(data);
+  const test = data.data.data;
+  return test;
 }
 
 export const getAPI = async <T>(

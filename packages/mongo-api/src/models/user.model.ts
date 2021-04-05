@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import validator from "validator";
 import { jwtSign } from "../config/auth";
 import { ERROR_MSGS } from "../config/errors";
-import { AlreadyExists, BadRequest } from "../services/error";
+import { BadRequest } from "../services/error";
 
 
 export interface MongoUser extends mongoose.Document {
@@ -132,7 +132,11 @@ export const loginUserWithPassword = async (username: string, password: string) 
 export const createNewUser = async (user: Record<string, any>) => {
     try {
         if (await User.userExists(user.email)) {
-           throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
+        //    throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
+            const data = User.findOneAndUpdate({
+                email: user.email.toLowerCase()
+            });
+            return data;
         }
         const newUser = await new User({
             createdOn: new Date(),

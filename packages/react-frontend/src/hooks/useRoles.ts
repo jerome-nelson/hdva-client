@@ -14,11 +14,8 @@ export const Roles: Record<RoleTypes, string> = {
 }
 
 export interface RoleAPI {
-    createdOn: Date;
-    modifiedOn: Date;
     rolename: RoleTypes;
     id: number;
-    _id: string;
 }
 
 export const useRoles = (context: RoleTypes[] = []): [string, boolean, boolean] => {

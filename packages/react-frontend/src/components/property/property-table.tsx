@@ -44,9 +44,11 @@ export interface PropertyMiniTableProps {
     color?: "primary" | "secondary";
     filter?: string;
     onFetch?(hasResults: boolean): void;
+    onEdit?(propertyData: any): void;
+
 }
 
-export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className, color, filter, onFetch }) => {
+export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className, color, filter, onEdit, onFetch }) => {
     const [pageNumber, setPageNumber] = useState(1);
     const { user } = useContext(LoginContext);
     const classes = useMiniTableStyles({ filter });
@@ -132,7 +134,13 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
             },
             download: {
                 data: (
-                    <Button size="small" variant="outlined" color="secondary">
+                    <Button onClick={() => {
+                        if (!onEdit) return;
+                        onEdit({
+                            name: el.name,
+                            propertyId: el.propertyId
+                        })
+                    }} size="small" variant="outlined" color="secondary">
                         Edit Uploads
                     </Button>
                 )
