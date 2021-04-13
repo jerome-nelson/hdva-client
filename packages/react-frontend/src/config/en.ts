@@ -33,7 +33,7 @@ export const messages: Record<string, string> = {
     "login.title": "Welcome",
     "login.subtitle": "Please sign in with your credentials",
     "login.no-account": "Don't have an account?",
-    "login.forgotten-password": "Oops! It looks like you may have forgotten your password. Click here to reset it.",
+    "login.forgotten-password": "Oops! It looks like you may have forgotten your password. Please email or call HD Virtual Art to reset it",
     "login.inactive-account": "Please call us on +44134234234234 or email us to get your account activated.",
     "login.form.forgotten-password": "Forgot your password?",
     "forgotten-password.description": "Enter your email address to reset your password. You may need to check your spam folder. If you don't recieve an email then please let us know.",

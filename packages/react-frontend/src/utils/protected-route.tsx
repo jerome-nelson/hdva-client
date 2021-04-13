@@ -45,7 +45,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
     modalSettings.updateMessage("Error Occurred");
     modalSettings.setModal(true);
     if (!canAccess) {
-      history.back();
+      history.goBack();
     }
     // return null;
   }

@@ -1,9 +1,9 @@
-import { Grid, Hidden, IconButton, Input, InputAdornment, Paper } from "@material-ui/core";
+import { Grid, IconButton, Input, InputAdornment, Paper } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import React, { useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { setUser, User } from "services/auth.service";
 import { useGenericStyle } from "utils/generic.style";
 import { messages } from "../../config/en";
@@ -45,8 +45,11 @@ const LoginComponent = (props: any) => {
     });
     
     useEffect(() => {
-        if (isSuccess && Array.isArray(details)) {
+        if (!isLoading) {
             setButtonLoading(false);
+        }
+        if (isSuccess && Array.isArray(details)) {
+           
             const [loggedIn] = details;
             if (!loginContext.setUserDetails) {                
                 console.error("loginContext.setUserDetails is null");
@@ -56,7 +59,7 @@ const LoginComponent = (props: any) => {
                 history.push("/");
             }
         }
-    }, [isSuccess]);
+    }, [isLoading, isSuccess]);
 
     const handleChange = (fieldname: keyof LoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [fieldname]: event.target.value });
@@ -76,8 +79,7 @@ const LoginComponent = (props: any) => {
         <React.Fragment>
             <ErrorPopup
                 message={{
-                    text: messages["login.forgotten-password"],
-                    link: "/forgotten-password"
+                    text: messages["login.forgotten-password"]
                 }}
                 show={isError}
             />
@@ -129,19 +131,6 @@ const LoginComponent = (props: any) => {
                     }
                 />
                 <Grid container justify="flex-end">
-                    <Hidden mdDown>
-                        <Grid md={5} item className={classes.mdUpMargin}>
-                            <CTAButton
-                                disabled={notAllFieldsFilled}
-                                loading={buttonLoading || isLoading} type="submit" fullWidth size="medium" variant="contained" color="primary">
-                                {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
-                            </CTAButton>
-                        </Grid>
-                        <Grid md={12} item className={classes.mdUpMargin} >
-                            <p><Link to="/forgotten-password">{messages["login.form.forgotten-password"]}</Link></p>
-                        </Grid>
-                    </Hidden>
-                    <Hidden mdUp>
                         <Grid item xs={12} className={classes.mdUpMargin}>
                             <CTAButton
                                 disabled={notAllFieldsFilled}
@@ -149,7 +138,7 @@ const LoginComponent = (props: any) => {
                                 {(notAllFieldsFilled ? "Fill in all fields" : "Login")}
                             </CTAButton>
                         </Grid>
-                    </Hidden>
+                    {/* </Hidden> */}
                 </Grid>
             </form>
         </React.Fragment>
@@ -158,8 +147,8 @@ const LoginComponent = (props: any) => {
 
 export const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
     return (
-        <Paper className={className}>
-            <Hidden mdUp>
+        <Paper className={className} square>
+            {/* <Hidden mdUp> */}
                 <HeaderTitle
                     alignText="left"
                     disableBack
@@ -168,9 +157,9 @@ export const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
                     subtitle={messages["login.subtitle"]}
                     variant="h2"
                 />
-            </Hidden>
+            {/* </Hidden> */}
             <Grid item>
-                <Hidden mdDown>
+                {/* <Hidden mdDown>
                     <HeaderTitle
                         alignText="left"
                         disableBack
@@ -179,7 +168,7 @@ export const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
                         subtitle={messages["login.subtitle"]}
                         variant="h2"
                     />
-                </Hidden>
+                </Hidden> */}
                 {/* <Hidden mdDown>
                     <p>{messages["login.no-account"]} <br /> {messages["login.inactive-account"]}</p>
                     <div className={classes.hrHeader}><span className="hr-label__text">or</span></div>
