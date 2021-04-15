@@ -23,23 +23,23 @@ export const jwtSign = (params: string | Buffer | object) => {
     );
 }
 
-export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGatewayAuthorizerResult> => {
+// TODO: Fix types
+export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent, context: any, callback: any): Promise<APIGatewayAuthorizerResult> => {
     try {
-
-        if (!process.env.jwt) {
-            throw new BadRequest(ERROR_MSGS.JWT_NOT_SET)
+        if (!process?.env?.jwt) {
+            throw Error(ERROR_MSGS.JWT_NOT_SET);
         }
 
         const token = event.authorizationToken.replace("Bearer ", "");
-        const user = await jwt.verify(token, process.env.jwt, {
+        const user = await jwt.verify(token, process.env.jwt as string, {
             algorithms: ["HS256"],
         }) as UserModel;
         await startMongoConn();
-        const isAuth = await User.userExists(user.email.toLowerCase());
-        const hasRole = await Roles.rolesExists(user.role);
+        const isAuth = await User.userExists(user.email);
+        const hasRole = await Roles.rolesExists(String(user.role));
 
         if (!isAuth || !hasRole) {
-            throw new BadRequest(ERROR_MSGS.USER_ROLE_NOT_ALLOWED);
+            throw new Error(ERROR_MSGS.USER_ROLE_NOT_ALLOWED);
         }
         return {
             "principalId": event.authorizationToken,
@@ -58,6 +58,18 @@ export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent): Promise<
             }
         }
     } catch (e) {
-        throw e;
+        return callback("Unauthorized", {
+            "principalId": event.authorizationToken,
+            "policyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": "execute-api:Invoke",
+                        "Effect": "Deny",
+                        "Resource": `${event.methodArn}`
+                    }
+                ],
+            }
+        });
     }
 }

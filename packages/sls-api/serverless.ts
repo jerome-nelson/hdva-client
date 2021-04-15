@@ -1,12 +1,14 @@
 import type { Serverless } from 'serverless/aws';
 import { ALLOWED_IMAGES } from './src/config/config';
 
+// TODO: Split bundles using Webpack (lambda packages too big)
 // TODO: Setup TEST API
 // TODO: Deal with DB Connection issues
 // TODO: If lambda fails
 // TODO: Deal with 'network error' error type 
+// TODO: Create Buckets for S3
 const sharedEnv = {
-  jwt: "${env:jwt}",
+  jwt: "${env:JWT}",
   dburl: "${ssm:hdva.image.service.db}",
   dbname: "${ssm:hdva.image.db.name}",
   dbauth: "${ssm:hdva.image.db.auth}",
@@ -18,13 +20,25 @@ const serverlessConfiguration: Serverless = {
   service: "${env:SLS_SERVICE}",
   frameworkVersion: '2',
   custom: {
-    customDomain: {
-      basePath: "v1",
-      certificateArn: "${ssm:hdva.image.domain.arn}",
-      domainName: "${ssm:hdva.image.domain}",
-      apiType: 'rest',
-      createRoute53Record: true
-    },
+    customDomains: [
+      {
+        createRoute53Record: true,
+        endpointType: "edge",
+        securityPolicy: "tls_1_2",
+        apiType: "rest",
+        basePath: "v1",
+        certificateArn: "${ssm:hdva.image.domain.arn}",
+        domainName: "${ssm:hdva.image.domain}",
+        stage: "production"
+      },
+      {
+        basePath: "v1",
+        certificateArn: "${ssm:hdva.image.dev.domain.arn}",
+        createRoute53Record: true,
+        domainName: "${ssm:hdva.image.dev.domain}",
+        stage: "dev"
+      },
+    ],
     apigwBinary: {
       types: ALLOWED_IMAGES
     },
@@ -33,7 +47,7 @@ const serverlessConfiguration: Serverless = {
       includeModules: true
     }
   },
-  plugins: ['serverless-webpack', 'serverless-domain-manager', 'serverless-apigw-binary', 'serverless-dotenv-plugin'],
+  plugins: ['serverless-webpack', 'serverless-domain-manager', 'serverless-apigw-binary'],
   provider: {
     name: 'aws',
     runtime: 'nodejs12.x',
@@ -43,8 +57,6 @@ const serverlessConfiguration: Serverless = {
     iamRoleStatements: [
       {
         Action: ['s3:PutObject'],
-        // TODO: Change this IAM to user with specific rights
-        // Otherwise application will have temporary rights to do anything on AWS account
         Resource: ["${ssm:hdva.image.iam}"],
         Effect: "Allow",
       }
@@ -54,9 +66,18 @@ const serverlessConfiguration: Serverless = {
     },
   },
   functions: {
+    pushToWebBucket: {
+      handler: 'handler.sendToPublicBucket',
+      role: "${ssm:hdva.image.bucket.lambda.role}",
+      description: "Lambda Resize function (triggered by s3 bucket event)",
+      environment: {
+        web_bucket: "${ssm:hdva.image.bucket.web}",
+        bucket_region: "${ssm:hdva.image.bucket.region}"
+      },
+    },
     auth: {
-      environment: sharedEnv,
       handler: 'handler.login',
+      environment: sharedEnv,
       events: [
         {
           http: {
@@ -103,6 +124,125 @@ const serverlessConfiguration: Serverless = {
         },
       ]
     },
+    getImage: {
+      handler: 'handler.signedUrlGetObject',
+      environment: {
+        ...sharedEnv,
+        highres_bucket_name: "${ssm:hdva.image.bucket}",
+        zip_bucket_name: "${ssm:hdva.zip.bucket}",
+        bucket_region: "${ssm:hdva.image.bucket.region}"
+      },
+      events: [{
+        http: {
+          authorizer: {
+            name: "jwtAuth",
+            resultTtlInSeconds: 0,
+            identitySource: "method.request.header.Authorization"
+          },
+          cors: true,
+          method: 'post',
+          path: 'image/download',
+        },
+      }]
+
+    },
+    getZip: {
+      handler: 'handler.getZip',
+      timeout: 30,
+      environment: {
+        ...sharedEnv,
+        highres_bucket_name: "${ssm:hdva.image.bucket}",
+        zip_bucket_name: "${ssm:hdva.zip.bucket}",
+        bucket_region: "${ssm:hdva.image.bucket.region}"
+      },
+      events: [{
+        http: {
+          authorizer: {
+            name: "jwtAuth",
+            resultTtlInSeconds: 0,
+            identitySource: "method.request.header.Authorization"
+          },
+          cors: true,
+          method: 'post',
+          path: 'generate-download',
+        },
+      }]
+    },
+    getPropertyMedia: {
+      handler: 'handler.getPropertyMedia',
+      environment: sharedEnv,
+      events: [
+        {
+          http: {
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
+            cors: true,
+            method: 'post',
+            path: 'get-media',
+          }
+        }
+      ]
+    },
+    propertyCount: {
+      handler: 'handler.propertiesCount',
+      environment: sharedEnv,
+      events: [
+        {
+          http: {
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
+            cors: true,
+            method: 'post',
+            path: 'properties-count',
+          }
+        }
+
+      ]
+    },
+    groupCount: {
+      handler: 'handler.groupCount',
+      environment: sharedEnv,
+      events: [
+        {
+          http: {
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
+            cors: true,
+            method: 'post',
+            path: 'group-count',
+          }
+        }
+
+      ]
+    },
+    userCount: {
+      handler: 'handler.usersCount',
+      environment: sharedEnv,
+      events: [
+        {
+          http: {
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
+            cors: true,
+            method: 'post',
+            path: 'users-count',
+          }
+        }
+
+      ]
+    },
     propertyCRUD: {
       handler: 'handler.propertyCRUD',
       environment: sharedEnv,
@@ -145,18 +285,6 @@ const serverlessConfiguration: Serverless = {
               identitySource: "method.request.header.Authorization"
             },
             cors: true,
-            method: 'get',
-            path: 'properties',
-          }
-        },
-        {
-          http: {
-            authorizer: {
-              name: "jwtAuth",
-              resultTtlInSeconds: 0,
-              identitySource: "method.request.header.Authorization"
-            },
-            cors: true,
             method: 'post',
             path: 'properties',
           }
@@ -175,8 +303,27 @@ const serverlessConfiguration: Serverless = {
               resultTtlInSeconds: 0,
               identitySource: "method.request.header.Authorization"
             },
+            cors: true,
             method: 'post',
             path: 'register',
+          }
+        }
+      ]
+    },
+    CRUDMedia: {
+      handler: 'handler.CRUDMedia',
+      environment: sharedEnv,
+      events: [
+        {
+          http: {
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
+            cors: true,
+            method: 'post',
+            path: 'media/add',
           }
         }
       ]
@@ -211,36 +358,56 @@ const serverlessConfiguration: Serverless = {
               identitySource: "method.request.header.Authorization"
             },
             cors: true,
-            method: 'get',
+            method: 'post',
             path: 'users',
           }
         }
       ]
     },
+    getUser: {
+      handler: 'handler.getUser',
+      environment: sharedEnv,
+      events: [
+        {
+          http: {
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
+            cors: true,
+            method: 'get',
+            path: 'get-user',
+          }
+        }
+      ]
+    },
     images: {
-      handler: 'handler.signedURL',
+      handler: 'handler.signedUrlPutObject',
       environment: {
         ...sharedEnv,
-        bucketname: "${ssm:hdva.image.bucket}"
+        highres_bucket_name: "${ssm:hdva.image.bucket}",
+        web_bucket: "${ssm:hdva.image.bucket.web}",
+        bucket_region: "${ssm:hdva.image.bucket.region}"
       },
       events: [
         {
           http: {
-            // authorizer: {
-            //   name: "jwtAuth",
-            //   resultTtlInSeconds: 0,
-            //   identitySource: "method.request.header.Authorization"
-            // }, 
+            authorizer: {
+              name: "jwtAuth",
+              resultTtlInSeconds: 0,
+              identitySource: "method.request.header.Authorization"
+            },
             cors: true,
             method: 'post',
-            path: 'images/{eventId}',
+            path: 'images/upload',
           }
         }
       ]
     },
     jwtAuth: {
+      environment: sharedEnv,
       handler: "handler.jwtVerify",
-      environment: sharedEnv
     }
   }
 }

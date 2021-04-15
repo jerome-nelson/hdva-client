@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import validator from "validator";
 import { ERROR_MSGS } from "../config/messages";
 import { jwtSign } from "../utils/auth";
-import { AlreadyExists, BadRequest } from "../utils/error";
+import { BadRequest } from "../utils/error";
 
 export interface UserModel {
     createdOn: Date;
@@ -71,8 +71,8 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.statics.userExists = async function (email: string) {
-    const user = this.findOne({ email });
-    return !!user;
+    const user = this.findOne({ email: email.toLowerCase() });
+    return user;
 }
 
 UserSchema.statics.comparePass = async function (email: string, password: string) {
@@ -83,7 +83,7 @@ UserSchema.statics.comparePass = async function (email: string, password: string
     }
 
     const userMap = JSON.parse(JSON.stringify(user));
-    return !!await bcrypt.compare(password, userMap.password);
+    return Boolean(await bcrypt.compare(password, userMap.password));
 }
 
 UserSchema.pre<MongoUserDocument>('save', async function (next: HookNextFunction) {
@@ -109,7 +109,7 @@ export const loginUserWithPassword = async (username: string, password: string) 
     }
 
     const email = username.toLowerCase();
-    if (await !User.comparePass(email, password)) {
+    if (!await User.comparePass(email, password)) {
         throw new BadRequest(ERROR_MSGS.USER_CREDENTIALS_FAIL);
     }
 
@@ -128,10 +128,13 @@ export const loginUserWithPassword = async (username: string, password: string) 
     }]
 }
 
-export const createNewUser = async (user: Record<string, any>) => {
+export const createOrEditUser = async (user: Record<string, any>) => {
     try {
         if (await User.userExists(user.email)) {
-            throw new AlreadyExists(ERROR_MSGS.ACCOUNT_EXISTS);
+            const data = User.findOneAndUpdate({
+                email: user.email.toLowerCase()
+            });
+            return data;
         }
         const result = await new User({
             createdOn: new Date(),
@@ -145,15 +148,78 @@ export const createNewUser = async (user: Record<string, any>) => {
     }
 }
 
-export const findUsers = async (groupId?: number) => {
-    const params = groupId ? {
-        group: {
-            $in: groupId
-        }
-    } : {};
+export const getCurrentUser = async (email: string) => {
     try {
-        return await User.find(params)
+        const result = await User.findOne({ email: String(email) }, {
+            "_id": 0,
+            "userId": 1,
+            "role": 1,
+            "group": 1,
+            "email": 1,
+            "name": 1
+        });
+        return [result];
     } catch (e) {
         throw e;
     }
+}
+
+export const findUsers = async ({ currentUserId, userSearch, groupId, offset, limit } : { currentUserId: string, userSearch?: string, groupId?: number, offset?: number, limit?: number }) => {
+    // TODO: Type correctly
+    const sort = {
+        lean: true,
+        skip: offset,
+        limit,
+    }
+    const textSearch: any = !!userSearch && String(userSearch) ? {
+        userId: {
+            $ne: currentUserId
+        },
+        name: {
+            $regex: userSearch,
+            $options: "i"
+        },
+        email: {
+            $regex: userSearch,
+            $options: "i"
+        }
+    } : {};
+    const params = groupId ? {
+        group: {
+            $in: groupId
+        },
+        ...textSearch
+    } : { ...textSearch };
+    try {
+        return await User.find(params, {
+            "_id": 0,
+            "userId": 1,
+            "role": 1,
+            "group": 1,
+            "email": 1,
+            "name": 1
+        }, sort);
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const getUserCount = async ({ filter, groupId }: { filter?: string, groupId?: number }) => {
+    const textSearch: any = !!filter && String(filter) ? {
+        name: {
+            $regex: filter,
+            $options: "i"
+        },
+        email: {
+            $regex: filter,
+            $options: "i"
+        }
+    } : {};
+    const params = groupId ? {
+        group: {
+            $in: groupId
+        },
+        ...textSearch
+    } : { ...textSearch };
+    return await User.countDocuments(params);
 }

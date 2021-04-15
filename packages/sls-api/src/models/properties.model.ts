@@ -3,13 +3,13 @@ import mongoose, { Model } from "mongoose";
 interface PropertiesModel {
     createdOn: Date;
     modifiedOn: Date;
-    name: number;
+    name: string;
     propertyId: number;
     groupId: number;
     _id: string;
 }
 
-type MongoPropertiesDocument = mongoose.Document & PropertiesModel;
+export type MongoPropertiesDocument = mongoose.Document & PropertiesModel;
 interface MongoPropertiesModel extends Model<MongoPropertiesDocument> {
     doPropertiesExist(ids: number[]): Promise<Record<number, boolean>>;
 }
@@ -59,14 +59,17 @@ PropertiesSchema.statics.doPropertiesExist = async function (ids: number[]): Pro
 }
 
 export const Properties: MongoPropertiesModel = mongoose.model<MongoPropertiesDocument, MongoPropertiesModel>('Properties', PropertiesSchema);
-export const addProperties = async (properties: Omit<PropertiesModel, "_id" | "createdOn" | "modifiedOn">[]) => {
+export const addProperties = async (properties: Omit<PropertiesModel, "_id" | "createdOn" | "modifiedOn" | "propertyId">) => {
     const currentTime = new Date().toDateString();
-    const propertiesToAdd = properties.map(property => ({
-        ...property,
-        createdOn: currentTime,
-        modifiedOn: currentTime
-    }));
-
+    const lastId = (await Properties.find({}).sort({_id: -1}).limit(1))[0].propertyId;
+    // TODO: Add arrays
+    const propertiesToAdd = [{
+                ...properties,
+                groupId: Number(properties.groupId),
+                propertyId: lastId + 1,
+                createdOn: currentTime,
+                modifiedOn: currentTime
+    }];
     try {
         const result = await Properties.insertMany(propertiesToAdd);
         return result;
@@ -75,17 +78,46 @@ export const addProperties = async (properties: Omit<PropertiesModel, "_id" | "c
     }
 };
 
+export const getPropertyCount = async ({ filter, gid }: { filter?: string, gid?: number }) => {
+    return await Properties.countDocuments({
+        ...(gid ? { groupId: gid } : {}),
+        ...(
+            !!filter && String(filter) ? {
+            name: {
+            $regex: filter,
+            $options: "i"
+        } 
+    } : {})
+    });
+}
 
-export const getProperties = async ({ pids, gid }: { pids?: number[], gid?: number }) => {
+export const getProperties = async ({ filter, pids, gid, offset, limit }: { filter?: string, pids?: number[], gid?: number, offset?: number, limit?: number }) => {
     // TODO: Add Admin Check
+    const sort = {
+        lean: true,
+        skip: offset,
+        limit,
+    }
+
+    // TODO: Type correctly
+    const textSearch: any = !!filter && String(filter) ? {
+        name: {
+            $regex: filter,
+            $options: "i"
+        }
+    } : {};
+
     if (!gid && !pids) {
-        return await Properties.find();
+        return await Properties.find({
+            ...textSearch
+        }, null, sort);
     }
 
     if (gid) {
         return await Properties.find({
-            groupId: gid
-        });
+            groupId: gid,
+            ...textSearch
+        }, null, sort);
     }
 
     if (!pids) {
@@ -103,8 +135,9 @@ export const getProperties = async ({ pids, gid }: { pids?: number[], gid?: numb
     return await Properties.find({
         propertyId: {
             $in: pids
-        }
-    });
+        },
+        ...textSearch
+    }, null, sort);
 };
 
 export const deleteProperties = async ({ pids }: { pids: number[] }) => {

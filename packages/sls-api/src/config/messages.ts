@@ -5,6 +5,7 @@ export enum ERROR_MSGS {
     CREDENTIALS_FAIL = "Credentials don\'t match",
     JWT_NOT_SET = "JWT ENV not set",
     INVALID_EMAIL = "Email is Invalid",
+    BUCKET_REGION_NOT_SET = "Bucket region is not set",
     NO_FILENAME = "Filename must be specified",
     NO_GROUPS = "Groups  must be added to payload",
     NO_POST_BODY = "No Body added to POST method",
