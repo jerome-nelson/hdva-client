@@ -1,16 +1,16 @@
 import { Grid, IconButton, Input, InputAdornment, Paper } from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { CTAButton } from "components/buttons/cta";
+import { HeaderTitle } from "components/header/header";
+import { ErrorPopup } from "components/popup/error-popup";
+import { messages } from "config/en";
+import { postAPI } from "hooks/useAPI";
 import React, { useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
 import { setUser, User } from "services/auth.service";
 import { useGenericStyle } from "utils/generic.style";
-import { messages } from "../../config/en";
-import { postAPI } from "../../hooks/useAPI";
-import { CTAButton } from "../buttons/cta";
-import { ErrorPopup } from "../error-popup/error-popup";
-import { HeaderTitle } from "../header/header";
 import { useLoginStyles } from "./login-form.style";
 import { LoginContext } from "./login.context";
 

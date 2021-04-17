@@ -223,7 +223,6 @@ export const postAPI = async <T>(
     },
   });
 
-  console.log(data);
   const test = data.data.data;
   return test;
 }

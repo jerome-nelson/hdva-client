@@ -21,6 +21,11 @@ const MediaSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    propertyId: {
+        type: Number,
+        required: true,
+        trim: true,
+    },
     modifiedOn: {
         type: Date,
         required: false,
@@ -44,6 +49,7 @@ export const addMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "mo
         // TODO: Accept Arrays
         const result = await Media.insertMany([{
             ...media,
+            propertyId: Number(media.propertyId),
             createdOn: currentTime,
             modifiedOn: currentTime
         }]);

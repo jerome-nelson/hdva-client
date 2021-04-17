@@ -2,7 +2,7 @@ import { Grid } from "@material-ui/core";
 import CancelIcon from '@material-ui/icons/Cancel';
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
-import { ErrorPopup } from "../error-popup/error-popup";
+import { ErrorPopup } from "../popup/error-popup";
 import { ModalContext } from "./modal.context";
 import { useModalProviderStyles } from "./modal.style";
 

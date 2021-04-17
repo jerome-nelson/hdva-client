@@ -116,13 +116,6 @@ export const theme = createMuiTheme({
         }
     },
     overrides: {
-        MuiCssBaseline: {
-            '@global': {
-              body: {
-                backgroundColor: `#fff`,
-              },
-            },
-        },
         MuiAppBar: {
             colorPrimary: {
                 color: COLOR_OVERRIDES.hdva_black,

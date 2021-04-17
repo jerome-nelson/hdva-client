@@ -36,6 +36,7 @@ export const AppComponent = () => (
 export const App = () => {
 
     const [message, setMsg] = useState("");
+    const [modalChild, setModalChild] = useState<null | React.ReactNode>(null);
     const [showModal, setModal] = useState(false);
     const [userDetails, setUserDetails] = useState<User | null>(getCurrentUser());
     const [, shouldDismiss] = useState(false);
@@ -56,11 +57,13 @@ export const App = () => {
                             flashModal: showModal,
                             shouldDismiss: shouldDismiss,
                             updateMessage: setMsg,
-                            setModal: setModal
+                            setModal: setModal,
+                            setChild: setModalChild,
+                            children: modalChild
                         }}
                     >
                         <CssBaseline />
-                        <Modal />
+                        {!modalChild ? <Modal /> : (<Modal>{modalChild}</Modal>)}
                         <AppComponent />
                     </ModalContext.Provider>
                 </LoginContext.Provider>

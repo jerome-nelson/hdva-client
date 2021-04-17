@@ -1,4 +1,4 @@
-import { createStyles, Grid, InputAdornment, LinearProgress, Link, makeStyles, MenuItem, OutlinedInput, Paper, Select, Theme, Typography } from "@material-ui/core";
+import { CircularProgress, createStyles, Grid, InputAdornment, Link, makeStyles, MenuItem, OutlinedInput, Paper, Select, Theme, Typography } from "@material-ui/core";
 import Modal from '@material-ui/core/Modal';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import CloseIcon from '@material-ui/icons/Close';
@@ -10,15 +10,17 @@ import { DragAndDrop } from "components/drag-and-drop/drag-and-drop";
 import { HeaderTitle } from "components/header/header";
 import { BootstrapInput } from "components/input-bootstrap/bootstrap.input";
 import { LoginContext } from "components/login-form/login.context";
+import { ModalContext } from "components/modal/modal.context";
 import { Properties, PropertyMiniTable } from "components/property/property-table";
 import { messages } from "config/en";
-import { getAPI, postAPI, useAPI } from "hooks/useAPI";
+import { getAPI, postAPI, putAPI } from "hooks/useAPI";
 import { ReactComponent as FloorplanSVG } from "media/floorplan.svg";
 import { ReactComponent as PhotoSVG } from "media/photography.svg";
 import { Groups } from "pages/group-management/group-management.page";
 import { Media } from "pages/properties/properties.page";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useQueries, useQuery } from "react-query";
+import { useHistory } from "react-router-dom";
 
 // TODO: Alert Popup on close button press
 export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
@@ -67,20 +69,16 @@ export const useAddPropertyStyles = makeStyles((theme: Theme) => createStyles({
 
 interface UploadPanelProps {
     existingData?: any;
+    onFetch?(media: any[]): void;
     onUpload(
         files: any[]
     ): void;
 }
 
-export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onUpload }) => {
+export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onFetch, onUpload }) => {
     const { user } = useContext(LoginContext);
     const [files, setFileList] = useState<any[]>([]);
-    useEffect(() => {
-        if (onUpload && files.length > 0) {
-            onUpload(files);
-        }
-    }, [files]);
-
+    const [removed, setRemovedFiles] = useState<string[]>([])
     const results = useQueries([
         {
             queryKey: [`properties`, user!.group, existingData?.propertyId],
@@ -103,27 +101,56 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onUpload
     ]);
 
     const isFetchingData = useMemo(
-        () => results.reduce((state, curr) =>
+        () => existingData && results.reduce((state, curr) =>
             (state ? state : curr.isLoading || curr.isIdle || curr.isFetching),
             false),
         [results]);
 
+    const isEmpty = useMemo(() =>
+        results.reduce((state, curr) =>
+            (state ? state : curr.isSuccess && !Boolean(curr.data)),
+            false),
+        [results]);
+
+    useEffect(() => {
+        if (onUpload && files.length > 0) {
+            onUpload(files);
+        }
+    }, [files]);
+
     const mediaFiles = useMemo(() => {
-        const mediaFiles = results[0].data as Media[];
-        if (mediaFiles && mediaFiles.length) {
-            return mediaFiles.map(({ resource, type }) => ({
-                name: resource,
-                type
-            }));
-        } else {
+
+        if (isFetchingData || isEmpty) {
             return [];
         }
-    }, [results]);
+
+        const mediaResults = results[0].data as Media[];
+        if (mediaResults && mediaResults.length) {
+            const data = (mediaResults as Media[])
+                .map(({ resource, type }) => ({
+                    name: resource,
+                    type
+                })
+                )
+                .filter(mediaFile => {
+                    return !removed.includes(mediaFile.name);
+                });
+
+            if (onFetch) {
+                onFetch(data);
+            }
+
+            return data;
+        }
+
+        return [];
+
+    }, [results, removed]);
 
     return (
         <Grid container justify="space-evenly">
             {isFetchingData
-                ? <LinearProgress color="secondary" />
+                ? <CircularProgress color="secondary" />
                 : ([
                     { name: "Upload Images", type: "photo", component: <PhotoSVG /> },
                     { name: "Upload Floorplans", type: "floorplan", component: <FloorplanSVG /> }
@@ -140,6 +167,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onUpload
                                 setFileList(flatList);
                             }}
                             onRemove={(removed: any) => {
+                                setRemovedFiles(removed);
                                 const newList = files.filter((el: any) => el.file.type !== removed.type && el.resourceType !== removed.resourceType && removed.size === el.file.size && removed.name !== el.file.name);
                                 setFileList(newList);
                             }}
@@ -159,6 +187,8 @@ interface AddPropertyProps {
 export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
     const classes = useAddPropertyStyles();
     const { user } = useContext(LoginContext);
+    const modal = useContext(ModalContext);
+    const history = useHistory();
     const [disableUpload, setDisabledUpload] = useState(true);
     const [images, setImages] = useState<any[]>([]);
     const [upload, showUpload] = useState(false);
@@ -166,6 +196,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
     const [isModalHidden, shouldHide] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [vtLink, setVTLink] = useState("");
+    // const [externalVTLink, setExternalVTLink] = useState("");
     const [groupId, setGroupId] = useState<string>("");
     const [existingProperty, setSelectedProperty] = useState<Record<any, any> | null>(null);
     const [btnDisabled, setDisabled] = useState(Boolean(searchTerm.length));
@@ -185,20 +216,12 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
         }
 
         setGroups(groupData);
-    }, [groupData])
+    }, [groupData]);
 
     useEffect(() => {
         const shouldShow = (images.length > 0 && !!groupId);
         setDisabledUpload(!shouldShow);
     }, [images, groupId]);
-
-    const [propertyResponse, , , callAPI] = useAPI<any>('/properties/add', {
-        prevent: true,
-        useToken: true,
-        extraHeaders: {
-            "Content-Type": "application/json",
-        }
-    });
 
     return (
         <Modal
@@ -252,7 +275,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                     showUpload(true);
                                 }}
                                 filter={searchTerm}
-                                onFetch={resultFound => setDisabled(resultFound)}
+                                onFetch={setDisabled}
                             />
                         </React.Fragment>
                     )}
@@ -263,14 +286,21 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                     <HeaderTitle
                                         disableGutters
                                         disableBack
-                                        title={searchTerm || (Boolean(existingProperty?.name)) ? existingProperty && existingProperty.name : ""}
+                                        title={(Boolean(existingProperty?.name)) ? existingProperty?.name : searchTerm}
                                         alignText="center"
                                         color="primary"
                                         variant="h5"
                                     />
                                 </Grid>
                             </Grid>
-                            <UploadPanel existingData={existingProperty} onUpload={setImages} />
+                            <UploadPanel
+                                existingData={existingProperty}
+                                onFetch={mediaList => {
+                                    // Prevent re-render isses
+                                }}
+                                onUpload={setImages}
+                            />
+                            {/* TODO: Integrate into UploadPanel */}
                             {groups && (
                                 <Grid container item xs={12} justify="center">
                                     <Grid xs={10} item className={classes.groupSection}>
@@ -305,7 +335,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                     <Grid container>
                         <Grid item xs={6}>
                             <CTAButton
-                                disabled={!Boolean(existingProperty?.name) || Boolean(searchTerm.length === 0 || btnDisabled)}
+                                disabled={!upload && (!searchTerm || btnDisabled)}
                                 type="submit"
                                 size="medium"
                                 variant={"contained"}
@@ -314,6 +344,13 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                 onClick={() => {
                                     if (upload) {
                                         showUpload(false);
+
+                                        if (!searchTerm) {
+                                            setSelectedProperty(null);
+                                            setImages([]);
+                                            console.log("gired");
+                                        }
+
                                         return;
                                     }
 
@@ -333,39 +370,41 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                     variant="contained"
                                     color="primary"
                                     onClick={async () => {
-                                        // try {
-                                        //     const propertiesResponse = await postAPI<any>('/properties/add', {
-                                        //         name: [searchTerm],
-                                        //         groupId: Number(groupId)
-                                        //     }, {
-                                        //         token: user!.token
-                                        //     });
-                                        //     for (let i = 0; i < images.length; i += 1) {
-                                        //         const url = await postAPI<string>('/images/upload', {
-                                        //             type: images[i].file.type,
-                                        //             path: `${searchTerm}/${images[i].file.name}`
-                                        //         }, {
-                                        //             token: user!.token
-                                        //         });
-                                        //         await putAPI<any>(url as unknown as string, images[i].file, {
-                                        //             extUrl: true,
-                                        //             extraHeaders: {
-                                        //                 "Content-Type": images[i].file.type
-                                        //             }
-                                        //         });
-                                        //         const addMedia = await postAPI<any>('/media/add', {
-                                        //             resource: images[i].file.name,
-                                        //             type: images[i].resourceType,
-                                        //             propertyId: propertiesResponse.propertyId
-                                        //         }, {
-                                        //             token: user!.token
-                                        //         });
-                                        //         console.log(addMedia);
-                                        //     }
-                                        // } catch (e) {
-                                        //     alert("Error");
-                                        //     console.log(e);
-                                        // }
+                                        try {
+                                            const propertiesResponse = await postAPI<Properties>('/properties/add', {
+                                                name: [searchTerm],
+                                                groupId: Number(groupId)
+                                            }, {
+                                                token: user!.token
+                                            });
+                                            for (let i = 0; i < images.length; i += 1) {
+                                                const url = await postAPI<string>('/images/upload', {
+                                                    type: images[i].file.type,
+                                                    path: `${searchTerm}/${images[i].file.name}`
+                                                }, {
+                                                    token: user!.token
+                                                });
+                                                const res = await putAPI<any>(url as unknown as string, images[i].file, {
+                                                    extUrl: true,
+                                                    extraHeaders: {
+                                                        "Content-Type": images[i].file.type
+                                                    }
+                                                });
+                                                const addMedia = await postAPI<any>('/media/add', {
+                                                    resource: images[i].file.name,
+                                                    type: images[i].resourceType,
+                                                    propertyId: propertiesResponse[0].propertyId
+                                                }, {
+                                                    token: user!.token
+                                                });
+                                            }
+                                            modal.shouldDismiss(true);
+                                            modal.updateMessage("Upload is completed");
+                                            history.go(0);
+                                        } catch (e) {
+                                            alert("Error");
+                                            console.log(e);
+                                        }
                                     }}
                                 >
                                     Upload

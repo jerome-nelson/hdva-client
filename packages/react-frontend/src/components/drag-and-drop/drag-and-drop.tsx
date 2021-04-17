@@ -162,8 +162,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd,
 
     if (files && files.length > 0) {
       const existingFiles = data.fileList.map((f: any) => f.name)
-      files = files.filter(f => !existingFiles.includes(f.name))
-
+      files = files.filter(f => !existingFiles.includes(f.name));
       dispatch({ type: 'ADD_FILE_TO_LIST', files });
       onAdd(files);
       dispatch({ type: 'SET_DROP_DEPTH', dropDepth: 0 });
@@ -183,8 +182,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd,
 
     if (files && files.length > 0) {
       const existingFiles = data.fileList.map((f: any) => f.name)
-      files = files.filter(f => !existingFiles.includes(f.name))
-
+      files = files.filter(f => !existingFiles.includes(f.name));
       dispatch({ type: 'ADD_FILE_TO_LIST', files });
       onAdd(files);
       dispatch({ type: 'SET_DROP_DEPTH', dropDepth: 0 });
@@ -204,7 +202,9 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd,
     onRemove(currentFile[0]);
   }
 
-  useEffect(() => { dispatch({ type: 'ADD_FILE_TO_LIST', files: fileData }); }, [fileData]);
+  useEffect(() => { 
+    dispatch({ type: 'ADD_FILE_TO_LIST', files: fileData }); 
+  }, [fileData]);
 
   return (
     <Paper className={classes.root} elevation={0}>
@@ -241,8 +241,8 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd,
             })}
           >
             <Grid className={classes.droppedFiles} item>
-              {[...data.fileList, ...fileData].map((f: any, index: number) => (
-                <Grid key={f.name} className={classes.fileContainer} container justify="space-between">
+              {data.fileList.map((f: any, index: number) => (
+                <Grid key={`${f.name}-${Math.floor(Math.random() * index)}`} className={classes.fileContainer} container justify="space-between">
                   <Grid className={classes.txtAlign} item xs={2} container>
                     <Grid item xs={12}><DescriptionIcon style={{ height: "100%", width: "100%" }} /></Grid>
                   </Grid>

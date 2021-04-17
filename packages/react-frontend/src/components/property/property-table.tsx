@@ -158,8 +158,11 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
 
     useEffect(() => {
         if (onFetch) {
-            const hasOption = propertyData.filter((property: any) => property.name.data.trim().toLowerCase() === (filter || "").trim().toLowerCase());
-            onFetch(isFetching || Boolean(hasOption.length));
+            let hasOption = propertyData.length;
+            if (filter) {
+                hasOption = propertyData.filter((property: any) => property.name.data.trim().toLowerCase() === (filter || "").trim().toLowerCase()).length;
+            }
+            onFetch(isFetching || Boolean(hasOption));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyData, filter]);
