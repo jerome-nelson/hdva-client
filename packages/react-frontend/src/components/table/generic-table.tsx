@@ -85,6 +85,11 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
     }
 
     const rowSelect = (checked: boolean, index: number) => {
+
+        if (!selectable) {
+            return;
+        }
+
         if (checked) {
             setSelected(itemsSelected.concat([index]));
             return;

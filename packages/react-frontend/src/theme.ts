@@ -87,6 +87,10 @@ export const STYLE_OVERRIDES = {
     }
 }
 
+export const HEIGHTS = {
+    logoHeader: `74px`
+};
+
 export const WIDTHS = {
     min: `480px`,
     imageCell: `${STYLE_OVERRIDES.thumbnail + 10}px`

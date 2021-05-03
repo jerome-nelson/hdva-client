@@ -19,6 +19,14 @@ export const useMiniTableStyles = makeStyles<Theme, PropertyMiniTableProps>((the
 }));
 
 export const useTableStyles = makeStyles<Theme, PropertyTableProps>((theme: Theme) => createStyles({
+    containerMod: {
+        paddingTop: `${theme.spacing(4)}px`,
+        paddingBottom: `${theme.spacing(4)}px`,
+        textAlign: 'center',
+    },
+    smDown: {
+        padding: `0 ${theme.spacing(1)}px`,
+    },
     pagination: {
         position: `fixed`,
         left: `55%`,

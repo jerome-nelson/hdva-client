@@ -9,6 +9,7 @@ import { Roles } from "hooks/useRoles";
 import { ReactComponent as LogoSVG } from "media/logo.svg";
 import React, { Suspense, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { HEIGHTS } from "theme";
 import { Permissions } from "utils/permissions";
 import { useDashboardStyles } from "./dashboard.page.style";
 
@@ -17,21 +18,20 @@ const DashboardPage = () => {
     const [showPopup, setPopup] = useState(false);
     const classes = useDashboardStyles();
     const history = useHistory();
-
-    // TODO: Fix Typing
     const AddProperty = React.lazy(() => import("../../components/property/add-property"));
 
     return (
         <React.Fragment>
-            <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
-                <Suspense fallback={false}>
+            <Suspense fallback={false}>
+                <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
                     {showPopup && <AddProperty onClose={() => setPopup(() => !showPopup)} />}
-                </Suspense>
-            </Permissions>
+                </Permissions>
+            </Suspense>
             <Hidden mdUp>
                 <HeaderTitle
                     disableBack
                     isFixed
+                    fixedHeight={HEIGHTS.logoHeader}
                     title={<div className={classes.logo}><LogoSVG /></div>}
                     alignText="left"
                     color="primary"
@@ -47,19 +47,21 @@ const DashboardPage = () => {
                 />
             </Grid>
             <Grid className={classes.table}>
-                <Grid item className={classes.btnNav}>
-                    <CTAButton
-                        size="medium"
-                        variant="contained"
-                        color="primary"
-                        type="button"
-                        startIcon={<CreateNewFolderIcon />}
-                        onClick={() => setPopup(() => !showPopup)}
-                    >
-                        {messages["upload.button.cta"]}
-                    </CTAButton>
-                </Grid>
-                <PropertyTable selectable show={LIMITS.home} />
+                <Hidden smDown>
+                    <Grid item className={classes.btnNav}>
+                        <CTAButton
+                            size="medium"
+                            variant="contained"
+                            color="primary"
+                            type="button"
+                            startIcon={<CreateNewFolderIcon />}
+                            onClick={() => setPopup(() => !showPopup)}
+                        >
+                            {messages["upload.button.cta"]}
+                        </CTAButton>
+                    </Grid>
+                </Hidden>
+                <PropertyTable show={LIMITS.home} />
                 <Grid item className={classes.moreLink}>
                     <CTAButton
                         fullWidth

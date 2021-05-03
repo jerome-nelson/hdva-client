@@ -1,4 +1,11 @@
-import { Box, Breadcrumbs, Card, Grid, Hidden, IconButton, Input, InputAdornment, Link, Paper, Typography } from "@material-ui/core";
+import { Box, Breadcrumbs, Button, ButtonGroup, Card, CircularProgress, Grid, Hidden, IconButton, Input, InputAdornment, Link, Paper, Typography } from "@material-ui/core";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import MenuItem from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuList';
+import Popper from '@material-ui/core/Popper';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -16,11 +23,11 @@ import { convertToSlug } from "utils/auth";
 
 export interface Media {
   createdOn: Date;
-    type?: string;
-    modifiedOn: Date;
-    resource: string;
-    propertyId: number;
-    _id: string;
+  type?: string;
+  modifiedOn: Date;
+  resource: string;
+  propertyId: number;
+  _id: string;
 }
 
 interface PropertyProps {
@@ -59,11 +66,19 @@ function reducer(_: Record<string, any>, action: { amount: number }) {
 const PropertiesPage: React.SFC<PropertyProps> = () => {
   const { user } = useContext(LoginContext);
   const classes = usePropertyStyles();
+  const anchorRef = React.useRef(null);
   const [amountTxt, updateAmount] = useReducer(reducer, initialState);
+  const [errorImages, setErrorImages] = useState<any>({});
+  const [loadingStates, updateLoading] = useState<Record<string, any>>({
+    imageLoading: {},
+    downloadSome: false,
+    downloadAll: false
+  });
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const location = useLocation<{ propertyName: string; propertyId: string; }>();
   const [currentMedia] = useState<Record<string, any>>();
   const [propertyData, setPropertyData] = useState<any>([]);
+  const [openSubmenu, setOpenSubmenu] = useState(false);
   const [vtLink, setVTLink] = useState<any>(null);
 
   const { data, isLoading, isSuccess } = useQuery({
@@ -87,12 +102,22 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
     setVTLink(vt[0]);
   }, [data]);
 
-  const tableStylesData = (data: any[]) => data.map(row => (
-    {
+  const tableStylesData = (data: any[]) => data.map(row => {
+
+    let fileName = `${location.state.propertyName}/${row.resource}`.replace(/ /g, "+");
+    const seperator = fileName.split(".");
+
+    return {
       type: {
         data: (
           <Paper variant="outlined" square className={classes.iconBg}>
-            <img src={getThumbnailUrl(`${location.state.propertyName}/${row.resource}`, row.type)} alt={location.state.propertyName} />
+            {errorImages[fileName] ? <BrokenImageIcon className={classes.imageIcon} color="disabled"  /> : <img onError={() => {
+              setErrorImages({
+                ...errorImages,
+                [fileName]: true
+              });
+            }} 
+            src={getThumbnailUrl(`${location.state.propertyName}/${row.resource}`, row.type)} alt={location.state.propertyName} />}
           </Paper>
         )
       },
@@ -103,17 +128,43 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         data: <Typography noWrap>{new Date(row.modifiedOn).toDateString()}</Typography>
       },
       extra: {
-        data: <CloudDownloadOutlinedIcon onClick={async () => {
-          const image = await postAPI<string>('/image/download', {
-            path: [`${location.state.propertyName}/${row.resource}`],
-          }, {
-            token: user!.token
-          })
-          await getDownload(image as unknown as string, row.resource);
-        }} />
+        data: (
+          <a href="#" onClick={async (e) => {
+            e.preventDefault();
+            const inQueue = {
+              ...loadingStates.imageLoading,
+              [seperator[0]]: true
+            };
+            updateLoading({
+              ...loadingStates,
+              imageLoading: inQueue,
+            });
+            const image = await postAPI<string>('/image/download', {
+              path: [`${location.state.propertyName}/${row.resource}`],
+            }, {
+              token: user!.token
+            })
+            await getDownload(image as unknown as string, row.resource);
+            const outQueue = {
+              ...loadingStates.imageLoading,
+              [seperator[0]]: false
+            };
+            updateLoading({
+              ...loadingStates,
+              imageLoading: outQueue,
+            });
+          }}>
+            {loadingStates.imageLoading[seperator[0]] ?
+              <CircularProgress size="1rem" color="secondary" />
+              :
+              <CloudDownloadOutlinedIcon />
+            }
+          </a>
+        )
       },
     }
-  ));
+  }
+  );
 
   const cells = [{
     className: classes.iconTableCell
@@ -151,29 +202,83 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         </Typography>
           {currentMedia ? currentMedia.title : <Skeleton className={classes.variantBG} animation={false} variant="rect" height={20} width={400} />}
           <div className={`${classes.variantBG} ${classes.photoBG}`} />
-          <CTAButton
-            onClick={async () => {
-              if (!selectedRows.length) {
-                return;
-              }
-              for (let i = 0; i < selectedRows.length; i += 1) {
-                const image = await postAPI<string>('/image/download', {
-                  path: [`${location.state.propertyName}/${propertyData[selectedRows[i]].resource}`],
-                }, {
-                  token: user!.token
-                })
-                await getDownload(image as unknown as string, propertyData[selectedRows[i]].resource);
-              }
-            }}
-            size="medium"
-            variant="contained"
-            color="primary"
-            disabled={!amountTxt.amount}
-            loading={false}
-            type="button">
-            Download {amountTxt.txt}
-          </CTAButton>
-
+          <Grid container className={classes.containerBtns} justify="space-between">
+            <Grid item xs={6}>
+              <CTAButton
+                onClick={async () => {
+                  if (!selectedRows.length) {
+                    return;
+                  }
+                  try {
+                    updateLoading({
+                      ...loadingStates,
+                      downloadSome: true,
+                    })
+                    for (let i = 0; i < selectedRows.length; i += 1) {
+                      const image = await postAPI<string>('/image/download', {
+                        path: [`${location.state.propertyName}/${propertyData[selectedRows[i]].resource}`],
+                      }, {
+                        token: user!.token
+                      })
+                      await getDownload(image as unknown as string, propertyData[selectedRows[i]].resource);
+                      updateLoading({
+                        ...loadingStates,
+                        downloadSome: false,
+                      })
+                    }
+                  } catch (e) {
+                    updateLoading({
+                      ...loadingStates,
+                      downloadSome: false,
+                    });
+                  }
+                }}
+                size="medium"
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={!amountTxt.amount}
+                loading={loadingStates.downloadSome}
+                type="button">
+                Download {amountTxt.txt}
+              </CTAButton>
+            </Grid>
+            <Grid item xs={5}>
+              <CTAButton
+                onClick={async () => {
+                  try {
+                    updateLoading({
+                      ...loadingStates,
+                      downloadAll: true,
+                    });
+                    const zip = await postAPI<any>('/generate-download', {
+                      pid: [location.state.propertyId],
+                    }, {
+                      token: user!.token
+                    })
+                    await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
+                    updateLoading({
+                      ...loadingStates,
+                      downloadAll: false,
+                    });
+                  }
+                  catch (e) {
+                    updateLoading({
+                      ...loadingStates,
+                      downloadAll: false,
+                    });
+                  }
+                }}
+                fullWidth
+                size="medium"
+                variant="contained"
+                color="primary"
+                loading={loadingStates.downloadAll}
+                type="button">
+                Download All
+              </CTAButton>
+            </Grid>
+          </Grid>
           {vtLink && (
             <React.Fragment>
               <div className={classes.inputTest}>
@@ -226,23 +331,163 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         </Hidden>
         {!isEmpty ? (
           <Grid container className={classes.container}>
+            <Grid item xs={12} className={classes.mobileMore}>
+              <Hidden mdUp>
+                <ButtonGroup ref={anchorRef} variant="contained" color="primary" aria-label="Mobile Download Options">
+                  <Button
+                    onClick={event => {
+                      setOpenSubmenu((prevOpen) => !prevOpen);
+                    }}
+                    color="primary"
+                    size="small"
+                    aria-label="Mobile Download Options"
+                    aria-haspopup="menu"
+                  >
+                    Download Options <ArrowDropDownIcon />
+                  </Button>
+                </ButtonGroup>
+                <Popper className={classes.popperOverrides} open={openSubmenu} anchorEl={anchorRef.current} role={undefined} placement="bottom-end" transition disablePortal>
+                  {({ TransitionProps, placement }) => (
+                    <Grow
+                      {...TransitionProps}
+                      style={{
+                        transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                      }}
+                    >
+                      <Paper>
+                        <ClickAwayListener onClickAway={() => null}>
+                          <MenuList id="split-button-menu">
+                            <MenuItem>
+
+                              <CTAButton
+                                onClick={async () => {
+                                  if (!selectedRows.length) {
+                                    return;
+                                  }
+                                  try {
+                                    updateLoading({
+                                      ...loadingStates,
+                                      downloadSome: true,
+                                    })
+                                    for (let i = 0; i < selectedRows.length; i += 1) {
+                                      const image = await postAPI<string>('/image/download', {
+                                        path: [`${location.state.propertyName}/${propertyData[selectedRows[i]].resource}`],
+                                      }, {
+                                        token: user!.token
+                                      })
+                                      await getDownload(image as unknown as string, propertyData[selectedRows[i]].resource);
+                                      updateLoading({
+                                        ...loadingStates,
+                                        downloadSome: false,
+                                      })
+                                    }
+                                  } catch (e) {
+                                    updateLoading({
+                                      ...loadingStates,
+                                      downloadSome: false,
+                                    });
+                                  }
+                                }}
+                                size="medium"
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                disabled={!amountTxt.amount}
+                                loading={loadingStates.downloadSome}
+                                type="button">
+                                Download {amountTxt.txt}
+                              </CTAButton>
+                            </MenuItem>
+                            <MenuItem>
+                              <CTAButton
+                                onClick={async () => {
+                                  try {
+                                    updateLoading({
+                                      ...loadingStates,
+                                      downloadAll: true,
+                                    });
+                                    const zip = await postAPI<any>('/generate-download', {
+                                      pid: [location.state.propertyId],
+                                    }, {
+                                      token: user!.token
+                                    })
+                                    await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
+                                    updateLoading({
+                                      ...loadingStates,
+                                      downloadAll: false,
+                                    });
+                                  }
+                                  catch (e) {
+                                    updateLoading({
+                                      ...loadingStates,
+                                      downloadAll: false,
+                                    });
+                                  }
+                                }}
+                                fullWidth
+                                size="medium"
+                                variant="contained"
+                                color="primary"
+                                loading={loadingStates.downloadAll}
+                                type="button">
+                                Download All
+                              </CTAButton>
+                            </MenuItem>
+                            {vtLink && (
+                            <MenuItem>
+                              <Grid container>
+                                <Grid item xs={12}>
+                                  <Typography display="block" variant={"h6"} color="primary">
+                                    Virtual Tour Link (click to copy link)
+                              </Typography>
+
+                                </Grid>
+                                <Grid item xs={12}>
+                                  <Input
+                                    disabled
+                                    color="secondary"
+                                    fullWidth={true}
+                                    id="standard-adornment-password"
+                                    type='text'
+                                    value={vtLink.resource}
+                                    endAdornment={
+                                      <InputAdornment position="end">
+                                        <IconButton
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(vtLink.resource);
+                                          }}
+                                        >
+                                          <FileCopyIcon color="secondary" />
+                                        </IconButton>
+                                      </InputAdornment>
+                                    }
+                                  />
+
+                                </Grid>
+                                <Grid className={classes.mobileVTTourLink} item xs={12}>
+                                  <CTAButton
+                                    type="button"
+                                    fullWidth
+                                    size="medium"
+                                    variant="contained"
+                                    color="primary"    
+                                    onClick={async () => { 
+                                      window.open(vtLink.resource,'_blank');
+                                     }}>
+                                    Open Virtual Tour
+                                </CTAButton>
+                                </Grid>
+                              </Grid>
+                            </MenuItem>)}
+                          </MenuList>
+                        </ClickAwayListener>
+                      </Paper>
+                    </Grow>
+                  )}
+                </Popper>
+              </Hidden>
+            </Grid>
             <Grid item md={7} xs={12}>
-              <CTAButton
-                onClick={async () => {
-                  const zip = await postAPI<any>('/generate-download', {
-                    pid: [location.state.propertyId],
-                  }, {
-                    token: user!.token
-                  })
-                  await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
-                }}
-                size="medium"
-                variant="contained"
-                color="primary"
-                loading={false}
-                type="button">
-                Download All
-          </CTAButton>
               <GenericTable
                 selectable
                 onSelect={items => {
