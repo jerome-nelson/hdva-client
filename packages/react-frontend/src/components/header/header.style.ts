@@ -4,10 +4,11 @@ import { HeaderProps } from "./header";
 
 export const useHeaderStyles = makeStyles((theme: Theme) =>
     createStyles({
-        reset: {
-            boxShadow: "none"
-        },
+        appBar: (props: HeaderProps) => (props.fixedHeight ? {
+          height: props.fixedHeight,
+        } : {}),
         paperReset: {
+            boxShadow: "none",
             padding: 0,
         },
         root: {
@@ -15,6 +16,7 @@ export const useHeaderStyles = makeStyles((theme: Theme) =>
         },
         title: (props: HeaderProps) => ({
             width: props.disableBack ? "100%" : "inherit",
+            height: `100%`,
             textAlign: props.alignText ? props.alignText : "center"
         })
     }),

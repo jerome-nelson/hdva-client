@@ -1,4 +1,4 @@
-import { Button, Divider, Hidden, Paper } from '@material-ui/core';
+import { Button, Divider, Hidden, Paper, Typography } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -65,12 +65,6 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
             children = (
               <IconButton
                 {...item}
-                // className={classNames({
-                //   [classes.button]: true,
-                //   [classes.iconBtn]: true,
-                //   [classes.btnSelected]: selected
-                // })}
-                // type="button"
                 onClick={event => {
                   clickHandler(page, type)
                   item.onClick(event);
@@ -92,12 +86,6 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
                 {(type === "next" && (
                   <IconButton
                     {...item}
-                    // className={classNames({
-                    //   [classes.button]: true,
-                    //   [classes.iconBtn]: true,
-                    //   [classes.btnSelected]: selected
-                    // })}
-                    // type="button"
                     onClick={event => {
                       clickHandler(page, type)
                       item.onClick(event);
@@ -106,17 +94,11 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
                   </IconButton>
                 ))}
                 {(type === "next" && <Divider light orientation="vertical" flexItem />)}
-                {selected && (<li><div className={classes.seperator}>{`${page} of ${count}`}</div></li>)}
+                {selected && (<li><Typography color="secondary" component="div" className={classes.seperator}><strong>{`${page} of ${count}`}</strong></Typography></li>)}
                 {(type === "previous" && <Divider light orientation="vertical" flexItem />)}
                 {(type === "previous" && (
                   <IconButton
                     {...item}
-                    // className={classNames({
-                    //   [classes.button]: true,
-                    //   [classes.iconBtn]: true,
-                    //   [classes.btnSelected]: selected
-                    // })}
-                    // type="button"
                     onClick={event => {
                       clickHandler(page, type)
                       item.onClick(event);

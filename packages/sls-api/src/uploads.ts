@@ -62,7 +62,6 @@ export const signedUrlPutObject = async (event: any, _: Context) => {
 
     // TODO: Not priority - how to protect against malformed images
     const s3PutObjectUrl = await BucketInstance.getSignedUrlPromise('putObject', req);
-    console.log(s3PutObjectUrl);
     return createResponse(s3PutObjectUrl);
   } catch (e) {
     return createErrorResponse(e);

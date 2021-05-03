@@ -8,7 +8,7 @@ import { SideNav } from "../components/navigation/side.nav";
 import { RoleTypes, useRoles } from "../hooks/useRoles";
 
 
-
+// TODO: WRONG COMPONENT ARCHITECTURE. FIX
 export interface RouterProps extends RouteProps {
   fullWidth?: boolean;
   auth?: boolean;
@@ -16,15 +16,14 @@ export interface RouterProps extends RouteProps {
   toRender: any; // TODO: Type correctly
 }
 
-export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps) => {
+export const PrivateRoute = ({ auth, fullWidth, toRender, allowed }: RouterProps) => {
 
   const { user } = useContext(LoginContext);
-  const history = useHistory();
   const modalSettings = useContext(ModalContext);
-  const permissions = rest && rest.allowed;
-
+  
+  const history = useHistory();
   const location = useLocation();
-  const [, canAccess, isError] = useRoles(permissions);
+  const [, canAccess, isError] = useRoles(allowed);
 
   const isAuthCanView = auth && !user;
   const DynamicComponent = toRender;
@@ -60,7 +59,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
     <React.Fragment>
       <Hidden smDown>
         <Grid container>
-          {!fullWidth && (<Grid item md={2}>
+          {!fullWidth && user && (<Grid item md={2}>
             <SideNav />
           </Grid>)}
           <Grid item md={!fullWidth ? 10 : 12}>
@@ -74,7 +73,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, ...rest }: RouterProps
         <Suspense fallback={<CircularProgress color="secondary"/>}>
           <DynamicComponent />
         </Suspense>
-        <BottomNav />
+        {user && (<BottomNav />)}
       </Hidden>
     </React.Fragment>
   );

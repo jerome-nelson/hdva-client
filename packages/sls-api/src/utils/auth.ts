@@ -34,11 +34,18 @@ export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent, context: 
         const user = await jwt.verify(token, process.env.jwt as string, {
             algorithms: ["HS256"],
         }) as UserModel;
+     
+        if (!user) {
+            context.failure("EXPIRED_TOKEN");
+            throw new Error(ERROR_MSGS.USER_CREDENTIALS_FAIL);
+        }
+
         await startMongoConn();
         const isAuth = await User.userExists(user.email);
         const hasRole = await Roles.rolesExists(String(user.role));
 
         if (!isAuth || !hasRole) {
+            context.failure("Unauthorized");
             throw new Error(ERROR_MSGS.USER_ROLE_NOT_ALLOWED);
         }
         return {
@@ -58,7 +65,7 @@ export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent, context: 
             }
         }
     } catch (e) {
-        return callback("Unauthorized", {
+        return {
             "principalId": event.authorizationToken,
             "policyDocument": {
                 "Version": "2012-10-17",
@@ -70,6 +77,6 @@ export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent, context: 
                     }
                 ],
             }
-        });
+        };
     }
 }

@@ -1,6 +1,8 @@
 import { LoginContext } from "components/login-form/login.context";
 import { useContext, useEffect, useReducer, useState } from "react";
 import { useQuery } from "react-query";
+import { useHistory } from "react-router-dom";
+import { setUser } from "services/auth.service";
 import { getAPI } from "./useAPI";
 
 export type RoleTypes = "super" | "admin" | "owner" | "uploader" | "viewer";
@@ -20,14 +22,28 @@ export interface RoleAPI {
 
 export const useRoles = (context: RoleTypes[] = []): [string, boolean, boolean] => {
 
-    const { user } = useContext(LoginContext);
+    const history = useHistory();
+    const { user, setUserDetails } = useContext(LoginContext);
     const [currentRole, setRole] = useState<string>("");
-    
-    const { data: roleData, isError } = useQuery({
+    const [showError, setErrorStatus] = useState(false);
+
+    const { data: roleData } = useQuery({
         queryKey: "roles",
         queryFn: () => getAPI<RoleAPI>("/roles", {
             token: user && user.token
         }),
+        onError: (error: any) => {
+            if ([401, 403].includes(error.response.status)) {
+
+                if ( setUserDetails ) {
+                    setUserDetails(null);
+                }
+                setUser(null);
+                history.push("/");
+                return;
+            }          
+            setErrorStatus(true);
+        },
         enabled: Boolean(user?.token)
     });
     const [canAccess, dispatch] = useReducer((state: any, action: any) => {
@@ -56,5 +72,5 @@ export const useRoles = (context: RoleTypes[] = []): [string, boolean, boolean] 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [context]);
 
-    return [currentRole, canAccess, isError];
+    return [currentRole, canAccess, showError];
 }

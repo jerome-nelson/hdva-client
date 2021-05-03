@@ -272,6 +272,9 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                 color="secondary"
                                 onEdit={data => {
                                     setSelectedProperty(data);
+                                    if (data.groupId) {
+                                        setGroupId(data.groupId);
+                                    }
                                     showUpload(true);
                                 }}
                                 filter={searchTerm}
@@ -384,13 +387,13 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                                 }, {
                                                     token: user!.token
                                                 });
-                                                const res = await putAPI<any>(url as unknown as string, images[i].file, {
+                                               await putAPI<any>(url as unknown as string, images[i].file, {
                                                     extUrl: true,
                                                     extraHeaders: {
                                                         "Content-Type": images[i].file.type
                                                     }
                                                 });
-                                                const addMedia = await postAPI<any>('/media/add', {
+                                                await postAPI<any>('/media/add', {
                                                     resource: images[i].file.name,
                                                     type: images[i].resourceType,
                                                     propertyId: propertiesResponse[0].propertyId

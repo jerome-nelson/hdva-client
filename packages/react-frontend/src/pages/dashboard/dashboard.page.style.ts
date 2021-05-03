@@ -7,7 +7,7 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             width: "90%",
             margin: `75px auto 0`,
             [theme.breakpoints.down("md")]: {
-                marginTop: `70px`
+                marginTop: `90px`
             },
         },
         table: {
@@ -15,8 +15,8 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             margin: `0 auto`
         },
         logo: {
-            width: "30%",
-            padding: `${theme.spacing(1)}px`
+            height: "100%",
+            padding: `${theme.spacing(1.5)}px`
         },
         infoText: {
             border: `solid 1px ${COLOR_OVERRIDES.hdva_white}`,

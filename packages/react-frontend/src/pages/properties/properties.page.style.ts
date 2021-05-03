@@ -1,5 +1,5 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
-import { STYLE_OVERRIDES } from "theme";
+import { COLOR_OVERRIDES, STYLE_OVERRIDES } from "theme";
 
 export const usePropertyStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -7,6 +7,11 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
             [theme.breakpoints.down("md")]: {
                 marginTop: `70px`
             },
+        },
+        mobileMore: {
+            textAlign: `right`,
+            padding: `0 ${theme.spacing(1)}px`,
+            margin: `${theme.spacing(2)}px 0`
         },
         inputTest: {
             cursor: `pointer`,
@@ -23,6 +28,9 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
         photoBG: {
             height: 300,
             width: 400
+        },
+        containerBtns: {
+            width: 400,
         },
         breadcrumb: {
             marginTop: `42px`,
@@ -61,7 +69,19 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
         iconTableCell: {
             width: `${STYLE_OVERRIDES.thumbnail + 10}px`
         },
+        popperOverrides: {
+            width: `98%`,
+            right: `1% !important`,
+        },
+        mobileVTTourLink: {
+            marginTop: theme.spacing(1),
+        },
         breadcrumbs: {
             marginTop: theme.spacing(3)
-        }
+        },
+        imageIcon: {
+            color: COLOR_OVERRIDES.hdva_grey,
+            display: 'block',
+            margin: `5px auto`,
+        },
     }));

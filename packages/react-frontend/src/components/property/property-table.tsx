@@ -1,9 +1,11 @@
-import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Grid, Hidden, InputAdornment, LinearProgress, OutlinedInput, Typography } from "@material-ui/core";
+import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Container, Grid, Hidden, InputAdornment, LinearProgress, OutlinedInput, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import SearchIcon from '@material-ui/icons/Search';
 import Skeleton from '@material-ui/lab/Skeleton';
+import classNames from "classnames";
+import { CTAButton } from "components/buttons/cta";
 import { LoginContext } from "components/login-form/login.context";
 import { CustomPagination } from "components/pagination/pagination";
 import { Placeholder } from "components/placeholder/placeholder";
@@ -138,7 +140,8 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
                         if (!onEdit) return;
                         onEdit({
                             name: el.name,
-                            propertyId: el.propertyId
+                            propertyId: el.propertyId,
+                            groupId: el.groupId
                         })
                     }} size="small" variant="outlined" color="secondary">
                         Edit Uploads
@@ -185,6 +188,7 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
 export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSearch, mini, show, showPagination, onSelect }) => {
     const [data, setData] = useState<any>([]);
     const [search, setSearch] = useState("");
+    const [loadingState, setLoadingState] = useState<Record<string, any>>({});
     const history = useHistory();
     const [pageNumber, setPageNumber] = useState(1);
     const { user } = useContext(LoginContext);
@@ -369,27 +373,44 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
                             </BottomNavigation>
                         </Hidden>
                         <Hidden smDown>
-                            <Button
+                            <CTAButton
+                                type="button"
                                 onClick={async () => {
-                                    // generate-download
-                                    analytics.onAction({
-                                        eventAction: "Download Property",
-                                        eventLabel: name
-                                    });
-
-                                    const zip = await postAPI<any>('/generate-download', {
-                                        pid: [id],
-                                    }, {
-                                        token: user!.token
-                                    })
-                                    await getDownload(zip as unknown as string, `${convertToSlug(name)}.zip`);
+                                    try {
+                                        setLoadingState({
+                                            ...loadingState,
+                                            [id]: true
+                                        });
+                                        // generate-download
+                                        analytics.onAction({
+                                            eventAction: "Download Property",
+                                            eventLabel: name
+                                        });
+    
+                                        const zip = await postAPI<any>('/generate-download', {
+                                            pid: [id],
+                                        }, {
+                                            token: user!.token
+                                        })
+                                        await getDownload(zip as unknown as string, `${convertToSlug(name)}.zip`);
+                                        setLoadingState({
+                                            ...loadingState,
+                                            [name]: false
+                                        });
+                                    } catch (e) {
+                                        setLoadingState({
+                                            ...loadingState,
+                                            [id]: false
+                                        });
+                                    }
                                 }}
                                 size="large"
                                 variant="outlined"
                                 color="primary"
+                                loading={loadingState[id]}
                             >
                                 Download
-                    </Button>
+                    </CTAButton>
                         </Hidden>
                     </React.Fragment>
                 )
@@ -399,8 +420,8 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
 
     const head = [
         { name: "Name", className: classes.tableHeadCell, colSpan: 2 },
-        { name: "Group", className: classes.tableHeadCell, colSpan: 2, hide: mini },
-        { name: "Modified", className: classes.tableHeadCell, colSpan: 2, hide: mini }
+        { name: "Group", className: classes.tableHeadCell, colSpan: 1, hide: mini },
+        { name: "Modified", className: classes.tableHeadCell, colSpan: 2, hide: mini },
     ];
 
 
@@ -439,10 +460,13 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
     return (
         <React.Fragment>
             <Grid container>
-                <Grid xs={12} md={5} item>
+                <Grid xs={12} md={5} item className={classes.smDown}>
                     {showSearch && (
                         <OutlinedInput
-                            className={classes.userField}
+                            className={classNames({
+                                [classes.userField]: true,
+                                // [classes.smDown]: true
+                            })}
                             fullWidth={true}
                             value={search}
                             placeholder={messages["property.table.search"]}
@@ -459,6 +483,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
             </Grid>
             <Hidden smDown>
                 <GenericTable
+                    selectable={selectable}
                     head={head}
                     cells={cells}
                     data={(isFetching || !isSuccess || data.length <= 0) ? skeleton : data}
@@ -466,11 +491,15 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
             </Hidden>
             <Hidden mdUp>
                 {(isFetching || !isSuccess || data.length <= 0) ?
-                    <CircularProgress size="1.5rem" color="secondary" /> :
+                    <Container className={classes.containerMod} maxWidth="md">
+                        <CircularProgress size="5rem" color="secondary" />
+                    </Container>
+                    :
                     <MobileTable
                         cellStyles={[cells[0]]}
                         data={data}
-                    />}
+                    />
+                }
             </Hidden>
             {!(isLoading || !isSuccess || data.length <= 0) && showPagination && show && !isNaN(total as unknown as number) && (
                 <div className={classes.pagination}>

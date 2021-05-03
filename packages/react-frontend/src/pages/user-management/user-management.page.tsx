@@ -117,7 +117,7 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
                 group: details.groupId,
                 name: name,
                 role: details.roleId,
-                email: details.email,
+                email: details.username,
                 password: details.password,
             }, {
             token: user!.token
@@ -310,13 +310,13 @@ const UserList: React.FC<UserListProps> = ({ onEdit, isFetching, isEmpty, userDa
                                     variant="contained"
                                     color="secondary"
                                     type="button">Edit</CTAButton>
-                                <CTAButton
+                                {/* <CTAButton
                                     loading={false}
                                     className={classes.btnOverride}
                                     onClick={handleDeletion}
                                     size="medium"
                                     variant="contained"
-                                    type="button">Delete</CTAButton>
+                                    type="button">Delete</CTAButton> */}
                             </ListItem>
                         )))}
                     </div>

@@ -44,7 +44,7 @@ const GroupForm: React.FC<any> = ({ existingGroup }) => {
         description: ""
     });
     const noOfFields = Object.keys(details);
-    const notAllFieldsFilled = noOfFields.filter(elem => !!details[elem]).length !== noOfFields.length - 1;
+    const fieldsFilled = noOfFields.filter(elem => !!details[elem]).length === noOfFields.length;
     const classes = useGroupStyle();
     const { user } = useContext(LoginContext);
 
@@ -62,7 +62,7 @@ const GroupForm: React.FC<any> = ({ existingGroup }) => {
     });
 
     useEffect(() => {
-        if (existingGroup) {
+        if (!Object.keys(existingGroup)) {
             setDetails({
                 ...existingGroup
             });
@@ -110,14 +110,14 @@ const GroupForm: React.FC<any> = ({ existingGroup }) => {
             <CTAButton
                 loading={groupsLoading}
                 className={classes.btnOverride}
-                disabled={notAllFieldsFilled}
+                disabled={!fieldsFilled}
                 type="submit"
                 fullWidth
                 size="medium"
                 variant="contained"
                 color="secondary"
             >
-                {(notAllFieldsFilled ? "Fill in all fields" : "Update group")}
+                {(!fieldsFilled ? "Fill in all fields" : "Update group")}
             </CTAButton>
 
         </form>
@@ -161,7 +161,7 @@ const GroupList: React.FC<GroupListProps> = ({ onEdit, isFetching, isEmpty, grou
                                     <Avatar className={classes.avatarLarge}>{group.name.slice(0, 1)}</Avatar>
                                 </ListItemIcon>
                                 <ListItemText className={classes.listItem} primary={group.name} secondary={group.description} />
-                                <CTAButton
+                                {/* <CTAButton
                                     onClick={() => {
                                         onEdit({
                                             name: group.name,
@@ -172,14 +172,14 @@ const GroupList: React.FC<GroupListProps> = ({ onEdit, isFetching, isEmpty, grou
                                     size="medium"
                                     variant="contained"
                                     color="secondary"
-                                    type="button">Edit</CTAButton>
-                                <CTAButton
+                                    type="button">Edit</CTAButton> */}
+                                {/* <CTAButton
                                     loading={false}
                                     className={classes.btnOverride}
                                     onClick={handleDeletion}
                                     size="medium"
                                     variant="contained"
-                                    type="button">Delete</CTAButton>
+                                    type="button">Delete</CTAButton> */}
                             </ListItem>
                         )))}
                     </div>
