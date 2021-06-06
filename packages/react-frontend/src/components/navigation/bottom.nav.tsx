@@ -6,8 +6,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import SettingsIcon from '@material-ui/icons/Settings';
 import classNames from "classnames";
-import { LoginContext } from "components/login-form/login.context";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { logout } from "../../services/auth.service";
 import { DELAY_MENU_ANIMATION } from "../../theme";
@@ -15,7 +14,6 @@ import { useBottomNavStyles } from "./bottom.nav.style";
 
 export const BottomNav = () => {
 
-    const { user } = useContext(LoginContext);
     const classes = useBottomNavStyles();
     const history = useHistory();
     const location = useLocation();
@@ -29,7 +27,7 @@ export const BottomNav = () => {
         return () => clearTimeout(menuHide);
     }, []);
 
-    return user ? (
+    return (
         <React.Fragment>
             <div className={`${classes.toggleMenu} ${classes.positionUp}`} onClick={() => toggleMenu(!showMenu)}>
                 <KeyboardArrowUpIcon />
@@ -76,5 +74,5 @@ export const BottomNav = () => {
                 </AppBar>
             </Slide>
         </React.Fragment>
-    ) : null
+    );
 };

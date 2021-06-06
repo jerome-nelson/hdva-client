@@ -3,15 +3,16 @@ import { GeneralError } from "./error";
 
 type ResponseOptions = Omit<APIGatewayProxyResult, 'body'>;
 
-export const createResponse = (data: any, options?: ResponseOptions, successful = true): APIGatewayProxyResult => {
+export const createResponse = (data: any, options?: ResponseOptions & { body?: any }, successful = true): APIGatewayProxyResult => {
     return {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...options?.headers
       },
-      ...options,
-      body: JSON.stringify({ success: successful, data }, null, 2)
+      body: JSON.stringify({ success: successful, data }, null, 2),
+      ...options
     }
   }
   

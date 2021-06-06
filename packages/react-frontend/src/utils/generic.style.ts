@@ -1,13 +1,16 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
-import { COLOR_OVERRIDES, STYLE_OVERRIDES } from "../theme";
+import { COLOR_OVERRIDES } from "../theme";
 
 export const useGenericStyle = makeStyles((theme: Theme) =>
     createStyles({
+        fullWidth: {
+            width: `100%`,
+        },
         userFields: {
             marginTop: `${theme.spacing(3)}px`,
         },
         linkColor: {
-            ...STYLE_OVERRIDES.button.main,
+            // ...STYLE_OVERRIDES.button.main,
             color: COLOR_OVERRIDES.hdva_white,
             fontWeight: "lighter"
         },

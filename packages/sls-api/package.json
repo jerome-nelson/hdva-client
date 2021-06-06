@@ -6,13 +6,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
   "dependencies": {
     "@meanie/mongoose-to-json": "^2.5.0",
+    "archiver": "^5.2.0",
+    "aws-cli": "0.0.2",
     "aws-sdk": "^2.808.0",
     "bcryptjs": "^2.4.3",
     "formidable": "^1.2.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.29",
+    "sharp": "^0.26.3",
     "source-map-support": "^0.5.10",
     "ssh-tunnel": "^2.3.23",
     "uuid": "^8.3.2",
@@ -31,7 +40,6 @@
     "fork-ts-checker-webpack-plugin": "^3.0.1",
     "serverless-apigw-binary": "^0.4.4",
     "serverless-domain-manager": "^5.1.0",
-    "serverless-dotenv-plugin": "^3.1.0",
     "serverless-webpack": "^5.2.0",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.10.2",

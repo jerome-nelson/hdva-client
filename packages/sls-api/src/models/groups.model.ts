@@ -61,15 +61,26 @@ export const addGroup = async (groups: Omit<GroupsModel, "_id" | "createdOn" | "
 };
 
 
-export const getGroups = async (gid?: number) => {
-    if (gid) {
+export const getGroups = async ({gid, offset, limit }: { filter?: string, gid?: number, offset?: number, limit?: number }) => {
+    // TODO: Add Admin Check
+    const sort = offset && limit ? {
+        lean: true,
+        skip: offset,
+        limit,
+    } : {};
+
+    if (Number(gid)) {
         return await Groups.find({
             groupId: gid
-        });
+        }, sort);
     }
 
-    return await Groups.find();
+    return await Groups.find({}, sort);
 };
+
+export const getGroupCount = async () => {
+    return await Groups.countDocuments();
+}
 
 export const updateGroup = async ({ from, to }: { from: number, to: Omit<GroupsModel, "_id" | "createdOn" | "modifiedOn"> }) => {
     try {

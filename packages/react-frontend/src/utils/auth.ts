@@ -16,6 +16,14 @@ export default function authHeader() {
 export const getToken = () => {
   const user = localStorage.getItem("user");
   const item = user && JSON.parse(user);
-  debugger;
   return item && item.token;
+}
+
+// Add to global library
+export const convertToSlug = (text: string) => {
+    return text
+        .toLowerCase()
+        .replace(/[^\w ]+/g,'')
+        .replace(/ +/g,'-')
+        ;
 }

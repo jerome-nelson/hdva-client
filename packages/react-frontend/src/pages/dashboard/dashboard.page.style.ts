@@ -5,15 +5,18 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
     createStyles({
         container: {
             width: "90%",
-            margin: `75px auto 0`
+            margin: `75px auto 0`,
+            [theme.breakpoints.down("md")]: {
+                marginTop: `90px`
+            },
         },
         table: {
-            width: "95%",
+            width: "90%",
             margin: `0 auto`
         },
         logo: {
-            width: "30%",
-            padding: `${theme.spacing(1)}px`
+            height: "100%",
+            padding: `${theme.spacing(1.5)}px`
         },
         infoText: {
             border: `solid 1px ${COLOR_OVERRIDES.hdva_white}`,
@@ -22,6 +25,9 @@ export const useDashboardStyles = makeStyles((theme: Theme) =>
             "& > div": {
                 flexGrow: 1,
             }
+        },
+        btnNav: {
+            padding: `${theme.spacing(2)}px 0`
         },
         moreLink: {
             padding: `${theme.spacing(1)}px 0`,

@@ -1,34 +1,18 @@
-import { ThemeProvider } from '@material-ui/core';
+// import { createBrowserHistory } from "history";
+// import { Integrations } from '@sentry/tracing';
 import 'fontsource-roboto';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from 'react-query/devtools';
 import { App } from "./app";
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { theme } from "./theme";
 
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      staleTime: 1000 * 60 * 60 * 24,
-      cacheTime: 1000 * 60 * 60 * 24
-    }
-  }
-});
+// export const browserHistory = createBrowserHistory();
 
 // TODO: Integrate all theme colours into theme override
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+      <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

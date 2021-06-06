@@ -5,13 +5,13 @@ import React from "react";
 // TODO: Fix onClick typing
 type CTAProps = ExtendButtonBaseTypeMap<ButtonTypeMap<{ type: "button" | "reset" | "submit" | undefined; }>>["props"] & { 
     onClick?(e?: any): void;
-    loading: boolean;
+    loading?: boolean;
     className?: string; };
 
 export const CTAButton: React.FC<CTAProps> = props => {
     const { children, loading, ...rest } = props;
     return (
-        <Button {...rest}>
+        <Button disableElevation {...rest}>
             {loading ? <CircularProgress size="1.5rem" color="secondary" /> : children}
         </Button>
     );

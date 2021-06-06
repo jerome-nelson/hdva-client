@@ -1,10 +1,13 @@
 import { Container, Grid, Hidden, Input, OutlinedInput, Paper, Typography } from "@material-ui/core";
 import { CTAButton } from "components/buttons/cta";
-import { postAPI } from "hooks/useAPI";
-import { useQuery as useQuerySelector } from "hooks/useQuery";
-import React, { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useHistory } from "react-router-dom";
+// import { postAPI } from "hooks/useAPI";
+// import { useQuery as useQuerySelector } from "hooks/useQuery";
+import React, {
+    // useEffect, 
+    useState
+} from "react";
+// import { useQuery } from "react-query";
+// import { useHistory } from "react-router-dom";
 import { useGenericStyle } from "utils/generic.style";
 import { usePasswordStyles } from "./password-reset.page.style";
 
@@ -14,30 +17,30 @@ interface Validation {
 
 // TODO: Needs db and api to store strings
 // Generate and send JWT token, this will be used to reset password in admin -> new JWT is sent and then logged in
-export const PasswordResetPage: React.FC = () => {
-    const query = useQuerySelector();
-    const history = useHistory();
+const PasswordResetPage: React.FC = () => {
+    // const query = useQuerySelector();
+    // const history = useHistory();
     const [password, setPassword] = useState("");
-    const { data: resetStatus, isLoading, refetch: resetPassword } = useQuery({ 
-        queryFn: () => postAPI<Validation>("/change-password", {
-            password
-        }),
-        enabled: false 
-    });
-    const { data: validate, isSuccess, refetch: checkStatus } = useQuery({ 
-        queryFn: () => postAPI<Validation>("/validate-reset"),
-        enabled: false 
-    });
+    // const { data: resetStatus, isLoading, refetch: resetPassword } = useQuery({ 
+    //     queryFn: () => postAPI<Validation>("/change-password", {
+    //         password
+    //     }),
+    //     enabled: false 
+    // });
+    // const { data: validate, isSuccess, refetch: checkStatus } = useQuery({ 
+    //     queryFn: () => postAPI<Validation>("/validate-reset"),
+    //     enabled: false 
+    // });
     
     const classes = usePasswordStyles();
     const notAllFieldsFilled = !password;
     const genericClasses = useGenericStyle();
 
-    useEffect(() => {
-        const token = query.get("token");
-        if (!token || validate && !isSuccess) {
-            history.push("/");
-        }
+    // useEffect(() => {
+    //     const token = query.get("token");
+    //     if (!token || validate && !isSuccess) {
+    //         history.push("/");
+    //     }
        
         // Problem with useAPI
         // if (!validate.isError) {
@@ -45,8 +48,8 @@ export const PasswordResetPage: React.FC = () => {
         //         token 
         //     });
         // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [query, validate]);
+    
+    // }, [query, validate]);
 
     return (
         <React.Fragment>
@@ -65,7 +68,7 @@ export const PasswordResetPage: React.FC = () => {
             <Container maxWidth="xl" >
                 <form onSubmit={() => {
                     setTimeout(() => {
-                        resetPassword()
+                        // resetPassword()
                     })
                 }}>
                     <Hidden smDown>
@@ -91,10 +94,10 @@ export const PasswordResetPage: React.FC = () => {
                                 <CTAButton
                                     className={genericClasses.userFields}
                                     disabled={notAllFieldsFilled}
-                                    loading={isLoading}
+                                    // loading={isLoading}
                                     type="submit"
                                     fullWidth
-                                    size="small"
+                                    size="medium"
                                     variant="contained"
                                     color="secondary"
                                 >
@@ -119,10 +122,10 @@ export const PasswordResetPage: React.FC = () => {
                             <Grid sm={6} item className={classes.mdUpMargin}>
                                 <CTAButton
                                     disabled={notAllFieldsFilled}
-                                    loading={isLoading}
+                                    // loading={isLoading}
                                     type="submit"
                                     fullWidth
-                                    size="small"
+                                    size="medium"
                                     variant="contained"
                                     color="secondary"
                                 >
@@ -136,3 +139,5 @@ export const PasswordResetPage: React.FC = () => {
         </React.Fragment>
     );
 };
+
+export default PasswordResetPage;

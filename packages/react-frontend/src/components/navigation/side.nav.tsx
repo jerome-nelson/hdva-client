@@ -1,8 +1,7 @@
 import { Drawer, Grid, List, ListItem, ListItemText } from "@material-ui/core";
 import classNames from "classnames";
-import { LoginContext } from "components/login-form/login.context";
 import { ReactComponent as LogoSVG } from "media/logo.svg";
-import React, { useContext } from "react";
+import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Settings } from "../../components/settings/settings";
 import { ROUTES } from "../../routing";
@@ -13,14 +12,23 @@ export const SideNav: React.FC = () => {
     const classes = useSidenavStyles();
     const location = useLocation();
     const history = useHistory();
-    const { user } = useContext(LoginContext);
+    // const [showMenu, toggleMenu] = useState(true);
 
-    return user ? (
+    return (
+        <React.Fragment>
+            {/* <div onClick={() => toggleMenu(!showMenu)}>
+                <KeyboardArrowRightIcon />
+            </div> */}
+            {/* <Slide direction="right" in={showMenu}> */}
                 <Drawer
                     variant="persistent"
                     anchor="left"
                     open={true}
                 >
+
+                    {/* <div onClick={() => toggleMenu(!showMenu)}>
+                        <KeyboardArrowLeftIcon />
+                    </div> */}
                     <Grid className={classes.nav} container>
                         <Grid item xs={12}>
                             <div className={classes.logo}>
@@ -46,5 +54,7 @@ export const SideNav: React.FC = () => {
                         <Settings variant="light" />
                     </List>
                 </Drawer>
-    ) : null
+            {/* </Slide> */}
+        </React.Fragment>
+    );
 }

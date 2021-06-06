@@ -57,12 +57,19 @@ export const STYLE_OVERRIDES = {
             color: COLOR_OVERRIDES.hdva_white,
             opacity: OPACITY_BASE
         },
-        main: {
+        medium: {
             borderRadius: `8px`,
             boxShadow: `none`,
             fontSize: `16px`,
             textTransform: "capitalize" as TextTransformProperty,
             padding: `10px 20px`
+        },
+        small: {
+            borderRadius: `4px`,
+            boxShadow: `none`,
+            fontSize: `12px`,
+            textTransform: "capitalize" as TextTransformProperty,
+            padding: `5px 10px`
         }
     },
     paper: {
@@ -79,6 +86,10 @@ export const STYLE_OVERRIDES = {
         }
     }
 }
+
+export const HEIGHTS = {
+    logoHeader: `74px`
+};
 
 export const WIDTHS = {
     min: `480px`,
@@ -139,8 +150,24 @@ export const theme = createMuiTheme({
         },
         MuiInputBase: {
             root: STYLE_OVERRIDES.input.main,
+            colorSecondary: {
+                color: COLOR_OVERRIDES.hdva_black,
+                "&.Mui-disabled": STYLE_OVERRIDES.input.disabled,
+                "&.MuiInput-underline::before": {
+                    borderBottom: `1px solid ${COLOR_OVERRIDES.hdva_black_light} !important`
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: `rgba(0, 0, 0, 0.23)`,
+                },
+            },
         },
         MuiSvgIcon: {
+            colorDisabled: {
+                color: COLOR_OVERRIDES.hdva_grey,
+            },
+            colorPrimary: {
+                color: COLOR_OVERRIDES.hdva_red,
+            },
             colorSecondary: {
                 color: COLOR_OVERRIDES.hdva_black,
             }
@@ -161,8 +188,8 @@ export const theme = createMuiTheme({
             }
         },
         MuiButton: {
-            containedSizeSmall: STYLE_OVERRIDES.button.main,
-            outlinedSizeSmall: STYLE_OVERRIDES.button.main,
+            sizeSmall: STYLE_OVERRIDES.button.small,
+            // sizeMedium: STYLE_OVERRIDES.button.medium,
             containedPrimary: {
                 backgroundColor: COLOR_OVERRIDES.hdva_red,
                 color: COLOR_OVERRIDES.hdva_white,
@@ -189,13 +216,18 @@ export const theme = createMuiTheme({
                 },
             },
             textPrimary: {
-                ...STYLE_OVERRIDES.button.main,
+                ...STYLE_OVERRIDES.button.medium,
                 color: COLOR_OVERRIDES.hdva_white
             },
         },
         MuiTableCell: {
             root: {
                 fontSize: `1rem`
+            }
+        },
+        MuiLinearProgress: {
+            colorSecondary: {
+                color: COLOR_OVERRIDES.hdva_white
             }
         },
         MuiCircularProgress: {

@@ -22,3 +22,4 @@ class NotFound extends GeneralError { }
 class AlreadyExists extends GeneralError { }
 
 export { AlreadyExists, BadRequest, GeneralError, NotFound };
+

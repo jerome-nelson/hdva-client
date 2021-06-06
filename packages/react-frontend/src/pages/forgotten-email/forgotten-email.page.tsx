@@ -9,7 +9,7 @@ import { messages } from "../../config/en";
 import { useForgottenStyles } from "./forgotten-email.page.style";
 
 
-export const ForgottenEmailPage: React.FC = () => {
+const ForgottenEmailPage: React.FC = () => {
     const [email, setEmail] = useState("");
     const [data, , , callAPI] = useAPI("/forgotten-password", { prevent: true });
     const classes = useForgottenStyles();
@@ -66,7 +66,7 @@ export const ForgottenEmailPage: React.FC = () => {
                                     loading={inProgress}
                                     type="submit"
                                     fullWidth
-                                    size="small"
+                                    size="medium"
                                     variant="contained"
                                     color="secondary"
                                 >
@@ -99,7 +99,7 @@ export const ForgottenEmailPage: React.FC = () => {
                                     loading={inProgress}
                                     type="submit"
                                     fullWidth
-                                    size="small"
+                                    size="medium"
                                     variant="contained"
                                     color="secondary"
                                 >
@@ -113,3 +113,5 @@ export const ForgottenEmailPage: React.FC = () => {
         </React.Fragment>
     );
 };
+
+export default ForgottenEmailPage;

@@ -2,29 +2,41 @@ import { Checkbox, createStyles, makeStyles, TableBody, TableCell, TableHead, Ta
 import Table from '@material-ui/core/Table';
 import TableContainer from '@material-ui/core/TableContainer';
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { COLOR_OVERRIDES } from 'theme';
 
 interface GenericTableProps {
+    color?: 'primary' | 'secondary';
     className?: string;
+    onSelect?(items: number[]): void;
     selectable?: boolean;
-    head: any[];
+    head?: any[];
     cells: any[];
     data: any[];
+    mini?: boolean;
     showCols?: {
         onMobile?: number;
     };
 }
 
-export const useGenericTableStyles = makeStyles((theme: Theme) => (
+export const useGenericTableStyles = makeStyles<Theme, Partial<GenericTableProps>>((theme: Theme) => (
     createStyles({
+        secondary: {
+            borderColor: `rgba(0,0,0, 0.23)`,
+            color: COLOR_OVERRIDES.hdva_black
+        },
+        mini: {
+            padding: `${theme.spacing(0.5)}px`,
+            fontSize: `0.9rem`
+        },
         cellStyle: {
-            borderLeft: `2px solid ${COLOR_OVERRIDES.hdva_black_bg}`,  
             "tr > & ~ &": {
                 borderLeftColor: `transparent`
             },
         },
         hideCheckbox: {
+            // TODO: TEMPORARY UNTIL CAN FIX ALIGNMENT
+            display: `none`,
             visibility: `hidden`
         },
         noBg: {
@@ -41,16 +53,23 @@ export const useGenericTableStyles = makeStyles((theme: Theme) => (
 ));
 
 
-export const GenericTable: React.FC<GenericTableProps> = ({ className, head, selectable, cells, data }) => {
+export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mini, head, selectable, cells, data, onSelect }) => {
 
-    const classes = useGenericTableStyles();
+    const classes = useGenericTableStyles({ mini });
     const [itemsSelected, setSelected] = useState<number[]>([]);
-    const [toggleCheckbox, setToggle] = useState<number | null>(null);
+    const [, setToggle] = useState<number | null>(null);
 
     const indeterminate = React.useMemo(
         () => itemsSelected.length > 0 && itemsSelected.length !== data.length,
         [data, itemsSelected]
     );
+
+    useEffect(() => {
+        if (onSelect) {
+            onSelect(itemsSelected);
+        }
+        
+    }, [itemsSelected]);
 
     const headerSelect = (checked: boolean) => {
         if (checked) {
@@ -66,6 +85,11 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
     }
 
     const rowSelect = (checked: boolean, index: number) => {
+
+        if (!selectable) {
+            return;
+        }
+
         if (checked) {
             setSelected(itemsSelected.concat([index]));
             return;
@@ -78,9 +102,6 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
         }
     }
 
-    console.log(`testing: `, indeterminate);
-    console.log(`lengths: `, itemsSelected.length, data.length);
-
     return (
         <TableContainer className={className}>
             <Table>
@@ -90,26 +111,37 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                             <TableCell
                                 onMouseOver={() => setToggle(-1)}
                                 onMouseOut={() => setToggle(null)}
-                                className={classes.noBg}
+                                classes={{
+                                    root: mini ? classes.mini : ""
+                                }}
+                                className={classNames({
+                                    [classes.noBg]: true,
+                                    [classes.hideCheckbox]: true,
+                                    [classes.secondary]: color === "secondary"
+                                })}
                                 padding="checkbox"
                             >
                                 <Checkbox
                                     className={classNames({
-                                        [classes.hideCheckbox]: !indeterminate && !(itemsSelected.length === data.length)
+                                        // [classes.hideCheckbox]: !indeterminate && !(itemsSelected.length === data.length)
+                                        [classes.hideCheckbox]: true
                                     })}
                                     onChange={({ target: { checked } }) => headerSelect(checked)}
+                                    checked={!indeterminate}
                                     indeterminate={indeterminate}
                                 />
                             </TableCell>
                         )}
-                        {head.map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
+                        {(head || []).filter(head => !Boolean(head.hide))
+                            .map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {data.map((row, rowIndex) => {
                         const isItemSelected = itemsSelected.includes(rowIndex);
+                        // const shouldHideCheckbox = !isItemSelected && !indeterminate && (toggleCheckbox !== rowIndex && toggleCheckbox !== -1);
                         return (
-                            <TableRow 
+                            <TableRow
                                 key={`row-${rowIndex}`}
                                 hover={selectable}
                                 onClick={() => rowSelect(!isItemSelected, rowIndex)}
@@ -118,31 +150,45 @@ export const GenericTable: React.FC<GenericTableProps> = ({ className, head, sel
                                     <TableCell
                                         onMouseOver={() => setToggle(rowIndex)}
                                         onMouseOut={() => setToggle(null)}
-                                        className={classes.noBg}
+                                        classes={{
+                                            root: mini ? classes.mini : ""
+                                        }}
+                                        className={classNames({
+                                            [classes.noBg]: true,
+                                            [classes.hideCheckbox]: true,
+                                            [classes.secondary]: color === "secondary"
+                                        })}
                                         padding="checkbox"
                                     >
                                         <Checkbox
                                             className={classNames({
-                                                [classes.hideCheckbox]: !!(toggleCheckbox === -1) || !!(toggleCheckbox === rowIndex) || !indeterminate
+                                                // [classes.hideCheckbox]: shouldHideCheckbox 
+                                                [classes.hideCheckbox]: true
                                             })}
                                             checked={isItemSelected}
                                             onChange={({ target: { checked } }) => rowSelect(checked, rowIndex)}
                                         />
                                     </TableCell>
                                 )}
-                                {Object.keys(row).map((item, index) => (
-                                    <TableCell
-                                        key={`cell-${index}`}
-                                        {...cells[index]}
-                                        className={classNames({
-                                            [cells[index].className]: true,
-                                            [classes.cellStyle]: true,
-                                            [classes.trSelected]: isItemSelected
-                                        })}
-                                    >
-                                        {row[item]}
-                                    </TableCell>
-                                ))}
+                                {Object.keys(row).map((item, index) => {
+                                    return !Boolean(row[item].hide) && (
+                                        <TableCell
+                                            key={`cell-${index}`}
+                                            {...cells[index]}
+                                            classes={{
+                                                root: mini ? classes.mini : ""
+                                            }}
+                                            className={classNames({
+                                                ...(cells[index] && cells[index].className ? { [cells[index].className]: true } : null),
+                                                [classes.cellStyle]: true,
+                                                [classes.trSelected]: isItemSelected,
+                                                [classes.secondary]: color === "secondary"
+                                            })}
+                                        >
+                                            {row[item].data}
+                                        </TableCell>
+                                    )
+                                })}
                             </TableRow>
                         );
                     })}

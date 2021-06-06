@@ -1,7 +1,7 @@
+import { render } from '@testing-library/react';
 import React from "react";
+import PropertiesPage from "./properties.page";
 
-import { render } from '@testing-library/react'
-import { PropertiesPage } from "./properties.page";
 
 describe("Properties Page Component", () => {
     it("should match snapshot", () => {
