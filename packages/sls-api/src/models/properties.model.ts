@@ -93,12 +93,14 @@ export const getPropertyCount = async ({ filter, gid }: { filter?: string, gid?:
 
 export const getProperties = async ({ filter, pids, gid, offset, limit }: { filter?: string, pids?: number[], gid?: number, offset?: number, limit?: number }) => {
     // TODO: Add Admin Check
-    const sort = {
+    const options = {
+        sort: { _id: -1 },
         lean: true,
         skip: offset,
         limit,
     }
 
+    // TODO: remove createdOn and use _id
     // TODO: Type correctly
     const textSearch: any = !!filter && String(filter) ? {
         name: {
@@ -110,14 +112,14 @@ export const getProperties = async ({ filter, pids, gid, offset, limit }: { filt
     if (!gid && !pids) {
         return await Properties.find({
             ...textSearch
-        }, null, sort);
+        }, null, options);
     }
 
     if (gid) {
         return await Properties.find({
             groupId: gid,
             ...textSearch
-        }, null, sort);
+        }, null, options);
     }
 
     if (!pids) {
@@ -137,7 +139,7 @@ export const getProperties = async ({ filter, pids, gid, offset, limit }: { filt
             $in: pids
         },
         ...textSearch
-    }, null, sort);
+    }, null, options);
 };
 
 export const deleteProperties = async ({ pids }: { pids: number[] }) => {

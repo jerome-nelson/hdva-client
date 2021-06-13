@@ -202,7 +202,7 @@ export const groupCount = async (event: any, context: Context): Promise<APIGatew
 
 export const groupCRUD = async (event: APIGatewayRequestAuthorizerEvent & { body: any }, context: Context): Promise<APIGatewayProxyResult> => {
   const action = event.pathParameters && event.pathParameters["action"];
-  const { body } = event;
+  const params = qs.parse(event.body);
   const authContext = event.requestContext
     && event.requestContext.authorizer;
   const user: UserModel | undefined = authContext
@@ -222,28 +222,31 @@ export const groupCRUD = async (event: APIGatewayRequestAuthorizerEvent & { body
   // ADD
   try {
     let result = {};
+    console.log(action);
     await startMongoConn();
     if (action === "add") {
-      if (!body || !body.length) {
+
+      if (!params) {
         throw new BadRequest(ERROR_MSGS.NO_GROUPS);
       }
-      result = await addGroup(body);
+      result = await addGroup([params as any]);
+      return createResponse(result);
     } else if (action === "update") {
-      const { gid, group } = body;
+      const { gid, group } = params;
       if (!gid || !group) {
         throw new BadRequest(ERROR_MSGS.NO_GROUPS);
       }
-      result = await updateGroup({ from: Number(gid), to: JSON.parse(group) });
+      result = await updateGroup({ from: Number(gid), to: group as any });
+      return createResponse(result);
     } else if (action === "delete") {
-      const { gids } = event.body;
-      if (!gids || !gids.length) {
+      if (!params.gids || !params.gids.length) {
         throw new BadRequest(ERROR_MSGS.NO_ID);
       }
       result = await deleteGroups({
-        gids: Array.isArray(gids) ? gids.map((gid: string) => Number(gid)) : [Number(gids)]
+        gids: Array.isArray(params.gids) ? params.gids.map((gid: string) => Number(gid)) : [Number(params.gids)]
       });
+      return createResponse(result);
     }
-    return createResponse(result);
   } catch (e) {
     return createErrorResponse(e);
   }

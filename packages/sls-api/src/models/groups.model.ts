@@ -64,18 +64,34 @@ export const addGroup = async (groups: Omit<GroupsModel, "_id" | "createdOn" | "
 export const getGroups = async ({gid, offset, limit }: { filter?: string, gid?: number, offset?: number, limit?: number }) => {
     // TODO: Add Admin Check
     const sort = offset && limit ? {
+        _id: -1,
         lean: true,
         skip: offset,
         limit,
-    } : {};
+    } : {
+        _id: -1
+    };
 
     if (Number(gid)) {
         return await Groups.find({
             groupId: gid
-        }, sort);
+        }, {
+            "_id": 0,
+            "createdOn": 1,
+            "description": 1,
+            "groupId": 1,
+            "name": 1
+        },
+        sort);
     }
 
-    return await Groups.find({}, sort);
+    return await Groups.find({},{
+        "_id": 0,
+        "createdOn": 1,
+        "description": 1,
+        "groupId": 1,
+        "name": 1
+    }, sort);
 };
 
 export const getGroupCount = async () => {

@@ -167,9 +167,10 @@ export const getCurrentUser = async (email: string) => {
 export const findUsers = async ({ currentUserId, userSearch, groupId, offset, limit } : { currentUserId: string, userSearch?: string, groupId?: number, offset?: number, limit?: number }) => {
     // TODO: Type correctly
     const sort = {
+        _id: -1,
         lean: true,
         skip: offset,
-        limit,
+        limit
     }
     const textSearch: any = !!userSearch && String(userSearch) ? {
         userId: {

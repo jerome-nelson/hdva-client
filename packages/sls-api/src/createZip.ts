@@ -1,14 +1,28 @@
-import archiver from 'archiver';
+import archiver from "archiver";
 import { Context } from 'aws-lambda';
+import S3 from "aws-sdk/clients/s3";
+import fs from "fs";
 import querystring from "querystring";
-import { Stream } from 'stream';
+import { Stream } from "stream";
 import { BucketInstance } from "./config/config";
 import { ERROR_MSGS } from './config/messages';
-import { getMedia, MongoMediaDocument } from './models/media.model';
+import { getMedia } from './models/media.model';
 import { getProperties } from "./models/properties.model";
 import { startMongoConn } from './utils/db';
 import { GeneralError } from './utils/error';
 import { createErrorResponse, createResponse } from './utils/responses';
+
+function _writeToFile(filePath: string, arr: string[]): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(filePath);
+        for (const row of arr) {
+            file.write(row + "\n");
+        }
+        file.end();
+        file.on("finish", () => { resolve(true); }); // not sure why you want to pass a boolean
+        file.on("error", reject); // don't forget this!
+    });
+}
 
 const _convertToSlug = (text: string) => {
     return text
@@ -39,24 +53,11 @@ const _retrieveArchive = async (bucketName: string, fileKey: string) => {
     }
 }
 
-const _getDataObjects = (files: MongoMediaDocument[], folder: string) => files.map((media) => {
-    const file = `properties/${folder}/${media.resource}`;
-    const stream = BucketInstance.getObject({
-        Bucket: process.env.highres_bucket_name as string,
-        Key: file
-    }).createReadStream()
-    return {
-        stream,
-        filename: `${file.split('/').pop()}`
-    }
-});
-
-
 export const _getProperty = async (id: number[]) => {
     await startMongoConn();
     const files = await getMedia(id);
     const property = await getProperties({
-        pids: [String(id[0])]
+        pids: [Number(id[0])]
     });
 
     if (!property.length || !files.length) {
@@ -78,10 +79,8 @@ export const getZip = async (event: any, context: Context) => {
         throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
     }
 
-
     const { body } = event;
     const { pid } = querystring.parse(body);
-
     const id = [Number(pid)];
 
     try {
@@ -92,53 +91,76 @@ export const getZip = async (event: any, context: Context) => {
             return createResponse(existingArchive)
         }
 
-        const getArchiveContent = _getDataObjects(results.files, results.property[0].folder);
+        const archive = archiver('zip');
         const passThrough = new Stream.PassThrough();
+        archive.pipe(passThrough);
 
-        const url = await new Promise((resolve, reject) => {
-            const s3Upload = BucketInstance.upload({
-                Bucket: process.env.zip_bucket_name as string,
-                ContentType: "application/zip",
-                Key: results.zipname,
-                Body: passThrough
-            }, async function (err) {
-                if (err) {
-                    console.error("upload error", err);
-                    reject(err);
-                }
-                else {
-                    const zipurl = await BucketInstance.getSignedUrlPromise("getObject", {
-                        Bucket: process.env.zip_bucket_name,
-                        Key: results.zipname,
-
-                    });
-                    resolve(zipurl);
-                }
-            })
-            const archive = archiver('zip');
-            archive.pipe(passThrough);
-            archive.on("error", (error: any) => {
-                throw new Error(
-                    `${error.name} ${error.code} ${error.message} ${error.path}  ${error.stack}`
-                )
-            });
-
-            for (let i = 0; i < getArchiveContent.length; i += 1) {
-                archive.append(getArchiveContent[i].stream, {
-                    name: getArchiveContent[i].filename,
-                })
+        archive.on('warning', function (error: any) {
+            console.log("Archive Warning");
+            if (error.code === 'ENOENT') {
+                console.log("warning");
+            } else {
+                console.log("error");
             }
-
-            passThrough
-                .on('error', (err) => {
-                    console.error(err)
-                    reject(err);
-                });
-
-            archive.finalize();
+            throw new Error(
+                `${error.name} ${error.code} ${error.message} ${error.path}  ${error.stack}`
+            );
+        });
+        
+        archive.on("error", (error: any) => {
+            console.log("Archive Error");
+            throw new Error(
+                `${error.name} ${error.code} ${error.message} ${error.path}  ${error.stack}`
+            );
         });
 
-        return createResponse(url);
+        for (const media of results.files) {
+            const fileKey = `properties/${results.property[0].name}/${media.resource}`;
+            const objectData = BucketInstance.getObject({
+                Bucket: process.env.highres_bucket_name as string,
+                Key: fileKey
+            }).createReadStream();
+            objectData.on('error', (e) => {
+                console.log('stream error');
+                console.log(fileKey);
+                console.log(e);
+            })
+            objectData.on('end', () => {
+                console.log('stream ended');
+                console.log(fileKey);
+            });
+            objectData.on("finish", () => {
+                console.log("streamed finished");
+                console.log(fileKey);
+            });    
+            archive.append(objectData, {
+                name:  `${fileKey.split('/').pop()}`,
+            });
+        }
+        archive.finalize();
+
+        const params = {
+            Bucket: process.env.zip_bucket_name as string,
+            ContentType: "application/zip",
+            Key: results.zipname,
+            Body: passThrough
+        };
+        const upload = new S3.ManagedUpload({ params: params });
+        await new Promise((resolve, reject) => {
+            upload.send(function (err, data) {
+                if (err) {
+                    console.log("Upload error");
+                    reject(err);
+                }
+                resolve(data);
+            });
+        });
+
+        const zipurl = await BucketInstance.getSignedUrlPromise("getObject", {
+            Bucket: process.env.zip_bucket_name,
+            Key: results.zipname,
+        });
+        return createResponse(zipurl);
     } catch (e) {
         return createErrorResponse(e);
     }

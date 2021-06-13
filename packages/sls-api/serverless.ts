@@ -56,6 +56,11 @@ const serverlessConfiguration: Serverless = {
     },
     iamRoleStatements: [
       {
+        Action: ['s3:getObject'],
+        Resource: ["${ssm:hdva.image.iam}"],
+        Effect: "Allow",
+      },
+      {
         Action: ['s3:PutObject'],
         Resource: ["${ssm:hdva.image.iam}"],
         Effect: "Allow",
@@ -148,7 +153,7 @@ const serverlessConfiguration: Serverless = {
     },
     getZip: {
       handler: 'handler.getZip',
-      timeout: 30,
+      timeout: 180,
       environment: {
         ...sharedEnv,
         highres_bucket_name: "${ssm:hdva.image.bucket}",
@@ -409,7 +414,25 @@ const serverlessConfiguration: Serverless = {
       environment: sharedEnv,
       handler: "handler.jwtVerify",
     }
-  }
-}
+  },
+  resources: {
+      Resources: {
+        ExpiredTokenResponse: {
+          Type: 'AWS::ApiGateway::GatewayResponse',
+          Properties: {
+            ResponseParameters: {
+              "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
+              "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+            },
+            ResponseType: "ACCESS_DENIED",
+            RestApiId: {
+              Ref: 'ApiGatewayRestApi'
+            },
+            StatusCode: '401'
+          },
+        },
+      },
+  },
+};
 
 module.exports = serverlessConfiguration;

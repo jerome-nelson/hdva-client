@@ -15,7 +15,9 @@ import { PrivateRoute } from "./utils/protected-route";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            retry: 3,
+            retry: (failureCount: number, error: any) => {       
+                return !([401, 403].includes(error.response.status) || failureCount === 3);
+            },
             staleTime: 1000 * 60 * 60 * 24,
             cacheTime: 1000 * 60 * 60 * 24
         }
