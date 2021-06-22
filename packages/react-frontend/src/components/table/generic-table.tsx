@@ -4,6 +4,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { COLOR_OVERRIDES } from 'theme';
+import { v4 as uuidv4 } from 'uuid';
 
 interface GenericTableProps {
     color?: 'primary' | 'secondary';
@@ -133,7 +134,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
                             </TableCell>
                         )}
                         {(head || []).filter(head => !Boolean(head.hide))
-                            .map(({ name, ...rest }, key) => <TableCell key={`${name}-${key}`} {...rest}>{name}</TableCell>)}
+                            .map(({ name, ...rest }, key) => <TableCell key={uuidv4()} {...rest}>{name}</TableCell>)}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -142,7 +143,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
                         // const shouldHideCheckbox = !isItemSelected && !indeterminate && (toggleCheckbox !== rowIndex && toggleCheckbox !== -1);
                         return (
                             <TableRow
-                                key={`row-${rowIndex}`}
+                                key={uuidv4()}
                                 hover={selectable}
                                 onClick={() => rowSelect(!isItemSelected, rowIndex)}
                             >
@@ -173,7 +174,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({ color, className, mi
                                 {Object.keys(row).map((item, index) => {
                                     return !Boolean(row[item].hide) && (
                                         <TableCell
-                                            key={`cell-${index}`}
+                                            key={uuidv4()}
                                             {...cells[index]}
                                             classes={{
                                                 root: mini ? classes.mini : ""

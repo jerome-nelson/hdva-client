@@ -4,6 +4,7 @@ import { COLOR_OVERRIDES } from "theme";
 export const useSidenavStyles = makeStyles((theme: Theme) =>
     createStyles({
         logo: {
+            display: `block`,
             width: `140px`,
             height: `44px`,
             marginBottom: `${theme.spacing(2)}px`

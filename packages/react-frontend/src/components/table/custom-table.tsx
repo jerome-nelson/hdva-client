@@ -7,6 +7,7 @@ import { NoImagePlaceholder } from "components/carousel/carousel";
 import { LoginContext } from "components/login-form/login.context";
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 import { useCustomTableStyles } from "./custom-table.styles";
 
 
@@ -83,7 +84,7 @@ const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setCheck
                 className={classes.tableRow}
                 role="checkbox"
                 tabIndex={-1}
-                key={row.name}
+                key={uuidv4()}
                 hover>
                 <Hidden only={["xs", "sm"]}>
                     <TableCell padding="checkbox" onClick={() => setChecked(!checked)}>
@@ -127,7 +128,7 @@ const CustomRow: React.FC<{ row: Record<string, any>; checked: boolean; setCheck
                             id="long-menu"
                             keepMounted
                         >
-                            {["Download all items"].map((option) => (<MenuItem key={option}>{option}</MenuItem>))}
+                            {["Download all items"].map((option) => (<MenuItem key={uuidv4()}>{option}</MenuItem>))}
                         </Menu>
                     </TableCell>
                 </Hidden>

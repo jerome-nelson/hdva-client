@@ -1,4 +1,4 @@
-import { CircularProgress, createStyles, Grid, InputAdornment, Link, makeStyles, MenuItem, OutlinedInput, Paper, Select, Theme, Typography } from "@material-ui/core";
+import { Box, CircularProgress, createStyles, Grid, InputAdornment, Link, makeStyles, MenuItem, OutlinedInput, Paper, Select, Theme, Typography } from "@material-ui/core";
 import Modal from '@material-ui/core/Modal';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import CloseIcon from '@material-ui/icons/Close';
@@ -21,6 +21,7 @@ import { Media } from "pages/properties/properties.page";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useQueries, useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 // TODO: Alert Popup on close button press
 export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
@@ -29,6 +30,10 @@ export const useUploadPanelStyles = makeStyles((theme: Theme) => createStyles({
     },
     subline: {
         margin: `0`
+    },
+    loader: {
+        margin: `${theme.spacing(2)}px 0`,
+        textAlign: `center`
     }
 }));
 export const useAddPropertyStyles = makeStyles((theme: Theme) => createStyles({
@@ -69,16 +74,16 @@ export const useAddPropertyStyles = makeStyles((theme: Theme) => createStyles({
 
 interface UploadPanelProps {
     existingData?: any;
-    onFetch?(media: any[]): void;
+    onDelete(file: any): void;
     onUpload(
         files: any[]
     ): void;
 }
 
-export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onFetch, onUpload }) => {
+export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete, onUpload }) => {
     const { user } = useContext(LoginContext);
-    const [files, setFileList] = useState<any[]>([]);
-    const [removed, setRemovedFiles] = useState<string[]>([])
+    const classes = useUploadPanelStyles();
+    const [mediaFiles, setFileList] = useState<any[]>([]);
     const results = useQueries([
         {
             queryKey: [`properties`, user!.group, existingData?.propertyId],
@@ -112,13 +117,11 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onFetch,
             false),
         [results]);
 
-    useEffect(() => {
-        if (onUpload && files.length > 0) {
-            onUpload(files);
-        }
-    }, [files]);
+    useMemo(() => {
 
-    const mediaFiles = useMemo(() => {
+        if (mediaFiles.length > 0) {
+            return;
+        }
 
         if (isFetchingData || isEmpty) {
             return [];
@@ -131,51 +134,55 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onFetch,
                     name: resource,
                     type
                 })
-                )
-                .filter(mediaFile => {
-                    return !removed.includes(mediaFile.name);
-                });
+                );
 
-            if (onFetch) {
-                onFetch(data);
-            }
-
-            return data;
+            setFileList(data);
         }
 
         return [];
 
-    }, [results, removed]);
+    }, [results]);
 
     return (
         <Grid container justify="space-evenly">
             {isFetchingData
-                ? <CircularProgress color="secondary" />
+                ? <Box className={classes.loader}><CircularProgress size="5rem" color="primary" /></Box>
                 : ([
                     { name: "Upload Images", type: "photo", component: <PhotoSVG /> },
                     { name: "Upload Floorplans", type: "floorplan", component: <FloorplanSVG /> }
-                ].map((obj, index) => (
-                    <Grid item key={`${obj.name}-${index}`}>
-                        <DragAndDrop
-                            name={obj.name}
-                            fileData={mediaFiles.filter(raw => raw.type === obj.type)}
-                            onAdd={(newFiles: any) => {
-                                const flatList = files.concat(newFiles.map((el: any) => ({
-                                    file: el,
-                                    resourceType: obj.type
-                                })));
-                                setFileList(flatList);
-                            }}
-                            onRemove={(removed: any) => {
-                                setRemovedFiles(removed);
-                                const newList = files.filter((el: any) => el.file.type !== removed.type && el.resourceType !== removed.resourceType && removed.size === el.file.size && removed.name !== el.file.name);
-                                setFileList(newList);
-                            }}
-                        >
-                            <CloudUploadIcon style={{ color: `rgba(1,1,1,0.29)`, fontSize: 120 }} />
-                        </DragAndDrop>
-                    </Grid>
-                )))}
+                ].map(obj => {
+                    const sortedByType = mediaFiles.filter(raw => raw.type === obj.type);
+                    return (
+                        <Grid item key={uuidv4()}>
+                            <DragAndDrop
+                                name={obj.name}
+                                fileData={sortedByType}
+                                onAdd={(newFiles: any) => {
+                                    const transformed = newFiles.map((file: any) => ({
+                                        name: file.name,
+                                        type: obj.type
+                                    }));
+                                
+                                    const uploadedFiles = newFiles.map((file: any) => ({
+                                        file: file,
+                                        resourceType: obj.type
+                                    }));
+                                    const newSet = mediaFiles.concat(transformed);
+                                    setFileList(newSet);
+                                    onUpload(uploadedFiles);
+                                }}
+                                onRemove={(removed: any) => {
+                                    const newFiles = mediaFiles.filter( elem => elem.name !== removed);
+                                    const removedFile = mediaFiles.filter( elem => elem.name === removed);
+                                    setFileList(newFiles);
+                                    onDelete(removedFile);
+                                }}
+                            >
+                                <CloudUploadIcon style={{ color: `rgba(1,1,1,0.29)`, fontSize: 120 }} />
+                            </DragAndDrop>
+                        </Grid>
+                    );
+                }))}
         </Grid>
     );
 };
@@ -272,6 +279,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                 color="secondary"
                                 onEdit={data => {
                                     setSelectedProperty(data);
+                                    setSearchTerm(data.name);
                                     if (data.groupId) {
                                         setGroupId(data.groupId);
                                     }
@@ -298,8 +306,18 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                             </Grid>
                             <UploadPanel
                                 existingData={existingProperty}
-                                onFetch={mediaList => {
-                                    // Prevent re-render isses
+                                onDelete={async (file) => {
+                                    try {
+                                        await postAPI<string>('/image/delete', {
+                                            type: file.file.type,
+                                            path: `${searchTerm}/${file.file.name}`
+                                        }, {
+                                            token: user!.token
+                                        });
+                                    } catch (e) {
+                                        console.log(e);
+                                        alert("File Delete Error");
+                                    }
                                 }}
                                 onUpload={setImages}
                             />
@@ -328,7 +346,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                             IconComponent={ExpandMoreIcon}
                                             label="Assign Property to a Group"
                                         >
-                                            {groups.map((val: any) => (<MenuItem key={val.groupId} value={val.groupId}>{val.name}</MenuItem>))}
+                                            {groups.map((val: any) => (<MenuItem key={uuidv4()} value={val.groupId}>{val.name}</MenuItem>))}
                                         </Select>
                                     </Grid>
                                 </Grid>
@@ -351,7 +369,6 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                         if (!searchTerm) {
                                             setSelectedProperty(null);
                                             setImages([]);
-                                            console.log("gired");
                                         }
 
                                         return;
@@ -374,9 +391,12 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                     color="primary"
                                     onClick={async () => {
                                         try {
-                                            const propertiesResponse = await postAPI<Properties>('/properties/add', {
+                                            const url = !!existingProperty ? '/properties/update' : '/properties/add';
+                                            const extras = !!existingProperty?.propertyId ? { propertyId: existingProperty.propertyId } : {};
+                                            const propertiesResponse = await postAPI<Properties>(url, {
                                                 name: [searchTerm],
-                                                groupId: Number(groupId)
+                                                groupId: Number(groupId),
+                                                ...extras
                                             }, {
                                                 token: user!.token
                                             });
@@ -387,7 +407,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                                 }, {
                                                     token: user!.token
                                                 });
-                                               await putAPI<any>(url as unknown as string, images[i].file, {
+                                                await putAPI<any>(url as unknown as string, images[i].file, {
                                                     extUrl: true,
                                                     extraHeaders: {
                                                         "Content-Type": images[i].file.type
@@ -396,7 +416,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                                 await postAPI<any>('/media/add', {
                                                     resource: images[i].file.name,
                                                     type: images[i].resourceType,
-                                                    propertyId: propertiesResponse[0].propertyId
+                                                    propertyId: !!existingProperty?.propertyId ? existingProperty?.propertyId : propertiesResponse[0].propertyId
                                                 }, {
                                                     token: user!.token
                                                 });

@@ -5,6 +5,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { usePagination } from '@material-ui/lab/Pagination';
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { usePaginationStyles } from "./pagination.styles";
 
 export interface PaginationProps {
@@ -76,7 +77,7 @@ export const CustomPagination: React.SFC<PaginationProps> = ({ count, onChange }
           }
 
           return (
-            <React.Fragment key={index}>
+            <React.Fragment key={uuidv4()}>
               <Hidden smDown>
                 {(type === "next" && <Divider light orientation="vertical" flexItem />)}
                 <li>{children}</li>

@@ -11,6 +11,7 @@ import { getAPI, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useQueries, useQuery } from "react-query";
+import { v4 as uuidv4 } from 'uuid';
 import { PaperReplacement } from "../user-management/user-management.page";
 import { useGroupStyle } from "./group-management.page.style";
 
@@ -156,7 +157,7 @@ const GroupList: React.FC<GroupListProps> = ({ onEdit, isFetching, isEmpty, grou
                 <React.Fragment>
                     <div>
                         {(groupData.map((group: Groups) => (
-                            <ListItem key={group.groupId} button>
+                            <ListItem key={uuidv4()} button>
                                 <ListItemIcon>
                                     <Avatar className={classes.avatarLarge}>{group.name.slice(0, 1)}</Avatar>
                                 </ListItemIcon>

@@ -4,6 +4,7 @@ import { COLOR_OVERRIDES, STYLE_OVERRIDES, WIDTHS } from "theme";
 
 export const useMiniTableStyles = makeStyles<Theme, PropertyMiniTableProps>((theme: Theme) => createStyles({
     root: {
+        position: 'relative',
         border: `1px solid ${COLOR_OVERRIDES.hdva_grey_light}`,
         height: `400px`,
         "&:focus": {

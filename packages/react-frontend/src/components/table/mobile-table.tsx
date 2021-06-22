@@ -2,6 +2,7 @@ import { Collapse, IconButton, Table, TableBody, TableCell, TableRow } from "@ma
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -73,7 +74,7 @@ const SetRow: React.FC<SetRowProps> = ({ isChecked, onSelect, row, styles }) => 
         <CustomRow selected={selected} row={collapsedCells}>
             {cells.map((item, index) => {
                 const className = (styles && styles[index] && styles[index].className) || "";
-                return <TableCell key={`row-${index}`} className={className}>{item}</TableCell>
+                return <TableCell key={uuidv4()} className={className}>{item}</TableCell>
             })}
         </CustomRow>
     );
@@ -89,7 +90,7 @@ export const MobileTable: React.FC<MobileTableProps> = ({ data, cellStyles }) =>
                         const key = itemsSelected.indexOf(rowIndex);
                         return (
                             <SetRow
-                                key={`row-${rowIndex}`}
+                                key={uuidv4()}
                                 onSelect={selected => {
                                     const newItems = itemsSelected;
 

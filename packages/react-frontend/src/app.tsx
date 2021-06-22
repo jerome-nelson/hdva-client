@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { getCurrentUser, User } from 'services/auth.service';
+import { v4 as uuidv4 } from 'uuid';
 import { LoginContext } from "./components/login-form/login.context";
 import { Modal } from "./components/modal/modal";
 import { ModalContext } from './components/modal/modal.context';
@@ -28,8 +29,8 @@ const queryClient = new QueryClient({
 export const AppComponent = () => (
     <Router>
         <Switch>
-            {ROUTES.map(({ auth, fullWidth, exact, props, component }, key) => (
-                <PrivateRoute auth={auth} fullWidth={fullWidth} exact={exact} key={`${key}-route`} allowed={props.allowed as RoleTypes[]} path={props.path} toRender={component} />
+            {ROUTES.map(({ auth, fullWidth, exact, props, component }) => (
+                <PrivateRoute auth={auth} fullWidth={fullWidth} exact={exact} key={uuidv4()} allowed={props.allowed as RoleTypes[]} path={props.path} toRender={component} />
             ))}
         </Switch>
     </Router>

@@ -1,12 +1,18 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { PlaceholderProps } from "./placeholder";
 
 export const usePlaceholderStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            margin: `${theme.spacing(2)}px auto`,
+            margin: (props: PlaceholderProps) => props.noMargin ? '0 auto' : `${theme.spacing(2)}px auto`,
             textAlign: "center",
             width: "100%"
         },
+        verticalCenter: (props: PlaceholderProps) => (props.centerVertical ? {
+            position: `absolute`,
+            top: `50%`,
+            transform: `translateY(-50%)`,
+          } : {}),
         icon: {
             background: "#b4d0e7",
             borderRadius: "50%",

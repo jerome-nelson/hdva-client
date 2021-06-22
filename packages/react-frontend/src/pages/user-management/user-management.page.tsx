@@ -14,6 +14,7 @@ import { Groups } from "pages/group-management/group-management.page";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useQueries, useQuery } from "react-query";
 import { User } from "services/auth.service";
+import { v4 as uuidv4 } from 'uuid';
 import { HeaderTitle } from "../../components/header/header";
 import { messages } from "../../config/en";
 import { useUserStyles } from "./user-management.page.style";
@@ -204,7 +205,7 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
                     IconComponent={ExpandMoreIcon}
                     label="Add User to Group"
                 >
-                    {(groupData || []).map((val: any) => (<MenuItem key={val.groupId} value={val.groupId}>{val.name}</MenuItem>))}
+                    {(groupData || []).map((val: any) => (<MenuItem key={uuidv4()} value={val.groupId}>{val.name}</MenuItem>))}
                 </Select>
 
             </div>
@@ -222,7 +223,7 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
                     IconComponent={ExpandMoreIcon}
                     label="Add User to Role"
                 >
-                    {(roleData || []).map((val: RoleAPI) => (<MenuItem key={val.id} value={val.id}>{Roles[val.rolename]}</MenuItem>))}
+                    {(roleData || []).map((val: RoleAPI) => (<MenuItem key={uuidv4()} value={val.id}>{Roles[val.rolename]}</MenuItem>))}
                 </Select>
 
             </div>
@@ -287,7 +288,7 @@ const UserList: React.FC<UserListProps> = ({ onEdit, isFetching, isEmpty, userDa
                 <React.Fragment>
                     <div>
                         {(userData.map((user: Users) => (
-                            <ListItem key={user.userId} button>
+                            <ListItem key={uuidv4()} button>
                                 <ListItemIcon>
                                     <Avatar className={classes.avatarLarge}>{user.name.slice(0, 1)}</Avatar>
                                 </ListItemIcon>

@@ -5,11 +5,12 @@ import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
 import { COLOR_OVERRIDES } from "theme";
 import { bytesToSize } from "utils/conversion";
+import { v4 as uuidv4 } from 'uuid';
 
 interface DragAndDropProps {
   fileData?: any;
   onAdd(files: any[]): void;
-  onRemove(files: any[]): void;
+  onRemove?(files: any[]): void;
   name: string;
 }
 
@@ -191,11 +192,16 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd,
   }
 
   const removeFile = (position: number, name: string) => {
-    const currentFile = data.fileList.filter((el: any, index: number) => el.name === name && index === position).map((f: any) => f.name);
+    
+    if (!onRemove) {
+      return;
+    }
+
+    const currentFile = data.fileList.filter((el: any, index: number) => el.name === name && index === position);
     dispatch({
       type: 'REMOVE_FILE_FROM_LIST',
       file: {
-        name: currentFile[0],
+        name: currentFile[0].name,
         position
       }
     });
@@ -242,7 +248,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ name, children, onAdd,
           >
             <Grid className={classes.droppedFiles} item>
               {data.fileList.map((f: any, index: number) => (
-                <Grid key={`${f.name}-${Math.floor(Math.random() * index)}`} className={classes.fileContainer} container justify="space-between">
+                <Grid key={uuidv4()} className={classes.fileContainer} container justify="space-between">
                   <Grid className={classes.txtAlign} item xs={2} container>
                     <Grid item xs={12}><DescriptionIcon style={{ height: "100%", width: "100%" }} /></Grid>
                   </Grid>

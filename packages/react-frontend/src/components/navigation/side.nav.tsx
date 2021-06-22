@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { ReactComponent as LogoSVG } from "media/logo.svg";
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 import { Settings } from "../../components/settings/settings";
 import { ROUTES } from "../../routing";
 import { useSidenavStyles } from "./side.nav.style";
@@ -31,9 +32,9 @@ export const SideNav: React.FC = () => {
                     </div> */}
                     <Grid className={classes.nav} container>
                         <Grid item xs={12}>
-                            <div className={classes.logo}>
+                            <a href="/" className={classes.logo}>
                                 <LogoSVG />
-                            </div>
+                            </a>
                         </Grid>
                     </Grid>
                     <List className={classes.root}>
@@ -46,7 +47,7 @@ export const SideNav: React.FC = () => {
                                 <ListItem className={classNames({
                                     [classes.listBtn]: true,
                                     [classes.selectedBtn]: location.pathname === text.props.path
-                                })} disabled={location.pathname === text.props.path} onClick={() => history.push(text.props.path)} button key={text.name}>
+                                })} disabled={location.pathname === text.props.path} onClick={() => history.push(text.props.path)} button key={uuidv4()}>
                                     <ListItemText className={classes.home} primary={text.name} />
                                 </ListItem>
                             );

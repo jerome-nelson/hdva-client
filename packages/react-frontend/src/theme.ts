@@ -231,6 +231,9 @@ export const theme = createMuiTheme({
             }
         },
         MuiCircularProgress: {
+            colorPrimary: {
+                color: COLOR_OVERRIDES.hdva_red,
+            },
             colorSecondary: {
                 color: COLOR_OVERRIDES.hdva_white
             }

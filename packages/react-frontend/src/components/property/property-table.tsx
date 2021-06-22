@@ -175,7 +175,7 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
             <Grid className={classes.root} xs={12} item>
                 {isFetching ? <LinearProgress color="secondary" /> : (
                     isEmpty ? (
-                        <Placeholder title="No Properties Found" subtitle="Create the Property and assign images to it">
+                        <Placeholder centerVertical noMargin title="No Properties Found" subtitle="Create the Property and assign images to it">
                             <NotInterestedIcon />
                         </Placeholder>
                     ) : <GenericTable color={color} data={propertyData} cells={cells} mini />
