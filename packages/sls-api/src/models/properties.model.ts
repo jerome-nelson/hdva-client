@@ -1,5 +1,4 @@
 import mongoose, { Model } from "mongoose";
-
 interface PropertiesModel {
     createdOn: Date;
     modifiedOn: Date;
@@ -73,6 +72,25 @@ export const addProperties = async (properties: Omit<PropertiesModel, "_id" | "c
     try {
         const result = await Properties.insertMany(propertiesToAdd);
         return result;
+    } catch (e) {
+        throw e;
+    }
+};
+
+export const updateProperty = async (property: Omit<PropertiesModel, "_id" | "createdOn" | "modifiedOn">) => {
+    const currentTime = new Date().toDateString();
+    // TODO: Add arrays
+    const updateValues = {
+        groupId: Number(property.groupId),
+        modifiedOn: currentTime as unknown as Date
+    };
+
+    try {
+        const result = await Properties.updateOne({ propertyId: Number(property.propertyId) }, updateValues);
+        if (result.n !== 1) {
+            throw new Error(`Result number doesn't match: ${result.n}`);
+        }
+        return { data: "Property Updated" };
     } catch (e) {
         throw e;
     }

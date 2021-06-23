@@ -47,8 +47,6 @@ const _retrieveArchive = async (bucketName: string, fileKey: string) => {
         });
 
     } catch (e) {
-        // TODO: How to log
-        console.log(`createZip error: `, e);
         return;
     }
 }
@@ -96,19 +94,12 @@ export const getZip = async (event: any, context: Context) => {
         archive.pipe(passThrough);
 
         archive.on('warning', function (error: any) {
-            console.log("Archive Warning");
-            if (error.code === 'ENOENT') {
-                console.log("warning");
-            } else {
-                console.log("error");
-            }
             throw new Error(
                 `${error.name} ${error.code} ${error.message} ${error.path}  ${error.stack}`
             );
         });
         
         archive.on("error", (error: any) => {
-            console.log("Archive Error");
             throw new Error(
                 `${error.name} ${error.code} ${error.message} ${error.path}  ${error.stack}`
             );
@@ -120,19 +111,6 @@ export const getZip = async (event: any, context: Context) => {
                 Bucket: process.env.highres_bucket_name as string,
                 Key: fileKey
             }).createReadStream();
-            objectData.on('error', (e) => {
-                console.log('stream error');
-                console.log(fileKey);
-                console.log(e);
-            })
-            objectData.on('end', () => {
-                console.log('stream ended');
-                console.log(fileKey);
-            });
-            objectData.on("finish", () => {
-                console.log("streamed finished");
-                console.log(fileKey);
-            });    
             archive.append(objectData, {
                 name:  `${fileKey.split('/').pop()}`,
             });
@@ -149,7 +127,6 @@ export const getZip = async (event: any, context: Context) => {
         await new Promise((resolve, reject) => {
             upload.send(function (err, data) {
                 if (err) {
-                    console.log("Upload error");
                     reject(err);
                 }
                 resolve(data);
