@@ -328,7 +328,7 @@ const serverlessConfiguration: Serverless = {
             },
             cors: true,
             method: 'post',
-            path: 'media/add',
+            path: 'media/{action}',
           }
         }
       ]

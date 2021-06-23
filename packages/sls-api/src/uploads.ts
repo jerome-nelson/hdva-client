@@ -74,12 +74,14 @@ export const signedUrlPutObject = async (event: any, _: Context) => {
 export const sendToPublicBucket = async (event: any) => {
 
   if (!process.env.bucket_region) {
+    console.log(ERROR_MSGS.BUCKET_REGION_NOT_SET);
     throw new Error(ERROR_MSGS.BUCKET_REGION_NOT_SET);
   }
 
   const srcBucket = event.Records[0].s3.bucket.name;
 
   if (!process.env.web_bucket || !srcBucket) {
+    console.log(ERROR_MSGS.BUCKET_NOT_SET);
     throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
   }
 
@@ -92,6 +94,7 @@ export const sendToPublicBucket = async (event: any) => {
 
     const original = await BucketInstance.getObject(params).promise();
     if (!original.ContentType || !ALLOWED_IMAGES.includes(original.ContentType)) {
+      console.log(ERROR_MSGS.CONTENT_TYPE_NOT_SET);
       throw new BadRequest(ERROR_MSGS.CONTENT_TYPE_NOT_SET);
     }
 

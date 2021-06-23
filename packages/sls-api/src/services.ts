@@ -2,12 +2,12 @@ import { APIGatewayProxyResult, APIGatewayRequestAuthorizerEvent, Context } from
 import { default as qs, default as querystring } from "querystring";
 import { ERROR_MSGS } from "./config/messages";
 import { addGroup, deleteGroups, getGroupCount, getGroups, updateGroup } from "./models/groups.model";
-import { addMedia, getMedia } from "./models/media.model";
-import { addProperties, deleteProperties, getProperties, getPropertyCount } from "./models/properties.model";
+import { addMedia, getMedia, removeMedia } from "./models/media.model";
+import { addProperties, deleteProperties, getProperties, getPropertyCount, updateProperty } from "./models/properties.model";
 import { Roles } from "./models/roles.model";
 import { createOrEditUser, findUsers, getCurrentUser, getUserCount, loginUserWithPassword, UserModel } from "./models/user.model";
 import { startMongoConn } from "./utils/db";
-import { BadRequest, GeneralError, NotFound } from "./utils/error";
+import { BadRequest, GeneralError } from "./utils/error";
 import { createErrorResponse, createResponse } from "./utils/responses";
 
 export const getPropertyMedia = async (event: any, context: Context) => {
@@ -222,7 +222,6 @@ export const groupCRUD = async (event: APIGatewayRequestAuthorizerEvent & { body
   // ADD
   try {
     let result = {};
-    console.log(action);
     await startMongoConn();
     if (action === "add") {
 
@@ -260,18 +259,24 @@ export const CRUDMedia = async (event: APIGatewayRequestAuthorizerEvent & { body
     && JSON.parse((authContext as any).user);
   const isAdmin = user
     && [1, 2, 4].includes((user as UserModel).role);
+    const action = event.pathParameters && event.pathParameters["action"];
 
   if (!user || !isAdmin) {
     throw new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL);
   }
-
+console.log(body);
   const entries: any = querystring.parse(body);
-  console.log(entries);
   try {
     await startMongoConn();
-    const result = await addMedia(entries);
+    let result = {};
+    if (action === "add") {
+      result = await addMedia(entries);
+    } else if ( action === "delete" ) {
+      result = await removeMedia(entries);
+    }
     return createResponse(result);
   } catch (e) {
+    console.log(`request error:`, e);
     return createErrorResponse(e);
   }
 }
@@ -298,7 +303,6 @@ export const propertyCRUD = async (event: APIGatewayRequestAuthorizerEvent & { b
   try {
     await startMongoConn();
     let result = {};
-
     if (action === "add") {
       if (!body || !body.length) {
         throw new BadRequest(ERROR_MSGS.NO_PROPERTIES_PAYLOAD);
@@ -308,7 +312,11 @@ export const propertyCRUD = async (event: APIGatewayRequestAuthorizerEvent & { b
     }
 
     else if (action === "update") {
-      throw new NotFound("UPDATE not set");
+      if (!body || !body.length) {
+        throw new BadRequest(ERROR_MSGS.NO_PROPERTIES_PAYLOAD);
+      }
+      const entry = querystring.parse(body) as any;
+      result = await updateProperty(entry);
     }
 
     else if (action === "delete") {

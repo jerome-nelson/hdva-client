@@ -172,10 +172,10 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete
                                     onUpload(uploadedFiles);
                                 }}
                                 onRemove={(removed: any) => {
-                                    const newFiles = mediaFiles.filter( elem => elem.name !== removed);
-                                    const removedFile = mediaFiles.filter( elem => elem.name === removed);
+                                    const newFiles = mediaFiles.filter( elem => elem.name !== removed.name);
+                                    const removedFile = mediaFiles.filter( elem => elem.name === removed.name);
                                     setFileList(newFiles);
-                                    onDelete(removedFile);
+                                    onDelete(removedFile[0]);
                                 }}
                             >
                                 <CloudUploadIcon style={{ color: `rgba(1,1,1,0.29)`, fontSize: 120 }} />
@@ -308,9 +308,10 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                 existingData={existingProperty}
                                 onDelete={async (file) => {
                                     try {
-                                        await postAPI<string>('/image/delete', {
-                                            type: file.file.type,
-                                            path: `${searchTerm}/${file.file.name}`
+                                        await postAPI<string>('/media/delete', {
+                                            type: file.type,
+                                            propertyId: existingProperty?.propertyId,
+                                            resource: file.name
                                         }, {
                                             token: user!.token
                                         });
