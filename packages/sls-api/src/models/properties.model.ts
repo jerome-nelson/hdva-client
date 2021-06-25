@@ -5,6 +5,7 @@ interface PropertiesModel {
     name: string;
     propertyId: number;
     groupId: number;
+    folder: string;
     _id: string;
 }
 

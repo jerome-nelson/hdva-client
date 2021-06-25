@@ -74,14 +74,12 @@ export const signedUrlPutObject = async (event: any, _: Context) => {
 export const sendToPublicBucket = async (event: any) => {
 
   if (!process.env.bucket_region) {
-    console.log(ERROR_MSGS.BUCKET_REGION_NOT_SET);
     throw new Error(ERROR_MSGS.BUCKET_REGION_NOT_SET);
   }
 
   const srcBucket = event.Records[0].s3.bucket.name;
 
   if (!process.env.web_bucket || !srcBucket) {
-    console.log(ERROR_MSGS.BUCKET_NOT_SET);
     throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
   }
 
@@ -94,7 +92,6 @@ export const sendToPublicBucket = async (event: any) => {
 
     const original = await BucketInstance.getObject(params).promise();
     if (!original.ContentType || !ALLOWED_IMAGES.includes(original.ContentType)) {
-      console.log(ERROR_MSGS.CONTENT_TYPE_NOT_SET);
       throw new BadRequest(ERROR_MSGS.CONTENT_TYPE_NOT_SET);
     }
 
@@ -110,6 +107,61 @@ export const sendToPublicBucket = async (event: any) => {
       await BucketInstance.putObject(params).promise();
     }
   } catch (error) {
-    throw new Error(error);
+    throw error;
+  }
+};
+
+export async function deleteFromBucket(path: string) {
+  try {
+
+    if (!process.env.highres_bucket_name) {
+      throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
+    }
+
+    const params = {
+      Bucket: process.env.highres_bucket_name as string,
+      Key: path
+    };
+
+    await BucketInstance.headObject(params).promise();
+    await BucketInstance.deleteObject(params).promise();
+
+  } catch (error) {
+    throw error;
+  }
+}
+
+/*
+* This function should be triggered by S3 event on highresbucket instead
+*/
+export const deleteFromPublicBucket = async (event: any) => {
+
+  if (!process.env.web_bucket) {
+    throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
+  }
+
+  const sourcePath = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
+  try {
+    const sizes = [IMAGE_SIZES.thumbnail, IMAGE_SIZES.slide];
+    for (const size of sizes) {
+      const type = sourcePath.match(/\.([^.]*)$/);
+
+      console.log(type);
+      console.log(size);
+      const params = {
+        Bucket: process.env.web_bucket,
+        Key: sourcePath.replace(type![0], `-${size[0]}x${size[1]}${type![0]}`),
+      };
+
+      console.log(params);
+
+      const res = await BucketInstance.deleteObject(params).promise();      
+      console.log(res);
+    }
+
+    return;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
