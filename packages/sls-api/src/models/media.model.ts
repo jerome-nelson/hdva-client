@@ -61,10 +61,7 @@ export const addMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "mo
 
 export const removeMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "modifiedOn">) => {
     try {
-        console.log(media);
-        console.log(media.resource, media.propertyId, media.type);
         const proposedDelete = await Media.findOneAndDelete({ resource: media.resource, propertyId: media.propertyId, type: media.type });
-        console.log(proposedDelete);
         if (!proposedDelete) {
             throw Error("Delete not successful");
         }
@@ -72,7 +69,6 @@ export const removeMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | 
         return proposedDelete;
 
     } catch (e) {
-        console.log(e);
         throw e;
     }
 };

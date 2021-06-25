@@ -71,6 +71,14 @@ const serverlessConfiguration: Serverless = {
     },
   },
   functions: {
+    deleteFromWebBucket: {
+      handler: "handler.deleteFromPublicBucket",
+      role: "${ssm:hdva.image.bucket.lambda.role}",
+      description: "Lambda Delete function (triggered by s3 bucket event)",
+      environment: {
+        web_bucket: "${ssm:hdva.image.bucket.web}"
+      },
+    },
     pushToWebBucket: {
       handler: 'handler.sendToPublicBucket',
       role: "${ssm:hdva.image.bucket.lambda.role}",

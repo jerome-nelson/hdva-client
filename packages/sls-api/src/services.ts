@@ -6,6 +6,7 @@ import { addMedia, getMedia, removeMedia } from "./models/media.model";
 import { addProperties, deleteProperties, getProperties, getPropertyCount, updateProperty } from "./models/properties.model";
 import { Roles } from "./models/roles.model";
 import { createOrEditUser, findUsers, getCurrentUser, getUserCount, loginUserWithPassword, UserModel } from "./models/user.model";
+import { deleteFromBucket } from "./uploads";
 import { startMongoConn } from "./utils/db";
 import { BadRequest, GeneralError } from "./utils/error";
 import { createErrorResponse, createResponse } from "./utils/responses";
@@ -264,7 +265,7 @@ export const CRUDMedia = async (event: APIGatewayRequestAuthorizerEvent & { body
   if (!user || !isAdmin) {
     throw new BadRequest(ERROR_MSGS.CREDENTIALS_FAIL);
   }
-console.log(body);
+
   const entries: any = querystring.parse(body);
   try {
     await startMongoConn();
@@ -272,11 +273,19 @@ console.log(body);
     if (action === "add") {
       result = await addMedia(entries);
     } else if ( action === "delete" ) {
-      result = await removeMedia(entries);
+      await removeMedia(entries);
+
+      const properties = await getProperties({
+        pids: [entries.propertyId]
+      });
+
+      const folder = properties[0].folder;
+      await deleteFromBucket(`${folder}/${entries.resource}`);
     }
+
     return createResponse(result);
+
   } catch (e) {
-    console.log(`request error:`, e);
     return createErrorResponse(e);
   }
 }

@@ -1,10 +1,10 @@
 import 'source-map-support/register';
 import { getZip } from "./src/createZip";
 import { CRUDMedia, getPropertyMedia, getUser, groupCount, groupCRUD, groups, login, properties, propertiesCount, propertyCRUD, register, roles, users, usersCount } from "./src/services";
-import { sendToPublicBucket, signedUrlGetObject, signedUrlPutObject } from "./src/uploads";
+import { deleteFromPublicBucket, sendToPublicBucket, signedUrlGetObject, signedUrlPutObject } from "./src/uploads";
 import { jwtVerify } from "./src/utils/auth";
 
-export { usersCount, groupCount, signedUrlGetObject, CRUDMedia, getZip, propertiesCount, getPropertyMedia, getUser, login, roles, register, properties, jwtVerify, users, propertyCRUD, groups, groupCRUD, signedUrlPutObject, sendToPublicBucket };
+export { usersCount, groupCount, signedUrlGetObject, CRUDMedia, getZip, propertiesCount, getPropertyMedia, getUser, login, roles, register, properties, jwtVerify, users, propertyCRUD, groups, groupCRUD, signedUrlPutObject, deleteFromPublicBucket, sendToPublicBucket };
 
 // const wrappedFunctions = [ login, roles, register, properties, jwtVerify, users, propertyCRUD, groups, groupCRUD, signedUrlPutObject ];
 // TODO: Wrap each try catch here instead
