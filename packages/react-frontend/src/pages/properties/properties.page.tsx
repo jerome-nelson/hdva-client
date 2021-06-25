@@ -12,11 +12,12 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
 import { LoginContext } from "components/login-form/login.context";
+import { Properties } from "components/property/property-table";
 import { GenericTable } from "components/table/generic-table";
 import { getDownload, postAPI } from "hooks/useAPI";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { usePropertyStyles } from "pages/properties/properties.page.style";
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import { convertToSlug } from "utils/auth";
@@ -76,19 +77,51 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
   });
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const location = useLocation<{ propertyName: string; propertyId: string; }>();
+  const propertyFilter = decodeURIComponent(location.hash.replace(`/properties/`, ``));
+  const getProperty = useQuery({
+    queryKey: [location.hash],
+    queryFn: () => postAPI<Properties>('/properties', {
+      filter: [propertyFilter],
+  }, {
+      token: user!.token
+  }),
+    enabled: !location.state?.propertyId || !location.state?.propertyId
+  })
   const [currentMedia] = useState<Record<string, any>>();
   const [propertyData, setPropertyData] = useState<any>([]);
   const [openSubmenu, setOpenSubmenu] = useState(false);
   const [vtLink, setVTLink] = useState<any>(null);
 
+  const defaultState = useMemo( () => {
+    
+    if (location.state?.propertyId && location.state?.propertyName) {
+      return {
+        propertyId: location.state.propertyId,
+        propertyName: location.state.propertyName,
+      }
+    }
+
+    if (getProperty.isError ) {
+      return {
+        propertyId: undefined,
+        propertyName: "Property Not Found" 
+      }
+    }
+
+    return {
+      propertyName: location.state?.propertyName || getProperty.data?.[0].name,
+      propertyId: location.state?.propertyId || getProperty.data?.[0].propertyId,
+    }
+  }, [getProperty, location]);
+
   const { data, isLoading, isSuccess } = useQuery({
-    queryKey: [`properties`, user!.group, location.state.propertyId],
+    queryKey: [`media`, user!.group, defaultState.propertyId],
     queryFn: () => postAPI<any>('/get-media', {
-      pids: [location.state.propertyId],
+      pids: [defaultState.propertyId],
     }, {
       token: user!.token
     }),
-    enabled: Boolean(user && user.group && location.state.propertyId)
+    enabled: Boolean(user && user.group && defaultState.propertyId)
   });
 
   useEffect(() => {
@@ -104,7 +137,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
 
   const tableStylesData = (data: any[]) => data.map(row => {
 
-    let fileName = `${location.state.propertyName}/${row.resource}`.replace(/ /g, "+");
+    let fileName = `${defaultState.propertyName}/${row.resource}`.replace(/ /g, "+");
     const seperator = fileName.split(".");
 
     return {
@@ -117,7 +150,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                 [fileName]: true
               });
             }} 
-            src={getThumbnailUrl(`${location.state.propertyName}/${row.resource}`, row.type)} alt={location.state.propertyName} />}
+            src={getThumbnailUrl(`${defaultState.propertyName}/${row.resource}`, row.type)} alt={defaultState.propertyName} />}
           </Paper>
         )
       },
@@ -140,7 +173,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
               imageLoading: inQueue,
             });
             const image = await postAPI<string>('/image/download', {
-              path: [`${location.state.propertyName}/${row.resource}`],
+              path: [`${defaultState.propertyName}/${row.resource}`],
             }, {
               token: user!.token
             })
@@ -216,7 +249,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                     })
                     for (let i = 0; i < selectedRows.length; i += 1) {
                       const image = await postAPI<string>('/image/download', {
-                        path: [`${location.state.propertyName}/${propertyData[selectedRows[i]].resource}`],
+                        path: [`${defaultState.propertyName}/${propertyData[selectedRows[i]].resource}`],
                       }, {
                         token: user!.token
                       })
@@ -252,11 +285,11 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                       downloadAll: true,
                     });
                     const zip = await postAPI<any>('/generate-download', {
-                      pid: [location.state.propertyId],
+                      pid: [defaultState.propertyId],
                     }, {
                       token: user!.token
                     })
-                    await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
+                    await getDownload(zip as unknown as string, `${convertToSlug(defaultState.propertyName)}.zip`);
                     updateLoading({
                       ...loadingStates,
                       downloadAll: false,
@@ -322,12 +355,12 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
               Properties
           </Link>
             <Link color="secondary" href="/" onClick={() => { }} className={classes.link}>
-              {location.state.propertyName}
+              {defaultState.propertyName}
             </Link>
           </Breadcrumbs>
         </Hidden>
         <Hidden mdUp>
-          <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={location.state.propertyName} />
+          <HeaderTitle isFixed alignText="center" color="primary" variant="h5" title={defaultState.propertyName} />
         </Hidden>
         {!isEmpty ? (
           <Grid container className={classes.container}>
@@ -371,7 +404,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                                     })
                                     for (let i = 0; i < selectedRows.length; i += 1) {
                                       const image = await postAPI<string>('/image/download', {
-                                        path: [`${location.state.propertyName}/${propertyData[selectedRows[i]].resource}`],
+                                        path: [`${defaultState.propertyName}/${propertyData[selectedRows[i]].resource}`],
                                       }, {
                                         token: user!.token
                                       })
@@ -407,11 +440,11 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                                       downloadAll: true,
                                     });
                                     const zip = await postAPI<any>('/generate-download', {
-                                      pid: [location.state.propertyId],
+                                      pid: [defaultState.propertyId],
                                     }, {
                                       token: user!.token
                                     })
-                                    await getDownload(zip as unknown as string, `${convertToSlug(location.state.propertyName)}.zip`);
+                                    await getDownload(zip as unknown as string, `${convertToSlug(defaultState.propertyName)}.zip`);
                                     updateLoading({
                                       ...loadingStates,
                                       downloadAll: false,
@@ -499,7 +532,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                   { name: "Modified", className: classes.tableHeadCell, colSpan: 2 }
                 ]}
                 cells={cells}
-                data={(isLoading || !isSuccess) ? skeleton : tableStylesData(propertyData)}
+                data={(getProperty.isLoading || isLoading || !isSuccess) ? skeleton : tableStylesData(propertyData)}
               />
             </Grid>
           </Grid>

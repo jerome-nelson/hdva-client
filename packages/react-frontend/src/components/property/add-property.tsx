@@ -86,7 +86,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete
     const [mediaFiles, setFileList] = useState<any[]>([]);
     const results = useQueries([
         {
-            queryKey: [`properties`, user!.group, existingData?.propertyId],
+            queryKey: [`media`, user!.group, existingData?.propertyId],
             queryFn: () => postAPI<Media>('/get-media', {
                 pids: [existingData?.propertyId],
             }, {
