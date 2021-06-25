@@ -289,7 +289,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                     }, {
                       token: user!.token
                     })
-                    await getDownload(zip as unknown as string, `${convertToSlug(defaultState.propertyName)}.zip`);
+                    await getDownload(zip as unknown as string, `${convertToSlug(defaultState.propertyName as string)}.zip`);
                     updateLoading({
                       ...loadingStates,
                       downloadAll: false,
@@ -444,7 +444,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                                     }, {
                                       token: user!.token
                                     })
-                                    await getDownload(zip as unknown as string, `${convertToSlug(defaultState.propertyName)}.zip`);
+                                    await getDownload(zip as unknown as string, `${convertToSlug(defaultState.propertyName as string)}.zip`);
                                     updateLoading({
                                       ...loadingStates,
                                       downloadAll: false,
