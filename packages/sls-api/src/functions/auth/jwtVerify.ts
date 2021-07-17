@@ -1,27 +1,9 @@
 import { APIGatewayAuthorizerResult, APIGatewayTokenAuthorizerEvent } from "aws-lambda";
 import jwt from "jsonwebtoken";
-import { ERROR_MSGS } from "../config/messages";
-import { Roles } from "../models/roles.model";
-import { User, UserModel } from "../models/user.model";
-import { startMongoConn } from "./db";
-import { BadRequest } from "./error";
-
-export const jwtSign = (params: string | Buffer | object) => {
-
-    if (!process.env.jwt) {
-        throw new BadRequest(ERROR_MSGS.JWT_NOT_SET)
-    }
-
-    return jwt.sign(
-        params,
-        process.env.jwt,
-        {
-            algorithm: "HS256",
-            expiresIn: "1d"
-
-        }
-    );
-}
+import { ERROR_MSGS } from "../../config/messages";
+import { Roles } from "../../models/roles.model";
+import { User, UserModel } from "../../models/user.model";
+import { startMongoConn } from "../../utils/db";
 
 // TODO: Fix types
 export const jwtVerify = async (event: APIGatewayTokenAuthorizerEvent, context: any, callback: any): Promise<APIGatewayAuthorizerResult> => {
