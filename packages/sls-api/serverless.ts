@@ -47,6 +47,9 @@ const serverlessConfiguration: Serverless = {
       includeModules: true
     }
   },
+  package: {
+    individually: true,
+  },
   plugins: ['serverless-webpack', 'serverless-domain-manager', 'serverless-apigw-binary'],
   provider: {
     name: 'aws',
@@ -72,7 +75,7 @@ const serverlessConfiguration: Serverless = {
   },
   functions: {
     deleteFromWebBucket: {
-      handler: "handler.deleteFromPublicBucket",
+      handler: "src/bucket-operations/deleteFromPublicBucket.deleteFromPublicBucket",
       role: "${ssm:hdva.image.bucket.lambda.role}",
       description: "Lambda Delete function (triggered by s3 bucket event)",
       environment: {
@@ -80,16 +83,16 @@ const serverlessConfiguration: Serverless = {
       },
     },
     pushToWebBucket: {
-      handler: 'handler.sendToPublicBucket',
+      handler: 'src/bucket-operations/cleanAndGenerateFiles.cleanAndGenerateFiles',
       role: "${ssm:hdva.image.bucket.lambda.role}",
-      description: "Lambda Resize function (triggered by s3 bucket event)",
+      description: "Cleans input given and generates the web resized files in web-bucket.",
       environment: {
         web_bucket: "${ssm:hdva.image.bucket.web}",
         bucket_region: "${ssm:hdva.image.bucket.region}"
       },
     },
     auth: {
-      handler: 'handler.login',
+      handler: 'src/functions/auth/login.login',
       environment: sharedEnv,
       events: [
         {
@@ -102,7 +105,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     groups: {
-      handler: 'handler.groups',
+      handler: 'src/functions/roles/groups.groups',
       environment: sharedEnv,
       events: [
         {
@@ -120,7 +123,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     groupCRUD: {
-      handler: 'handler.groupCRUD',
+      handler: 'src/functions/roles/groupCRUD.groupCRUD',
       environment: sharedEnv,
       events: [
         {
@@ -138,7 +141,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     getImage: {
-      handler: 'handler.signedUrlGetObject',
+      handler: 'src/functions/property/uploads.signedUrlGetObject',
       environment: {
         ...sharedEnv,
         highres_bucket_name: "${ssm:hdva.image.bucket}",
@@ -160,8 +163,8 @@ const serverlessConfiguration: Serverless = {
 
     },
     getZip: {
-      handler: 'handler.getZip',
-      timeout: 180,
+      handler: 'src/functions/property/createZip.getZip',
+      timeout: 30,
       environment: {
         ...sharedEnv,
         highres_bucket_name: "${ssm:hdva.image.bucket}",
@@ -182,7 +185,7 @@ const serverlessConfiguration: Serverless = {
       }]
     },
     getPropertyMedia: {
-      handler: 'handler.getPropertyMedia',
+      handler: 'src/functions/property/getPropertyMedia.getPropertyMedia',
       environment: sharedEnv,
       events: [
         {
@@ -200,7 +203,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     propertyCount: {
-      handler: 'handler.propertiesCount',
+      handler: 'src/functions/property/propertiesCount.propertiesCount',
       environment: sharedEnv,
       events: [
         {
@@ -219,7 +222,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     groupCount: {
-      handler: 'handler.groupCount',
+      handler: 'src/functions/roles/groupCount.groupCount',
       environment: sharedEnv,
       events: [
         {
@@ -238,7 +241,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     userCount: {
-      handler: 'handler.usersCount',
+      handler: 'src/functions/user/usersCount.usersCount',
       environment: sharedEnv,
       events: [
         {
@@ -257,7 +260,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     propertyCRUD: {
-      handler: 'handler.propertyCRUD',
+      handler: 'src/functions/property/propertyCRUD.propertyCRUD',
       environment: sharedEnv,
       events: [
         {
@@ -275,7 +278,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     property: {
-      handler: 'handler.properties',
+      handler: 'src/functions/property/properties.properties',
       environment: sharedEnv,
       events: [
         {
@@ -306,7 +309,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     register: {
-      handler: 'handler.register',
+      handler: 'src/functions/auth/register.register',
       environment: sharedEnv,
       events: [
         {
@@ -324,7 +327,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     CRUDMedia: {
-      handler: 'handler.CRUDMedia',
+      handler: 'src/functions/property/CRUDMedia.CRUDMedia',
       environment: sharedEnv,
       events: [
         {
@@ -342,7 +345,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     roles: {
-      handler: 'handler.roles',
+      handler: 'src/functions/roles/roles.roles',
       environment: sharedEnv,
       events: [
         {
@@ -360,7 +363,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     users: {
-      handler: 'handler.users',
+      handler: 'src/functions/user/users.users',
       environment: sharedEnv,
       events: [
         {
@@ -378,7 +381,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     getUser: {
-      handler: 'handler.getUser',
+      handler: 'src/functions/user/getUser.getUser',
       environment: sharedEnv,
       events: [
         {
@@ -396,7 +399,7 @@ const serverlessConfiguration: Serverless = {
       ]
     },
     images: {
-      handler: 'handler.signedUrlPutObject',
+      handler: 'src/functions/property/uploads.signedUrlPutObject',
       environment: {
         ...sharedEnv,
         highres_bucket_name: "${ssm:hdva.image.bucket}",
@@ -420,7 +423,7 @@ const serverlessConfiguration: Serverless = {
     },
     jwtAuth: {
       environment: sharedEnv,
-      handler: "handler.jwtVerify",
+      handler: "src/functions/auth/jwtVerify.jwtVerify",
     }
   },
   resources: {

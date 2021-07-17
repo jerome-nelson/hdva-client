@@ -1,28 +1,15 @@
 import archiver from "archiver";
 import { Context } from 'aws-lambda';
 import S3 from "aws-sdk/clients/s3";
-import fs from "fs";
 import querystring from "querystring";
 import { Stream } from "stream";
-import { BucketInstance } from "./config/config";
-import { ERROR_MSGS } from './config/messages';
-import { getMedia } from './models/media.model';
-import { getProperties } from "./models/properties.model";
-import { startMongoConn } from './utils/db';
-import { GeneralError } from './utils/error';
-import { createErrorResponse, createResponse } from './utils/responses';
-
-function _writeToFile(filePath: string, arr: string[]): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-        const file = fs.createWriteStream(filePath);
-        for (const row of arr) {
-            file.write(row + "\n");
-        }
-        file.end();
-        file.on("finish", () => { resolve(true); }); // not sure why you want to pass a boolean
-        file.on("error", reject); // don't forget this!
-    });
-}
+import { BucketInstance } from "../../config/config";
+import { ERROR_MSGS } from "../../config/messages";
+import { getMedia } from "../../models/media.model";
+import { getProperties } from "../../models/properties.model";
+import { startMongoConn } from "../../utils/db";
+import { GeneralError } from "../../utils/error";
+import { createErrorResponse, createResponse } from "../../utils/responses";
 
 const _convertToSlug = (text: string) => {
     return text

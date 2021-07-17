@@ -1,0 +1,44 @@
+{
+    "Statement": [
+        {
+            "Action": "s3:DeleteObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Resource": "arn:aws:s3:::hdva-image-bucket-web/*"
+        },
+        {
+            "Action": [
+                "s3:GetObjectTagging",
+                "s3:PutObjectTagging",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl"
+            ],
+            "Effect": "Allow",
+            "Principal": "*",
+            "Resource": [
+                "arn:aws:s3:::hdva-image-bucket-web/**/*.jpg",
+                "arn:aws:s3:::hdva-image-bucket-web/**/*.png"
+            ]
+        },
+        {
+            "Action": [
+                "s3:GetObjectTagging",
+                "s3:PutObjectTagging",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl"
+            ],
+            "Effect": "Deny",
+            "Principal": "*",
+            "Resource": [
+                "arn:aws:s3:::hdva-image-bucket-web/*.zip",
+                "arn:aws:s3:::hdva-image-bucket-web/*DS_Store",
+                "arn:aws:s3:::hdva-image-bucket-web/*_MACOSX*"
+            ]
+        }
+    ],
+    "Version": "2012-10-17"
+}

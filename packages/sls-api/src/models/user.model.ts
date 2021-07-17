@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import mongoose, { HookNextFunction, Model } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import validator from "validator";
 import { ERROR_MSGS } from "../config/messages";
-import { jwtSign } from "../utils/auth";
 import { BadRequest } from "../utils/error";
 
 export interface UserModel {
@@ -102,6 +102,22 @@ UserSchema.pre<MongoUserDocument>('save', async function (next: HookNextFunction
 });
 
 export const User: MongoUserModel = mongoose.model<MongoUserDocument, MongoUserModel>('User', UserSchema);
+
+const jwtSign = (params: string | Buffer | object) => {
+    if (!process.env.jwt) {
+        throw new BadRequest(ERROR_MSGS.JWT_NOT_SET)
+    }
+
+    return jwt.sign(
+        params,
+        process.env.jwt,
+        {
+            algorithm: "HS256",
+            expiresIn: "1d"
+
+        }
+    );
+}
 
 export const loginUserWithPassword = async (username: string, password: string) => {
     if (!username || !password) {
