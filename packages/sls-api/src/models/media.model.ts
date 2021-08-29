@@ -59,7 +59,30 @@ export const addMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "mo
     }
 };
 
-export const removeMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "modifiedOn">) => {
+interface MediaFilter {
+    propertyIds: number[];
+}
+
+export const removeMedia = async (filter: MediaFilter) => {
+    try {
+        const proposedDelete = await Media.deleteMany({ 
+            propertyId: {
+                $in: filter.propertyIds 
+            }
+        });
+        if (!proposedDelete) {
+            throw Error("Delete not successful");
+        }
+
+        console.log(proposedDelete);
+        return proposedDelete;
+    } catch (e) {
+        throw e;
+    }
+};
+
+// TODO: Merge into global delete
+export const removeOneMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "modifiedOn">) => {
     try {
         const proposedDelete = await Media.findOneAndDelete({ resource: media.resource, propertyId: media.propertyId, type: media.type });
         if (!proposedDelete) {
