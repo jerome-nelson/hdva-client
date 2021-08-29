@@ -21,40 +21,40 @@ export const SideNav: React.FC = () => {
                 <KeyboardArrowRightIcon />
             </div> */}
             {/* <Slide direction="right" in={showMenu}> */}
-                <Drawer
-                    variant="persistent"
-                    anchor="left"
-                    open={true}
-                >
+            <Drawer
+                variant="persistent"
+                anchor="left"
+                open={true}
+            >
 
-                    {/* <div onClick={() => toggleMenu(!showMenu)}>
+                {/* <div onClick={() => toggleMenu(!showMenu)}>
                         <KeyboardArrowLeftIcon />
                     </div> */}
-                    <Grid className={classes.nav} container>
-                        <Grid item xs={12}>
-                            <a href="/" className={classes.logo}>
-                                <LogoSVG />
-                            </a>
-                        </Grid>
+                <Grid className={classes.nav} container>
+                    <Grid item xs={12}>
+                        <a href="/" className={classes.logo}>
+                            <LogoSVG />
+                        </a>
                     </Grid>
-                    <List className={classes.root}>
-                        {/* TODO: Why did I map this? */}
-                        {[{
-                            ...ROUTES[0],
-                            name: "Home"
-                        }].map((text, index) => {
-                            return (
-                                <ListItem className={classNames({
-                                    [classes.listBtn]: true,
-                                    [classes.selectedBtn]: location.pathname === text.props.path
-                                })} disabled={location.pathname === text.props.path} onClick={() => history.push(text.props.path)} button key={uuidv4()}>
-                                    <ListItemText className={classes.home} primary={text.name} />
-                                </ListItem>
-                            );
-                        })}
-                        <Settings variant="light" />
-                    </List>
-                </Drawer>
+                </Grid>
+                <List className={classes.root}>
+                    {/* TODO: Why did I map this? */}
+                    {[{
+                        ...ROUTES[0],
+                        name: "Home"
+                    }].map((text, index) => {
+                        return (
+                            <ListItem className={classNames({
+                                [classes.listBtn]: true,
+                                [classes.selectedBtn]: location.pathname === text.props.path
+                            })} disabled={location.pathname === text.props.path} onClick={() => history.push(text.props.path)} button key={uuidv4()}>
+                                <ListItemText className={classes.home} primary={text.name} />
+                            </ListItem>
+                        );
+                    })}
+                    <Settings variant="light" />
+                </List>
+            </Drawer>
             {/* </Slide> */}
         </React.Fragment>
     );
