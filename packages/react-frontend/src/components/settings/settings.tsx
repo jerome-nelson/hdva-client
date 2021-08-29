@@ -1,11 +1,13 @@
 import { List, ListItem, ListItemText, ListSubheader } from "@material-ui/core";
 import classNames from "classnames";
+import { messages } from "config/en";
 import { Roles } from "hooks/useRoles";
-import React from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Permissions } from "utils/permissions";
 import { logout } from "../../services/auth.service";
 import { useSettingsStyles } from "./settings.style";
+
 
 // TODO: Add logout to login.context
 
@@ -19,9 +21,16 @@ export const Settings: React.SFC<SettingsProps> = ({ variant }) => {
     const location = useLocation();
     const classes = useSettingsStyles({ variant });
     const history = useHistory();
+    const AddProperty = lazy(() => import("../../components/property/add-property"));
+    const [showPopup, setPopup] = useState(false);
 
     return (
         <React.Fragment>
+            <Suspense fallback={false}>
+                <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
+                    {showPopup && <AddProperty onClose={() => setPopup(() => !showPopup)} />}
+                </Permissions>
+            </Suspense>
             <List
                 component="nav"
                 aria-labelledby="nested-list-subheader"
@@ -53,10 +62,25 @@ export const Settings: React.SFC<SettingsProps> = ({ variant }) => {
                     subheader={
                         <ListSubheader className={classes.listHeader} component="div" id="nested-list-subheader">
                             Management Settings
-                    </ListSubheader>
+                        </ListSubheader>
                     }
                     className={classes.root}
                 >
+                    <ListItem
+                        className={classNames({
+                            [classes.listBtn]: variant === "light",
+                            [classes.selectedBtn]: showPopup
+                        })}
+                        button
+                        disabled={showPopup}
+                        onClick={() => setPopup(() => !showPopup)}
+                    >
+                        <ListItemText
+                            classes={{
+                                root: classes.listItem
+                            }}
+                            primary={messages["upload.button.cta"]} />
+                    </ListItem>
                     <ListItem
                         className={classNames({
                             [classes.listBtn]: variant === "light",
