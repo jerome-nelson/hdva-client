@@ -92,10 +92,10 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
         groupId: "",
         roleId: "",
     });
+
     const noOfFields = Object.keys(details);
     const notAllFieldsFilled = noOfFields.filter(elem => elem !== "lastName" && !!details[elem]).length !== noOfFields.length - 1;
     const classes = useUserStyles();
-    const name = !!details.firstName || !!details.lastName ? `${details.firstName} ${details.lastName}` : "";
     const { user } = useContext(LoginContext);
     const { data: groupData, isLoading: groupsLoading } = useQuery({
         queryKey: "groups",
@@ -110,13 +110,13 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
         enabled: Boolean(user?.token)
     });
 
-    const { data: registration, refetch, isLoading: registrationLoading, isSuccess } = useQuery({
+    const { refetch, isLoading: registrationLoading, isSuccess } = useQuery({
         queryKey: [`register`],
         queryFn: () => postAPI<User>(
             '/register',
             {
                 group: details.groupId,
-                name: name,
+                name: details.name,
                 role: details.roleId,
                 email: details.username,
                 password: details.password,
@@ -155,14 +155,12 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
         }}>
             <div className={classes.inputMargin} >
                 <UserInput
-                    value={name}
+                    value={details.name}
                     placeholder={messages["user.form.name"]}
-                    onUpdate={name => {
-                        const names = name.trim().split(" ");
+                    onUpdate={proposedName => {
                         setDetails({
                             ...details,
-                            firstName: names[0],
-                            lastName: names[1] || ""
+                            name: proposedName.trimStart(),
                         });
                     }}
                 />
@@ -296,10 +294,8 @@ const UserList: React.FC<UserListProps> = ({ onEdit, isFetching, isEmpty, userDa
                                     (group: Groups) => String(user.group) === String(group.groupId))[0].name || "No Group")} />
                                 <CTAButton
                                     onClick={() => {
-                                        const names = user.name.split(" ");
                                         onEdit({
-                                            firstName: names[0],
-                                            lastName: names[1] || "",
+                                            name: user.name,
                                             groupId: user.group,
                                             roleId: user.role,
                                             username: user.email,
