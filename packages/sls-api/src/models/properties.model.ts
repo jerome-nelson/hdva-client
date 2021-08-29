@@ -1,4 +1,5 @@
 import mongoose, { Model } from "mongoose";
+import { removeMedia } from "./media.model";
 interface PropertiesModel {
     createdOn: Date;
     modifiedOn: Date;
@@ -163,6 +164,8 @@ export const getProperties = async ({ filter, pids, gid, offset, limit }: { filt
 
 export const deleteProperties = async ({ pids }: { pids: number[] }) => {
     try {
+        
+        const media = await removeMedia({ propertyIds: pids });
         const result = await Properties.deleteMany({
             propertyId: {
                 $in: pids

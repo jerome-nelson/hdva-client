@@ -1,7 +1,7 @@
 import { APIGatewayProxyResult, APIGatewayRequestAuthorizerEvent } from "aws-lambda";
 import querystring from "querystring";
 import { ERROR_MSGS } from "../../config/messages";
-import { addMedia, removeMedia } from "../../models/media.model";
+import { addMedia, removeOneMedia } from "../../models/media.model";
 import { getProperties } from "../../models/properties.model";
 import { UserModel } from "../../models/user.model";
 import { startMongoConn } from "../../utils/db";
@@ -30,7 +30,7 @@ export const CRUDMedia = async (event: APIGatewayRequestAuthorizerEvent & { body
       if (action === "add") {
         result = await addMedia(entries);
       } else if ( action === "delete" ) {
-        await removeMedia(entries);
+        await removeOneMedia(entries);
   
         const properties = await getProperties({
           pids: [entries.propertyId]
