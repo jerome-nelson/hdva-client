@@ -136,16 +136,34 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
             },
             download: {
                 data: (
-                    <Button onClick={() => {
-                        if (!onEdit) return;
-                        onEdit({
-                            name: el.name,
-                            propertyId: el.propertyId,
-                            groupId: el.groupId
-                        })
-                    }} size="small" variant="outlined" color="secondary">
-                        Edit Uploads
-                    </Button>
+                    <Grid container spacing={1}>
+                        <Grid item>
+                            <Button onClick={() => {
+                                if (!onEdit) return;
+                                onEdit({
+                                    name: el.name,
+                                    propertyId: el.propertyId,
+                                    groupId: el.groupId
+                                })
+                            }} size="small" variant="outlined" color="secondary">
+                                Edit Uploads
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <Button onClick={async () => {
+                                try {
+                                    const deleted = await postAPI(`/properties/delete`, { pids: [el.propertyId] }, { token: user!.token });
+                                    results[0].refetch();
+                                    results[1].refetch();
+                                } catch (e) {
+                                    console.log(e);
+                                    alert("Delete Failed");
+                                }
+                            }} size="small" variant="outlined" color="secondary">
+                                Delete Property
+                            </Button>
+                        </Grid>
+                    </Grid>
                 )
             }
         }));
@@ -386,7 +404,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
                                             eventAction: "Download Property",
                                             eventLabel: name
                                         });
-    
+
                                         const zip = await postAPI<any>('/generate-download', {
                                             pid: [id],
                                         }, {
