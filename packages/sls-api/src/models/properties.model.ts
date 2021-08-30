@@ -171,7 +171,7 @@ export const deleteProperties = async ({ pids }: { pids: number[] }) => {
                 $in: pids
             }
         });
-        return { deleted: result }
+        return { deleted: true }
     } catch (e) {
         throw e;
     }
