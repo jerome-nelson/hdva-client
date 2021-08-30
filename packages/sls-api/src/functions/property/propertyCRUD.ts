@@ -46,7 +46,7 @@ export const propertyCRUD = async (event: APIGatewayRequestAuthorizerEvent & { b
       }
   
       else if (action === "delete") {
-        const { pids } = body;
+        const { pids } = querystring.parse(body) as any;
         if (!pids || !pids.length) {
           throw new BadRequest(ERROR_MSGS.NO_ID);
         }
@@ -56,6 +56,7 @@ export const propertyCRUD = async (event: APIGatewayRequestAuthorizerEvent & { b
       }
       return createResponse(result);
     } catch (e) {
+      console.log(e.message);
       return createErrorResponse(e);
     }
   }
