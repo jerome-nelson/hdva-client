@@ -1,8 +1,8 @@
 import { Context } from "aws-lambda";
 import querystring from "querystring";
-import { loginUserWithPassword } from "../models/user.model";
-import { startMongoConn } from "../utils/db";
-import { createErrorResponse, createResponse } from "../utils/responses";
+import { loginUserWithPassword } from "../../models/user.model";
+import { startMongoConn } from "../../utils/db";
+import { createErrorResponse, createResponse } from "../../utils/responses";
 
 export const login = async (event: any, context: Context) => {
     context.callbackWaitsForEmptyEventLoop = false;
