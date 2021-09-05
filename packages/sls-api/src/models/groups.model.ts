@@ -47,8 +47,10 @@ const GroupsSchema = new mongoose.Schema({
 export const Groups: Model<MongoGroupsDocument> = mongoose.model<MongoGroupsDocument, Model<MongoGroupsDocument>>('Groups', GroupsSchema);
 export const addGroup = async (groups: Omit<GroupsModel, "_id" | "createdOn" | "modifiedOn">[]) => {
     const currentTime = new Date().toDateString();
-    const groupsToAdd = groups.map(group => ({
+    const lastId = (await Groups.find({}).sort({_id: -1}).limit(1))[0].groupId;
+    const groupsToAdd = groups.map((group, index) => ({
         ...group,
+        groupId: lastId + (index + 1),
         createdOn: currentTime,
         modifiedOn: currentTime
     }));

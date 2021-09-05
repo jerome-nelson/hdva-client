@@ -165,8 +165,8 @@ export const getProperties = async ({ filter, pids, gid, offset, limit }: { filt
 export const deleteProperties = async ({ pids }: { pids: number[] }) => {
     try {
         
-        const media = await removeMedia({ propertyIds: pids });
-        const result = await Properties.deleteMany({
+       await removeMedia({ propertyIds: pids });
+       await Properties.deleteMany({
             propertyId: {
                 $in: pids
             }

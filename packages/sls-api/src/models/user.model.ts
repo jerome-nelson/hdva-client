@@ -15,7 +15,6 @@ export interface UserModel {
     password: string;
     role: number;
     userId: string;
-    _id: string;
 }
 
 type MongoUserDocument = UserModel & mongoose.Document;
@@ -30,6 +29,12 @@ export interface MongoUserModel extends Model<MongoUserDocument> {
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
+        required: true,
+        trim: true,
+    },
+    username: {
+        type: String,
+        unique: true,
         required: true,
         trim: true,
     },
@@ -70,14 +75,24 @@ const UserSchema = new mongoose.Schema({
     userId: String,
 });
 
-UserSchema.statics.userExists = async function (email: string) {
-    const user = this.findOne({ email: email.toLowerCase() });
+UserSchema.statics.userExists = async function (userOrEmail: string) {
+    const user = this.findOne({
+        $or: [
+            { email: userOrEmail.toLowerCase() },
+            { username: userOrEmail }
+        ]
+    });
     return user;
 }
 
-UserSchema.statics.comparePass = async function (email: string, password: string) {
+UserSchema.statics.comparePass = async function (userOrEmail: string, password: string) {
 
-    const user = await this.findOne({ email: email.toLowerCase() });
+    const user = await this.findOne({
+        $or: [
+            { email: userOrEmail.toLowerCase() },
+            { username: userOrEmail }
+        ]
+    });
     if (!user) {
         return false;
     }
@@ -119,17 +134,21 @@ const jwtSign = (params: string | Buffer | object) => {
     );
 }
 
-export const loginUserWithPassword = async (username: string, password: string) => {
-    if (!username || !password) {
+export const loginUserWithPassword = async (usernameOrEmail: string, password: string) => {
+    if (!usernameOrEmail || !password) {
         throw new BadRequest(ERROR_MSGS.NO_POST_BODY);
     }
 
-    const email = username.toLowerCase();
-    if (!await User.comparePass(email, password)) {
+    if (!await User.comparePass(usernameOrEmail, password)) {
         throw new BadRequest(ERROR_MSGS.USER_CREDENTIALS_FAIL);
     }
 
-    const item = await User.findOne({ email: email });
+    const item = await User.findOne({ 
+        $or: [
+            { email: usernameOrEmail.toLowerCase() },
+            { username: usernameOrEmail }
+        ]
+     });
     const userToken = JSON.parse(JSON.stringify(item));
     const token = jwtSign(userToken);
 
@@ -172,7 +191,8 @@ export const getCurrentUser = async (email: string) => {
             "role": 1,
             "group": 1,
             "email": 1,
-            "name": 1
+            "name": 1,
+            "username": 1
         });
         return [result];
     } catch (e) {
@@ -180,7 +200,7 @@ export const getCurrentUser = async (email: string) => {
     }
 }
 
-export const findUsers = async ({ currentUserId, userSearch, groupId, offset, limit } : { currentUserId: string, userSearch?: string, groupId?: number, offset?: number, limit?: number }) => {
+export const findUsers = async ({ currentUserId, userSearch, groupId, offset, limit }: { currentUserId: string, userSearch?: string, groupId?: number, offset?: number, limit?: number }) => {
     // TODO: Type correctly
     const sort = {
         _id: -1,
@@ -195,6 +215,10 @@ export const findUsers = async ({ currentUserId, userSearch, groupId, offset, li
         name: {
             $regex: userSearch,
             $options: "i"
+        },
+        username: {
+            $regex: userSearch,
+            $options: "i",
         },
         email: {
             $regex: userSearch,
@@ -214,7 +238,8 @@ export const findUsers = async ({ currentUserId, userSearch, groupId, offset, li
             "role": 1,
             "group": 1,
             "email": 1,
-            "name": 1
+            "name": 1,
+            "username": 1
         }, sort);
     } catch (e) {
         throw e;
@@ -224,6 +249,10 @@ export const findUsers = async ({ currentUserId, userSearch, groupId, offset, li
 export const getUserCount = async ({ filter, groupId }: { filter?: string, groupId?: number }) => {
     const textSearch: any = !!filter && String(filter) ? {
         name: {
+            $regex: filter,
+            $options: "i"
+        },
+        username: {
             $regex: filter,
             $options: "i"
         },

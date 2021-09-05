@@ -1,8 +1,8 @@
 import { APIGatewayProxyResult, Context } from "aws-lambda";
 import querystring from "querystring";
-import { createOrEditUser } from "../models/user.model";
-import { startMongoConn } from "../utils/db";
-import { createErrorResponse, createResponse } from "../utils/responses";
+import { createOrEditUser } from "../../models/user.model";
+import { startMongoConn } from "../../utils/db";
+import { createErrorResponse, createResponse } from "../../utils/responses";
 
 export const register = async (event: any, context: Context): Promise<APIGatewayProxyResult> => {
     context.callbackWaitsForEmptyEventLoop = false;
@@ -12,6 +12,7 @@ export const register = async (event: any, context: Context): Promise<APIGateway
       const data = await createOrEditUser({
         group: params.group,
         name: params.name,
+        username: params.username,
         role: params.role,
         email: params.email,
         password: params.password

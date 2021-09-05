@@ -2,12 +2,10 @@ import { APIGatewayProxyResult, APIGatewayRequestAuthorizerEvent } from "aws-lam
 import querystring from "querystring";
 import { ERROR_MSGS } from "../../config/messages";
 import { addMedia, removeOneMedia } from "../../models/media.model";
-import { getProperties } from "../../models/properties.model";
 import { UserModel } from "../../models/user.model";
 import { startMongoConn } from "../../utils/db";
 import { BadRequest } from "../../utils/error";
 import { createErrorResponse, createResponse } from "../../utils/responses";
-import { deleteFromBucket } from "./uploads";
 
 export const CRUDMedia = async (event: APIGatewayRequestAuthorizerEvent & { body: any }): Promise<APIGatewayProxyResult> => {
     const { body } = event;
@@ -32,17 +30,20 @@ export const CRUDMedia = async (event: APIGatewayRequestAuthorizerEvent & { body
       } else if ( action === "delete" ) {
         await removeOneMedia(entries);
   
-        const properties = await getProperties({
-          pids: [entries.propertyId]
-        });
+        // TODO: (Maybe) Integrate Bucket Deletion
+        // const properties = await getProperties({
+        //   pids: [entries.propertyId]
+        // });
   
-        const folder = properties[0].folder;
-        await deleteFromBucket(`${folder}/${entries.resource}`);
+        // const folder = properties[0].folder;
+        // console.log(folder);
+        // await deleteFromBucket(`${folder}/${entries.resource}`);
       }
   
       return createResponse(result);
   
     } catch (e) {
+      console.log(e);
       return createErrorResponse(e);
     }
   }
