@@ -78,12 +78,14 @@ interface UploadPanelProps {
     onUpload(
         files: any[]
     ): void;
+    onVT(link: string): void;
 }
 
-export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete, onUpload }) => {
+export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete, onUpload, onVT }) => {
     const { user } = useContext(LoginContext);
     const classes = useUploadPanelStyles();
     const [mediaFiles, setFileList] = useState<any[]>([]);
+    const [fileUploads, setFileUploads] = useState<any[]>([]);
     const results = useQueries([
         {
             queryKey: [`media`, user!.group, existingData?.propertyId],
@@ -135,6 +137,11 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete
                     type
                 })
                 );
+            
+            const link = mediaResults.find(elem => elem.type === "vt");
+            if (link) {
+                onVT(link.resource);
+            }    
 
             setFileList(data);
         }
@@ -169,12 +176,21 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({ existingData, onDelete
                                     }));
                                     const newSet = mediaFiles.concat(transformed);
                                     setFileList(newSet);
-                                    onUpload(uploadedFiles);
+                                    setFileUploads([
+                                        ...fileUploads,
+                                        ...uploadedFiles,
+                                    ]);
+                                    onUpload([
+                                        ...fileUploads,
+                                        ...uploadedFiles,
+                                    ]);
                                 }}
                                 onRemove={(removed: any) => {
                                     const newFiles = mediaFiles.filter( elem => elem.name !== removed.name);
+                                    const newUploads = fileUploads.filter( elem => elem.name !== removed.name);
                                     const removedFile = mediaFiles.filter( elem => elem.name === removed.name);
                                     setFileList(newFiles);
+                                    setFileUploads(newUploads);
                                     onDelete(removedFile[0]);
                                 }}
                             >
@@ -224,6 +240,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
 
         setGroups(groupData);
     }, [groupData]);
+
 
     useEffect(() => {
         const shouldShow = (images.length > 0 && !!groupId);
@@ -306,6 +323,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                             </Grid>
                             <UploadPanel
                                 existingData={existingProperty}
+                                onVT={setVTLink}
                                 onDelete={async (file) => {
                                     try {
                                         await postAPI<string>('/media/delete', {
@@ -333,8 +351,11 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                             id="vt"
                                             type="text"
                                             value={vtLink}
-                                            onChange={event => setVTLink(event.target.value)}
-                                        />
+                                            onChange={event => {
+                                                setVTLink(event.target.value);
+                                                setDisabledUpload(false);
+                                            }}
+                                        />  
                                     </Grid>
                                     <Grid xs={10} item className={classes.groupSection}>
                                         <Select
@@ -342,6 +363,7 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                             value={groupId}
                                             onChange={({ target }) => {
                                                 setGroupId(target.value as string);
+                                                setDisabledUpload(false);
                                             }}
                                             input={<BootstrapInput />}
                                             IconComponent={ExpandMoreIcon}
@@ -417,6 +439,16 @@ export const AddProperty: React.FC<AddPropertyProps> = ({ onClose }) => {
                                                 await postAPI<any>('/media/add', {
                                                     resource: images[i].file.name,
                                                     type: images[i].resourceType,
+                                                    propertyId: !!existingProperty?.propertyId ? existingProperty?.propertyId : propertiesResponse[0].propertyId
+                                                }, {
+                                                    token: user!.token
+                                                });
+                                            }
+
+                                            if (vtLink) {
+                                                await postAPI<any>('/media/add', {
+                                                    resource: vtLink,
+                                                    type: 'vt',
                                                     propertyId: !!existingProperty?.propertyId ? existingProperty?.propertyId : propertiesResponse[0].propertyId
                                                 }, {
                                                     token: user!.token

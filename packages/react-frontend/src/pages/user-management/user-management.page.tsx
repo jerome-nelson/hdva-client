@@ -20,6 +20,7 @@ import { messages } from "../../config/en";
 import { useUserStyles } from "./user-management.page.style";
 
 interface UserInputProps {
+    showIcon?: boolean;
     placeholder: string;
     value: string;
     onUpdate(value: string): void;
@@ -64,7 +65,7 @@ export const PaperReplacement: React.FC<PaperReplacementProps> = ({ children, ti
 
 
 // TODO: make generic component
-const UserInput: React.FC<UserInputProps> = ({ placeholder, children, value, onUpdate }) => {
+const UserInput: React.FC<UserInputProps> = ({ showIcon, placeholder, children, value, onUpdate }) => {
     return (
         <OutlinedInput
             fullWidth
@@ -75,7 +76,7 @@ const UserInput: React.FC<UserInputProps> = ({ placeholder, children, value, onU
                 onUpdate(target.value);
             }}
             endAdornment={
-                <InputAdornment position="end">
+                showIcon && <InputAdornment position="end">
                     <SearchIcon />
                 </InputAdornment>
             }
@@ -86,15 +87,15 @@ const UserInput: React.FC<UserInputProps> = ({ placeholder, children, value, onU
 const UserForm: React.FC<any> = ({ existingUser }) => {
     const [details, setDetails] = useState<{ [key: string]: string }>({
         username: "",
+        email: "",
         password: "",
-        firstName: "",
-        lastName: "",
+        name: "",
         groupId: "",
         roleId: "",
     });
 
     const noOfFields = Object.keys(details);
-    const notAllFieldsFilled = noOfFields.filter(elem => elem !== "lastName" && !!details[elem]).length !== noOfFields.length - 1;
+    const notAllFieldsFilled = noOfFields.filter(elem => !!details[elem]).length < noOfFields.length;
     const classes = useUserStyles();
     const { user } = useContext(LoginContext);
     const { data: groupData, isLoading: groupsLoading } = useQuery({
@@ -117,8 +118,9 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
             {
                 group: details.groupId,
                 name: details.name,
+                username: details.username,
                 role: details.roleId,
-                email: details.username,
+                email: details.email,
                 password: details.password,
             }, {
             token: user!.token
@@ -138,10 +140,10 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
     useEffect(() => {
         if (isSuccess) {
             setDetails({
+                email: "",
                 username: "",
                 password: "",
-                firstName: "",
-                lastName: "",
+                name: "",
                 groupId: "",
                 roleId: ""
             });
@@ -162,6 +164,18 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
                             ...details,
                             name: proposedName.trimStart(),
                         });
+                    }}
+                />
+            </div>
+            <div className={classes.inputMargin} >
+                <UserInput
+                    value={details.email}
+                    placeholder={messages["user.form.email"]}
+                    onUpdate={email => {
+                        setDetails({
+                            ...details,
+                            email
+                        })
                     }}
                 />
             </div>
@@ -235,7 +249,7 @@ const UserForm: React.FC<any> = ({ existingUser }) => {
                 variant="contained"
                 color="secondary"
             >
-                {(notAllFieldsFilled ? "Fill in all fields" : "Update user")}
+                {(notAllFieldsFilled ? "Fill in all fields" : "Add/Update user")}
             </CTAButton>
 
         </form>
@@ -418,7 +432,7 @@ const UserPage: React.FC = () => {
                             <Typography gutterBottom variant="h6" component="h6">Search user pages</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <UserInput value={searchTerm} onUpdate={setSearchTerm} placeholder="Search for a user">
+                            <UserInput showIcon value={searchTerm} onUpdate={setSearchTerm} placeholder="Search for a user">
                                 <SearchIcon color="secondary" />
                             </UserInput>
                         </Grid>
