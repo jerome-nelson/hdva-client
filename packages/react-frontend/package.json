@@ -74,5 +74,8 @@
     "start": "react-scripts start",
     "test": "react-scripts test"
   },
-  "version": "0.2.1"
+  "version": "0.2.1",
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
+  }
 }
