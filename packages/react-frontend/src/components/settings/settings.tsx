@@ -1,8 +1,9 @@
 import { List, ListItem, ListItemText, ListSubheader } from "@material-ui/core";
 import classNames from "classnames";
+import { FileContext, FileUpload, FileUploadRef, UPLOAD_STATE } from "components/upload/upload.context";
 import { messages } from "config/en";
 import { Roles } from "hooks/useRoles";
-import React, { lazy, Suspense, useState } from "react";
+import React, { useContext } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Permissions } from "utils/permissions";
 import { logout } from "../../services/auth.service";
@@ -16,21 +17,21 @@ export interface SettingsProps {
     variant?: "light" | "dark";
 }
 
-export const Settings: React.SFC<SettingsProps> = ({ variant }) => {
-
+export const Settings: React.FC<SettingsProps> = ({ variant }) => {
     const location = useLocation();
+    const fileContext = useContext(FileContext);
     const classes = useSettingsStyles({ variant });
     const history = useHistory();
-    const AddProperty = lazy(() => import("../../components/property/add-property"));
-    const [showPopup, setPopup] = useState(false);
+    // const UploadPopup = lazy(() => import("../../components/upload/upload-popup"));
 
     return (
         <React.Fragment>
-            <Suspense fallback={false}>
+           <FileUpload />
+            {/* <Suspense fallback={false}>
                 <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
-                    {showPopup && <AddProperty onClose={() => setPopup(() => !showPopup)} />}
+                    {showPopup && <UploadPopup />}
                 </Permissions>
-            </Suspense>
+            </Suspense> */}
             <List
                 component="nav"
                 aria-labelledby="nested-list-subheader"
@@ -69,11 +70,14 @@ export const Settings: React.SFC<SettingsProps> = ({ variant }) => {
                     <ListItem
                         className={classNames({
                             [classes.listBtn]: variant === "light",
-                            [classes.selectedBtn]: showPopup
                         })}
+                        disabled={fileContext.status !== UPLOAD_STATE.READY}
                         button
-                        disabled={showPopup}
-                        onClick={() => setPopup(() => !showPopup)}
+                        onClick={() => {
+                            if (FileUploadRef?.current) {
+                                FileUploadRef?.current.click();
+                            }
+                        }}
                     >
                         <ListItemText
                             classes={{
