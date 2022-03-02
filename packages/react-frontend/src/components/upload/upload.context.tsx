@@ -113,7 +113,7 @@ export const MiniFileUpload: React.FC<{ name: string; count: number; onClick?():
                         {status === UPLOAD_STATE.FINISHED && `Uploaded`}
                         {status === UPLOAD_STATE.FAILED && `Failed`}
                     </Grid>
-                    {count && status === UPLOAD_STATE.IN_PROGRESS && name && (
+                    {count && status === UPLOAD_STATE.IN_PROGRESS && name  && (
                         <Grid item>
                             <button className={classes.btn} onClick={onClick}>{btnText}</button>
                         </Grid>
