@@ -15,9 +15,7 @@ export enum UPLOAD_STATE {
 }
 
 export type FileMap = {
-    name: string;
-    size: number;
-    type: string;
+    file: File;
     folder: string;
 }
 
@@ -54,16 +52,13 @@ export const FileUpload: React.FC = () => {
                 return;
             }
 
-            const mapped = Array.from(target.files)
-                .map((file) => ({
-                    name: file.name,
-                    type: file.type,
-                    size: file.size,
-                    folder: (file as any).webkitRelativePath.replace(file.name, '')
-                }));
+            const mapped = Array.from(target.files).map((file) => ({
+                file: file,
+                folder: (file as any).webkitRelativePath.replace(file.name, '')
+            }));
 
-            const skipped = mapped.filter(file => !ALLOWED_IMAGES.includes(file.type));
-            const data = mapped.filter(file => ALLOWED_IMAGES.includes(file.type));
+            const skipped = mapped.filter(({ file }) => !ALLOWED_IMAGES.includes(file.type));
+            const data = mapped.filter(({ file }) => ALLOWED_IMAGES.includes(file.type));
 
             if (skipped.length > 0) {
                 fileContext.setSkippedFiles(skipped);
@@ -132,28 +127,28 @@ export const MiniFileUpload: React.FC<{ name: string; count: number; onClick?():
 
 export const processFile = async (file: FileMap, token: string, propertyId: string): Promise<boolean | Error> => {
     try {
-            const url = await postAPI<string>('/images/upload', {
-                type: file.type,
-                path: `${file.folder}${file.name}`
-            }, {
-                token
-            });
-            await putAPI<any>(url as unknown as string, file.name, {
-                extUrl: true,
-                extraHeaders: {
-                    "Content-Type": file.type
-                }
-            });
-            const subfolder = file.folder.split(/\/(.+)/);
-            const rootFile = subfolder.length > 1 ? subfolder[1] : ''; 
-            console.log(rootFile, subfolder, file.folder);
-            await postAPI<any>('/media/add', {
-                resource: `${rootFile}${file.name}`,
-                type: "image",
-                propertyId
-            }, {
-                token
-            });
+        const url = await postAPI<string>('/images/upload', {
+            type: file.file.type,
+            path: `${file.folder}${file.file.name}`
+        }, {
+            token
+        });
+        await putAPI<any>(url as unknown as string, file.file, {
+            extUrl: true,
+            extraHeaders: {
+                "Content-Type": file.file.type
+            }
+        });
+        const subfolder = file.folder.split(/\/(.+)/);
+        const rootFile = subfolder.length > 1 ? subfolder[1] : '';
+        console.log(rootFile, subfolder, file.folder);
+        await postAPI<any>('/media/add', {
+            resource: `${rootFile}${file.file.name}`,
+            type: "image",
+            propertyId
+        }, {
+            token
+        });
         return true;
     } catch (e) {
         console.log(e);
