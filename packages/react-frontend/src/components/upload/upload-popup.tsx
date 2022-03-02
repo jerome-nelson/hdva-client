@@ -79,10 +79,10 @@ const UploadTable: React.FC<{
                 data: <FileIcon />,
             },
             name: {
-                data: upload.name,
+                data: upload.file.name,
             },
             size: {
-                data: `${bytesToSize(upload.size)}`,
+                data: `${bytesToSize(upload.file.size)}`,
             },
             folder: {
                 data: upload.folder
@@ -208,7 +208,7 @@ const UploadPopup: React.FC<IUploadDetails> = ({ onCurrent, currentGroup = "", f
                         onUpload={nextId => {
                             const next = internalFileState[nextId];
                             setProcessing({
-                                name: next.name,
+                                name: next.file.name,
                                 index: nextId
                             })
                         }}

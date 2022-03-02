@@ -99,7 +99,7 @@ export const getZip = async (event: any, context: Context) => {
                 Key: fileKey
             }).createReadStream();
             archive.append(objectData, {
-                name:  `${fileKey.split('/').pop()}`,
+                name:  `${fileKey.replace(`properties/${results.property[0].name}/`, "")}`,
             });
         }
         archive.finalize();
