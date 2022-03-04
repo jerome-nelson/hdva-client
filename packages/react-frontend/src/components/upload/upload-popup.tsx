@@ -1,4 +1,4 @@
-import { CircularProgress, createStyles, IconButton, makeStyles, MenuItem, Select, Theme } from "@material-ui/core";
+import { CircularProgress, createStyles, IconButton, makeStyles, MenuItem, OutlinedInput, Select, Theme } from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import classNames from "classnames";
 import { BootstrapInput } from "components/input-bootstrap/bootstrap.input";
@@ -38,6 +38,9 @@ export const useTableStyles = makeStyles<Theme>((theme) => createStyles({
         opacity: 0.3,
         cursor: "hand",
     },
+    vtField: {
+        marginBottom: `${theme.spacing(1.5)}px`
+    },
     iconBtn: {
         color: COLOR_OVERRIDES.hdva_grey,
         "&:hover": {
@@ -54,6 +57,12 @@ const FileIcon = React.lazy(() => import('@material-ui/icons/Image'));
 let called = false;
 // <CircularProgress size="1rem" color="primary" />
 
+interface UploadDetails {
+    group: string;
+    link?: string;
+    property?: string;
+}
+
 const UploadTable: React.FC<{
     currentGroup?: string;
     isReady(groupId: string): void;
@@ -67,11 +76,13 @@ const UploadTable: React.FC<{
         queryKey: "groups",
         queryFn: () => getAPI<Groups>(`/groups`, { token: user!.token })
     });
-    const [details, setDetails] = useState({
+    const [details, setDetails] = useState<UploadDetails>({
         group: currentGroup,
-        property: ""
+        property: "",
+        link: ""
     });
     const [uploading, setStatus] = useState(false);
+    const fileContext = useContext(FileContext);
     const classes = useTableStyles();
     const cells = useMemo(() => {
         return files.map((upload, index) => ({
@@ -101,6 +112,16 @@ const UploadTable: React.FC<{
         }))
     }, [files]);
 
+    useEffect(() => {
+        if(isReady && !!details.group) {
+            isReady(details.group);
+            setStatus(true);
+        }
+        if (details.link) {
+            fileContext.setVTLink(details.link);
+        }
+    }, [details]);
+
     return (
         <Suspense fallback={<CircularProgress color="secondary" />}>
             {!isLoading && (
@@ -119,15 +140,27 @@ const UploadTable: React.FC<{
                                         group: String(target.value)
                                     }
                                 });
-
-                                if(isReady) {
-                                    isReady(String(target.value));
-                                    setStatus(true);
-                                }
                             }}
                         >
                             {(groupData || []).map((val: any, index: number) => (<MenuItem key={`${val}-${index}`} value={val.groupId}>{val.name}</MenuItem>))}
                         </Select>
+                        <OutlinedInput
+                            color="secondary"
+                            className={classes.vtField}
+                            fullWidth
+                            placeholder="Add Virtual Tour Link here (optional)"
+                            id="virtual_tour"
+                            type="text"
+                            value={details.link}
+                            onChange={({ target: { value }}) => {
+                                setDetails(prevState => {
+                                    return {
+                                        ...prevState,
+                                        link: value
+                                    }
+                                });
+                            }}
+                        />
                     </form>
             <GenericTable
                 className={classNames({
@@ -197,9 +230,15 @@ const UploadPopup: React.FC<IUploadDetails> = ({ onCurrent, currentGroup = "", f
                             if (!state) {
                                 return;
                             }
-                            setReady(true);
-                            setGroupId(state);
-                            fileContext.setStatus(UPLOAD_STATE.PENDING);
+                            if (!ready) {
+                                setReady(true);
+                            }
+                            if (!groupId) {
+                                setGroupId(state);
+                            }
+                            if (fileContext.status !== UPLOAD_STATE.PENDING) {
+                                fileContext.setStatus(UPLOAD_STATE.PENDING);
+                            }
                         }}
                         onFailure={message => {
                             fileContext.setStatus(UPLOAD_STATE.FAILED);

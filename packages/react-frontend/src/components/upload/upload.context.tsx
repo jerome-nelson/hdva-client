@@ -6,6 +6,12 @@ import { COLOR_OVERRIDES } from "theme";
 import { UploadIndicator } from "./upload";
 
 const ALLOWED_IMAGES = ["image/jpeg", "image/png"];
+export enum MEDIA_TYPES {
+    VIRTUAL_TOUR = 'vt',
+    FLOORPLAN = 'floorplan',
+    IMAGE = 'photo'
+};
+
 export enum UPLOAD_STATE {
     READY,
     IN_PROGRESS,
@@ -24,13 +30,17 @@ interface FileContext {
     setStatus: any;
     files: FileMap[];
     setFiles: any;
-    skippedFiles: FileMap[],
+    skippedFiles: FileMap[];
+    setVTLink: any;
+    vtLink: string;
     setSkippedFiles: any;
 }
 
 export const FileContext = React.createContext<FileContext>({
+    vtLink: "",
     status: UPLOAD_STATE.READY,
     skippedFiles: [],
+    setVTLink: null,
     setSkippedFiles: [],
     setStatus: null,
     setFiles: null,
