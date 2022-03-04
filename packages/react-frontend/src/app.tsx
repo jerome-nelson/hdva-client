@@ -2,7 +2,7 @@ import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import { Properties } from 'components/property/property-table';
 import { Popup } from 'components/upload/upload';
 import UploadPopup from 'components/upload/upload-popup';
-import { FileContext, MiniFileUpload, processFile, UPLOAD_STATE } from 'components/upload/upload.context';
+import { FileContext, MEDIA_TYPES, MiniFileUpload, processFile, UPLOAD_STATE } from 'components/upload/upload.context';
 import { postAPI } from 'hooks/useAPI';
 import { RoleTypes } from 'hooks/useRoles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -50,6 +50,7 @@ export const App = () => {
     const [skippedFiles, setSkippedFiles] = useState<any[]>([]);
     const [fileState, setFileState] = useState<any[]>([]);
     const [currentFile, setCurrentFile] = useState("");
+    const [vtLink, setVTLink] = useState("");
     const [currentGroup, setCurrentGroup] = useState("");
     const [message, setMsg] = useState("");
     const [modalChild, setModalChild] = useState<null | React.ReactNode>(null);
@@ -88,6 +89,16 @@ export const App = () => {
                             propertiesResponse[0].propertyId
                         );
                     }
+
+                    if (vtLink) {
+                        await postAPI<any>('/media/add', {
+                            resource: vtLink,
+                            type: MEDIA_TYPES.VIRTUAL_TOUR,
+                            propertyId: propertiesResponse[0].propertyId
+                        }, {
+                            token
+                        });
+                    }
                     called.current = true;
                     resetState();
                 } catch (e) {
@@ -123,6 +134,8 @@ export const App = () => {
                         <FileContext.Provider value={{
                             skippedFiles,
                             setSkippedFiles,
+                            setVTLink,
+                            vtLink,
                             status,
                             files: fileState,
                             setFiles: setFileState,
