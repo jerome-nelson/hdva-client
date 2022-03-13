@@ -41,15 +41,17 @@ interface PropertyProps {
 const getThumbnailUrl = (url: string, type: string): string => {
   let fileName = url.replace(/ /g, "+");
   const seperator = fileName.split(".");
+  console.log(fileName, seperator);
+  const [name, ext] = seperator.slice(-2);
+  let newFileName = '';
   if (type === "floorplan") {
-    fileName = `${seperator[0]}-500x350.${seperator[1]}`;
+    newFileName = `${name}-500x350.${ext}`;
   }
 
-  if (type === "photo") {
-    fileName = `${seperator[0]}-35x35.${seperator[1]}`;
+  if (type === "photo" || type === "image") {
+    newFileName = `${name}-35x35.${ext}`;
   }
-
-  return `${process.env.REACT_APP_IMG}/${fileName}`;
+  return `${process.env.REACT_APP_IMG}/${fileName.replace(`${name}.${ext}`, newFileName)}`;
 }
 
 const initialState = {
