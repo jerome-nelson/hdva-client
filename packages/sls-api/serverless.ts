@@ -18,7 +18,7 @@ const serverlessConfiguration: Serverless = {
   org: "jeromednelson",
   app: "hdva-api-app",
   service: "${env:SLS_SERVICE}",
-  frameworkVersion: '2',
+  frameworkVersion: '3',
   custom: {
     customDomains: [
       {

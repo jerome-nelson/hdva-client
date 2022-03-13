@@ -6,9 +6,16 @@ import { BadRequest, GeneralError } from "../utils/error";
 
 const _resizeImages = async (original: S3.Types.GetObjectOutput, size: number[]) => {
     try { 
+      console.log(original.Body);
         return await sharp(original.Body).resize(size[0], size[1], { fit: 'cover', position: 'center' }).toBuffer();    
     } catch (error) {
-        throw new Error(error);
+
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
+
+        throw new Error("resize: Unknown Error");
+
     } 
 }
 
