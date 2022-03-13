@@ -1,5 +1,6 @@
 import { BottomNavigation, BottomNavigationAction, Button, CircularProgress, Container, Grid, Hidden, InputAdornment, LinearProgress, OutlinedInput, Typography } from "@material-ui/core";
 import BurstModeIcon from '@material-ui/icons/BurstMode';
+import CloseIcon from '@material-ui/icons/Close';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import SearchIcon from '@material-ui/icons/Search';
@@ -11,8 +12,10 @@ import { CustomPagination } from "components/pagination/pagination";
 import { Placeholder } from "components/placeholder/placeholder";
 import { GenericTable } from "components/table/generic-table";
 import { MobileTable } from "components/table/mobile-table";
+import { Popup } from "components/upload/upload";
 import { messages } from "config/en";
 import { getAPI, getDownload, postAPI } from "hooks/useAPI";
+import { Roles } from "hooks/useRoles";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { Groups } from "pages/group-management/group-management.page";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -21,6 +24,7 @@ import { useQueries, useQuery } from "react-query";
 import { Link, useHistory } from 'react-router-dom';
 import { STYLE_OVERRIDES } from 'theme';
 import { convertToSlug } from "utils/auth";
+import { Permissions } from "utils/permissions";
 import { PropertyGTM } from "./property-gtm";
 import { useMiniTableStyles, useTableStyles } from "./property-table.style";
 
@@ -52,6 +56,7 @@ export interface PropertyMiniTableProps {
 
 export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className, color, filter, onEdit, onFetch }) => {
     const [pageNumber, setPageNumber] = useState(1);
+    const [currentProperty, setPropertyContext] = useState<Partial<Properties>>();
     const { user } = useContext(LoginContext);
     const classes = useMiniTableStyles({ filter });
     const { data: groups } = useQuery({
@@ -150,18 +155,16 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
                             </Button>
                         </Grid>
                         <Grid item>
-                            <Button onClick={async () => {
-                                try {
-                                    const deleted = await postAPI(`/properties/delete`, { pids: [el.propertyId] }, { token: user!.token });
-                                    results[0].refetch();
-                                    results[1].refetch();
-                                } catch (e) {
-                                    console.log(e);
-                                    alert("Delete Failed");
-                                }
-                            }} size="small" variant="outlined" color="secondary">
-                                Delete Property
-                            </Button>
+                            <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
+                                <Button onClick={async () => {
+                                    setPropertyContext({
+                                        name: el.name,
+                                        propertyId: el.propertyId,
+                                    });
+                                }} size="small" variant="outlined" color="secondary">
+                                    Delete Property
+                                </Button>
+                            </Permissions>
                         </Grid>
                     </Grid>
                 )
@@ -189,23 +192,45 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
     }, [propertyData, filter]);
 
     return (
-        <Grid container className={className}>
-            <Grid className={classes.root} xs={12} item>
-                {isFetching ? <LinearProgress color="secondary" /> : (
-                    isEmpty ? (
-                        <Placeholder centerVertical noMargin title="No Properties Found" subtitle="Create the Property and assign images to it">
-                            <NotInterestedIcon />
-                        </Placeholder>
-                    ) : <GenericTable color={color} data={propertyData} cells={cells} mini />
-                )}
+        <React.Fragment>
+            {currentProperty?.name && currentProperty?.propertyId && (
+                <Popup
+                    heading="Delete Folder?"
+                    description={`Are you sure you want to delete ${currentProperty.name}?`}
+                    onOk={async () => {
+                        try {
+                            await postAPI(`/properties/delete`, { pids: [currentProperty.propertyId] }, { token: user!.token });
+                            window.location.reload();
+                        } catch (e) {
+                            console.log(e);
+                            alert("Delete Failed");
+                        } finally {
+                            setPropertyContext({});
+                        }
+                    }}
+                    okText="Delete"
+                />
+            )}
+            <Grid container className={className}>
+                <Grid className={classes.root} xs={12} item>
+                    {isFetching ? <LinearProgress color="secondary" /> : (
+                        isEmpty ? (
+                            <Placeholder centerVertical noMargin title="No Properties Found" subtitle="Create the Property and assign images to it">
+                                <NotInterestedIcon />
+                            </Placeholder>
+                        ) : <GenericTable color={color} data={propertyData} cells={cells} mini />
+                    )}
+                </Grid>
             </Grid>
-        </Grid>
+        </React.Fragment>
+
     )
 }
 
 export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSearch, mini, show, showPagination, onSelect }) => {
     const [data, setData] = useState<any>([]);
     const [search, setSearch] = useState("");
+    const [currentProperty, setPropertyContext] = useState<Partial<Properties>>();
     const [loadingState, setLoadingState] = useState<Record<string, any>>({});
     const history = useHistory();
     const [pageNumber, setPageNumber] = useState(1);
@@ -391,44 +416,64 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
                             </BottomNavigation>
                         </Hidden>
                         <Hidden smDown>
-                            <CTAButton
-                                type="button"
-                                onClick={async () => {
-                                    try {
-                                        setLoadingState({
-                                            ...loadingState,
-                                            [id]: true
-                                        });
-                                        // generate-download
-                                        analytics.onAction({
-                                            eventAction: "Download Property",
-                                            eventLabel: name
-                                        });
+                            <Grid container>
+                                <Grid item xs={7}>
+                                    <CTAButton
+                                        type="button"
+                                        onClick={async () => {
+                                            try {
+                                                setLoadingState({
+                                                    ...loadingState,
+                                                    [id]: true
+                                                });
+                                                // generate-download
+                                                analytics.onAction({
+                                                    eventAction: "Download Property",
+                                                    eventLabel: name
+                                                });
 
-                                        const zip = await postAPI<any>('/generate-download', {
-                                            pid: [id],
-                                        }, {
-                                            token: user!.token
-                                        })
-                                        await getDownload(zip as unknown as string, `${convertToSlug(name)}.zip`);
-                                        setLoadingState({
-                                            ...loadingState,
-                                            [name]: false
-                                        });
-                                    } catch (e) {
-                                        setLoadingState({
-                                            ...loadingState,
-                                            [id]: false
-                                        });
-                                    }
-                                }}
-                                size="large"
-                                variant="outlined"
-                                color="primary"
-                                loading={loadingState[id]}
-                            >
-                                Download
-                    </CTAButton>
+                                                const zip = await postAPI<any>('/generate-download', {
+                                                    pid: [id],
+                                                }, {
+                                                    token: user!.token
+                                                })
+                                                await getDownload(zip as unknown as string, `${convertToSlug(name)}.zip`);
+                                                setLoadingState({
+                                                    ...loadingState,
+                                                    [name]: false
+                                                });
+                                            } catch (e) {
+                                                setLoadingState({
+                                                    ...loadingState,
+                                                    [id]: false
+                                                });
+                                            }
+                                        }}
+                                        size="large"
+                                        variant="outlined"
+                                        color="primary"
+                                        loading={loadingState[id]}
+                                    >
+                                        Download
+                                    </CTAButton>
+
+                                </Grid>
+                                <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
+                                    <Grid item xs={4}>
+                                        <CTAButton type="button"
+                                            onClick={() => {
+                                                setPropertyContext({
+                                                    name,
+                                                    propertyId: id
+                                                });
+                                            }}
+                                            size="large" variant="outlined" color="secondary">
+                                            <CloseIcon />
+                                        </CTAButton>
+                                    </Grid>
+                                </Permissions>
+                            </Grid>
+
                         </Hidden>
                     </React.Fragment>
                 )
@@ -477,6 +522,24 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
 
     return (
         <React.Fragment>
+            {currentProperty?.name && currentProperty?.propertyId && (
+                <Popup
+                    heading="Delete Folder?"
+                    description={`Are you sure you want to delete ${currentProperty.name}?`}
+                    onOk={async () => {
+                        try {
+                            await postAPI(`/properties/delete`, { pids: [currentProperty.propertyId] }, { token: user!.token });
+                            window.location.reload();
+                        } catch (e) {
+                            console.log(e);
+                            alert("Delete Failed");
+                        } finally {
+                            setPropertyContext({});
+                        }
+                    }}
+                    okText="Delete"
+                />
+            )}
             <Grid container>
                 <Grid xs={12} md={5} item className={classes.smDown}>
                     {showSearch && (

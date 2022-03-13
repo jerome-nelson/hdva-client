@@ -8,6 +8,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { CTAButton } from "components/buttons/cta";
 import { HeaderTitle } from "components/header/header";
@@ -15,12 +16,14 @@ import { LoginContext } from "components/login-form/login.context";
 import { Properties } from "components/property/property-table";
 import { GenericTable } from "components/table/generic-table";
 import { getDownload, postAPI } from "hooks/useAPI";
+import { Roles } from "hooks/useRoles";
 import { ReactComponent as FolderSVG } from "media/folder.svg";
 import { usePropertyStyles } from "pages/properties/properties.page.style";
 import React, { useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import { convertToSlug } from "utils/auth";
+import { Permissions } from "utils/permissions";
 
 export interface Media {
   createdOn: Date;
@@ -59,9 +62,9 @@ function reducer(_: Record<string, any>, action: { amount: number }) {
     amount,
     txt: "Images"
   } : {
-      amount,
-      ...initialState
-    };
+    amount,
+    ...initialState
+  };
 }
 
 const PropertiesPage: React.SFC<PropertyProps> = () => {
@@ -82,9 +85,9 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
     queryKey: [location.hash],
     queryFn: () => postAPI<Properties>('/properties', {
       filter: [propertyFilter],
-  }, {
+    }, {
       token: user!.token
-  }),
+    }),
     enabled: !location.state?.propertyId || !location.state?.propertyId
   })
   const [currentMedia] = useState<Record<string, any>>();
@@ -92,8 +95,8 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
   const [openSubmenu, setOpenSubmenu] = useState(false);
   const [vtLink, setVTLink] = useState<any>(null);
 
-  const defaultState = useMemo( () => {
-    
+  const defaultState = useMemo(() => {
+
     if (location.state?.propertyId && location.state?.propertyName) {
       return {
         propertyId: location.state.propertyId,
@@ -101,10 +104,10 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
       }
     }
 
-    if (getProperty.isError ) {
+    if (getProperty.isError) {
       return {
         propertyId: undefined,
-        propertyName: "Property Not Found" 
+        propertyName: "Property Not Found"
       }
     }
 
@@ -144,13 +147,13 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
       type: {
         data: (
           <Paper variant="outlined" square className={classes.iconBg}>
-            {errorImages[fileName] ? <BrokenImageIcon className={classes.imageIcon} color="disabled"  /> : <img onError={() => {
+            {errorImages[fileName] ? <BrokenImageIcon className={classes.imageIcon} color="disabled" /> : <img onError={() => {
               setErrorImages({
                 ...errorImages,
                 [fileName]: true
               });
-            }} 
-            src={getThumbnailUrl(`${defaultState.propertyName}/${row.resource}`, row.type)} alt={defaultState.propertyName} />}
+            }}
+              src={getThumbnailUrl(`${defaultState.propertyName}/${row.resource}`, row.type)} alt={defaultState.propertyName} />}
           </Paper>
         )
       },
@@ -162,37 +165,84 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
       },
       extra: {
         data: (
-          <a href="#" onClick={async (e) => {
-            e.preventDefault();
-            const inQueue = {
-              ...loadingStates.imageLoading,
-              [seperator[0]]: true
-            };
-            updateLoading({
-              ...loadingStates,
-              imageLoading: inQueue,
-            });
-            const image = await postAPI<string>('/image/download', {
-              path: [`${defaultState.propertyName}/${row.resource}`],
-            }, {
-              token: user!.token
-            })
-            await getDownload(image as unknown as string, row.resource);
-            const outQueue = {
-              ...loadingStates.imageLoading,
-              [seperator[0]]: false
-            };
-            updateLoading({
-              ...loadingStates,
-              imageLoading: outQueue,
-            });
-          }}>
-            {loadingStates.imageLoading[seperator[0]] ?
-              <CircularProgress size="1rem" color="secondary" />
-              :
-              <CloudDownloadOutlinedIcon />
-            }
-          </a>
+          <Grid container style={{ textAlign: "right" }}>
+            <Grid item xs={6}>
+              <a href="#" onClick={async (e) => {
+                e.preventDefault();
+                const inQueue = {
+                  ...loadingStates.imageLoading,
+                  [seperator[0]]: true
+                };
+                updateLoading({
+                  ...loadingStates,
+                  imageLoading: inQueue,
+                });
+                const image = await postAPI<string>('/image/download', {
+                  path: [`${defaultState.propertyName}/${row.resource}`],
+                }, {
+                  token: user!.token
+                })
+                await getDownload(image as unknown as string, row.resource);
+                const outQueue = {
+                  ...loadingStates.imageLoading,
+                  [seperator[0]]: false
+                };
+                updateLoading({
+                  ...loadingStates,
+                  imageLoading: outQueue,
+                });
+              }}>
+                {loadingStates.imageLoading[seperator[0]] ?
+                  <CircularProgress size="1rem" color="secondary" />
+                  :
+                  <CloudDownloadOutlinedIcon />
+                }
+              </a>
+            </Grid>
+            <Grid item xs={6}>
+              <Permissions showOn={[Roles.super, Roles.admin, Roles.uploader]}>
+                <a href="#" onClick={async (e) => {
+                  e.preventDefault();
+                  const inQueue = {
+                    ...loadingStates.imageLoading,
+                    [seperator[0]]: true
+                  };
+                  updateLoading({
+                    ...loadingStates,
+                    imageLoading: inQueue,
+                  });
+                  try {
+                    console.log(row, defaultState);
+                    await postAPI<string>('/media/delete', {
+                      type: row.type,
+                      propertyId: defaultState?.propertyId,
+                      resource: row.resource
+                    }, {
+                      token: user!.token
+                    });
+                  } catch (e) {
+                    console.log(e);
+                    alert("File Delete Error");
+                  }
+                  const outQueue = {
+                    ...loadingStates.imageLoading,
+                    [seperator[0]]: false
+                  };
+                  updateLoading({
+                    ...loadingStates,
+                    imageLoading: outQueue,
+                  });
+                  window.location.reload();
+                }}>
+                  {loadingStates.imageLoading[seperator[0]] ?
+                    <CircularProgress size="1rem" color="secondary" />
+                    :
+                    <HighlightOffIcon />
+                  }
+                </a>
+              </Permissions>
+            </Grid>
+          </Grid>
         )
       },
     }
@@ -232,7 +282,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         <Card className={classes.sidePanel} square elevation={0}>
           <Typography gutterBottom variant="h5" component="h2">
             Overview
-        </Typography>
+          </Typography>
           {currentMedia ? currentMedia.title : <Skeleton className={classes.variantBG} animation={false} variant="rect" height={20} width={400} />}
           <div className={`${classes.variantBG} ${classes.photoBG}`} />
           <Grid container className={classes.containerBtns} justify="space-between">
@@ -317,7 +367,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
               <div className={classes.inputTest}>
                 <Typography display="block" variant={"h6"} color="primary">
                   Virtual Tour Link (click to copy link)
-              </Typography>
+                </Typography>
                 <Input
 
                   disabled
@@ -349,11 +399,11 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
           <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
             <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
               <FolderSVG className={classes.icon} />
-          HDVA
-          </Link>
+              HDVA
+            </Link>
             <Link color="textSecondary" href="/properties" onClick={() => { }} className={classes.link}>
               Properties
-          </Link>
+            </Link>
             <Link color="secondary" href="/" onClick={() => { }} className={classes.link}>
               {defaultState.propertyName}
             </Link>
@@ -467,51 +517,51 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                               </CTAButton>
                             </MenuItem>
                             {vtLink && (
-                            <MenuItem>
-                              <Grid container>
-                                <Grid item xs={12}>
-                                  <Typography display="block" variant={"h6"} color="primary">
-                                    Virtual Tour Link (click to copy link)
-                              </Typography>
+                              <MenuItem>
+                                <Grid container>
+                                  <Grid item xs={12}>
+                                    <Typography display="block" variant={"h6"} color="primary">
+                                      Virtual Tour Link (click to copy link)
+                                    </Typography>
 
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Input
-                                    disabled
-                                    color="secondary"
-                                    fullWidth={true}
-                                    id="standard-adornment-password"
-                                    type='text'
-                                    value={vtLink.resource}
-                                    endAdornment={
-                                      <InputAdornment position="end">
-                                        <IconButton
-                                          onClick={() => {
-                                            navigator.clipboard.writeText(vtLink.resource);
-                                          }}
-                                        >
-                                          <FileCopyIcon color="secondary" />
-                                        </IconButton>
-                                      </InputAdornment>
-                                    }
-                                  />
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Input
+                                      disabled
+                                      color="secondary"
+                                      fullWidth={true}
+                                      id="standard-adornment-password"
+                                      type='text'
+                                      value={vtLink.resource}
+                                      endAdornment={
+                                        <InputAdornment position="end">
+                                          <IconButton
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(vtLink.resource);
+                                            }}
+                                          >
+                                            <FileCopyIcon color="secondary" />
+                                          </IconButton>
+                                        </InputAdornment>
+                                      }
+                                    />
 
+                                  </Grid>
+                                  <Grid className={classes.mobileVTTourLink} item xs={12}>
+                                    <CTAButton
+                                      type="button"
+                                      fullWidth
+                                      size="medium"
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={async () => {
+                                        window.open(vtLink.resource, '_blank');
+                                      }}>
+                                      Open Virtual Tour
+                                    </CTAButton>
+                                  </Grid>
                                 </Grid>
-                                <Grid className={classes.mobileVTTourLink} item xs={12}>
-                                  <CTAButton
-                                    type="button"
-                                    fullWidth
-                                    size="medium"
-                                    variant="contained"
-                                    color="primary"    
-                                    onClick={async () => { 
-                                      window.open(vtLink.resource,'_blank');
-                                     }}>
-                                    Open Virtual Tour
-                                </CTAButton>
-                                </Grid>
-                              </Grid>
-                            </MenuItem>)}
+                              </MenuItem>)}
                           </MenuList>
                         </ClickAwayListener>
                       </Paper>
