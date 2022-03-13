@@ -47,6 +47,9 @@
     "webpack": "^4.29.0",
     "webpack-node-externals": "^1.7.2"
   },
+  "overrides": {
+		"fs-events": "2.3.1"
+	},
   "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
   "license": "MIT"
 }
