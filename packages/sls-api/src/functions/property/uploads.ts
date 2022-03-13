@@ -1,5 +1,6 @@
 import { Context } from "aws-lambda";
 import S3 from "aws-sdk/clients/s3";
+import { basename } from "path";
 import querystring from "querystring";
 import { ALLOWED_IMAGES, BucketInstance } from "../../config/config";
 import { ERROR_MSGS } from "../../config/messages";
@@ -13,7 +14,6 @@ export const signedUrlGetObject = async (event: any, _: Context) => {
     }
 
     const { path } = querystring.parse(event.body);
-
     const req = {
       Bucket: process.env.highres_bucket_name,
       Key: `properties/${path}`,
@@ -51,9 +51,10 @@ export const signedUrlPutObject = async (event: any, _: Context) => {
       throw new BadRequest(ERROR_MSGS.CONTENT_TYPE_NOT_SET);
     }
 
+    const file = basename(`${path}`);
     const req: S3.Types.PutObjectRequest = {
       Bucket: process.env.highres_bucket_name,
-      Key: `properties/${path}`
+      Key: `properties/${String(path).replace(file, file.toLowerCase())}`
     };
 
     // TODO: Not priority - how to protect against malformed images

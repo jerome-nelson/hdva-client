@@ -49,6 +49,7 @@ export const addMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "mo
         // TODO: Accept Arrays
         const result = await Media.insertMany([{
             ...media,
+            resource: media.resource.toLowerCase(),
             propertyId: Number(media.propertyId),
             createdOn: currentTime,
             modifiedOn: currentTime
@@ -84,9 +85,7 @@ export const removeMedia = async (filter: MediaFilter) => {
 // TODO: Merge into global delete
 export const removeOneMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "modifiedOn">) => {
     try {
-        console.log(media);
         const proposedDelete = await Media.findOneAndDelete({ resource: media.resource, propertyId: media.propertyId, type: media.type });
-        console.log(proposedDelete);
         if (!proposedDelete) {
             throw Error("Delete not successful");
         }
