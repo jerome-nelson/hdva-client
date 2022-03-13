@@ -18,7 +18,7 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@sentry/react": "^6.1.0",
     "@sentry/tracing": "^6.1.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "classnames": "^2.2.6",
     "fontsource-roboto": "^3.0.3",
     "history": "^5.0.0",
