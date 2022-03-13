@@ -4,7 +4,9 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sls": "serverless",
+    "dev:deploy": "sls deploy"
   },
   "os": [
     "linux"
@@ -44,6 +46,7 @@
     "ts-loader": "^5.3.3",
     "ts-node": "^8.10.2",
     "typescript": "^3.2.4",
+    "serverless": "^3.7.4",
     "webpack": "^4.29.0",
     "webpack-node-externals": "^1.7.2"
   },
