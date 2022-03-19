@@ -1,10 +1,8 @@
-name: Deploy Dev. API
+name: Deploy Production API
 on: 
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
+  push:
+    branches:
+      - main
 jobs:
   deploy:
     name: deploy
@@ -25,11 +23,11 @@ jobs:
         npm i
         cd ./lib
         ../../../scripts/generate-packages.sh
-    - name: Serverless Deploy
+    - name: Deploy to Production
       run: |
         cd ./packages/sls-api/
         npm run sls -- config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        npm run sls -- deploy
+        npm run sls -- deploy -s production 
       env:
         JWT: ${{ secrets.JWT }}
         SLS_SERVICE: ${{ secrets.SLS_SERVICE }} 
