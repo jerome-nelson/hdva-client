@@ -8,7 +8,7 @@ import { ALLOWED_IMAGES } from './src/config/config';
 // TODO: Deal with 'network error' error type 
 // TODO: Create Buckets for S3
 const sharedEnv = {
-  jwt: "${env:JWT}",
+  jwt: "${ssm:hdva.jwt}",
   dburl: "${ssm:hdva.image.service.db}",
   dbname: "${ssm:hdva.image.db.name}",
   dbauth: "${ssm:hdva.image.db.auth}",
@@ -17,7 +17,7 @@ const sharedEnv = {
 const serverlessConfiguration: Serverless = {
   org: "jeromednelson",
   app: "hdva-api-app",
-  service: "${env:SLS_SERVICE}",
+  service: "hdva",
   frameworkVersion: '3',
   custom: {
     customDomains: [
@@ -424,6 +424,15 @@ const serverlessConfiguration: Serverless = {
     jwtAuth: {
       environment: sharedEnv,
       handler: "src/functions/auth/jwtVerify.jwtVerify",
+    },
+    goAuth: {
+      runtime: "go1.x",
+      memorySize: 128,
+      package: {     	
+        exclude: ["**"],
+        include: ["lib/bin/**"]
+      },
+      handler: "lib/bin/auth",
     }
   },
   resources: {
