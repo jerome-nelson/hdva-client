@@ -60,12 +60,17 @@ const initialState = {
 }
 function reducer(_: Record<string, any>, action: { amount: number }) {
   const amount = action.amount;
-  return amount > 0 ? {
-    amount,
-    txt: "Images"
-  } : {
-    amount,
-    ...initialState
+
+  if (amount > 0) {
+    return {
+      amount,
+      txt: "Images"
+    };
+  }
+
+  return {
+    ...initialState,
+    amount
   };
 }
 
