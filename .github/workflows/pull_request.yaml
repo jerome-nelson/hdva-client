@@ -5,6 +5,9 @@ on:
       - opened
       - edited
       - synchronize
+    paths:
+      - "packages/sls-api/src/**"
+      - "packages/sls-api/lib/**"
 jobs:
   deploy:
     name: deploy
