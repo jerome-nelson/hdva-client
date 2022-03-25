@@ -151,7 +151,6 @@ export const processFile = async (file: FileMap, token: string, propertyId: stri
         });
         const subfolder = file.folder.split(/\/(.+)/);
         const rootFile = subfolder.length > 1 ? subfolder[1] : '';
-        console.log(rootFile, subfolder, file.folder);
         await postAPI<any>('/media/add', {
             resource: `${rootFile}${file.file.name}`,
             type: "image",

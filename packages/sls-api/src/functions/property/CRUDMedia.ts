@@ -43,7 +43,7 @@ export const CRUDMedia = async (event: APIGatewayRequestAuthorizerEvent & { body
       return createResponse(result);
   
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return createErrorResponse(e);
     }
   }

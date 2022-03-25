@@ -41,7 +41,6 @@ interface PropertyProps {
 const getThumbnailUrl = (url: string, type: string): string => {
   let fileName = url.replace(/ /g, "+");
   const seperator = fileName.split(".");
-  console.log(fileName, seperator);
   const [name, ext] = seperator.slice(-2);
   let newFileName = '';
   if (type === "floorplan") {
@@ -74,7 +73,7 @@ function reducer(_: Record<string, any>, action: { amount: number }) {
   };
 }
 
-const PropertiesPage: React.SFC<PropertyProps> = () => {
+const PropertiesPage: React.FC<PropertyProps> = () => {
   const { user } = useContext(LoginContext);
   const classes = usePropertyStyles();
   const anchorRef = React.useRef(null);
@@ -219,7 +218,6 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                     imageLoading: inQueue,
                   });
                   try {
-                    console.log(row, defaultState);
                     await postAPI<string>('/media/delete', {
                       type: row.type,
                       propertyId: defaultState?.propertyId,
@@ -228,7 +226,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                       token: user!.token
                     });
                   } catch (e) {
-                    console.log(e);
+                    console.error(e);
                     alert("File Delete Error");
                   }
                   const outQueue = {
@@ -402,7 +400,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         </Card>
       </Hidden>
       <Box>
-        <Hidden mdDown>
+        <Hidden smDown>
           <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
             <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
               <FolderSVG className={classes.icon} />
@@ -421,8 +419,8 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
         </Hidden>
         {!isEmpty ? (
           <Grid container className={classes.container}>
-            <Grid item xs={12} className={classes.mobileMore}>
               <Hidden mdUp>
+            <Grid item xs={12} className={classes.mobileMore}>
                 <ButtonGroup ref={anchorRef} variant="contained" color="primary" aria-label="Mobile Download Options">
                   <Button
                     onClick={event => {
@@ -575,9 +573,9 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                     </Grow>
                   )}
                 </Popper>
-              </Hidden>
             </Grid>
-            <Grid item md={7} xs={12}>
+              </Hidden>
+            <Grid item xs>
               <GenericTable
                 selectable
                 onSelect={items => {

@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, Hidden } from "@material-ui/core";
+import { CircularProgress, createStyles, Grid, Hidden, makeStyles, Theme } from "@material-ui/core";
 import { LoginContext } from "components/login-form/login.context";
 import React, { Suspense, useContext } from "react";
 import { Redirect, RouteProps, useHistory, useLocation } from "react-router-dom";
@@ -7,6 +7,15 @@ import { BottomNav } from "../components/navigation/bottom.nav";
 import { SideNav } from "../components/navigation/side.nav";
 import { RoleTypes, useRoles } from "../hooks/useRoles";
 
+
+export const useProtectedStyles = makeStyles((theme: Theme) => createStyles({
+  sidebar: {
+    maxWidth: `250px`
+  },
+  layout: {
+   padding: `0 ${theme.spacing(3)}px`, 
+  }
+}));
 
 // TODO: WRONG COMPONENT ARCHITECTURE. FIX
 export interface RouterProps extends RouteProps {
@@ -20,6 +29,7 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, allowed }: RouterProps
 
   const { user } = useContext(LoginContext);
   const modalSettings = useContext(ModalContext);
+  const classes = useProtectedStyles();
   
   const history = useHistory();
   const location = useLocation();
@@ -59,10 +69,12 @@ export const PrivateRoute = ({ auth, fullWidth, toRender, allowed }: RouterProps
     <React.Fragment>
       <Hidden smDown>
         <Grid container>
-          {!fullWidth && user && (<Grid item md={2}>
-            <SideNav />
-          </Grid>)}
-          <Grid item md={!fullWidth ? 10 : 12}>
+          {!fullWidth && user && (
+            <Grid className={classes.sidebar} item xs>
+              <SideNav />
+            </Grid>
+          )}
+          <Grid className={classes.layout} item xs>
             <Suspense fallback={<CircularProgress color="secondary"/>}>
               <DynamicComponent />
             </Suspense>

@@ -202,7 +202,7 @@ export const PropertyMiniTable: React.FC<PropertyMiniTableProps> = ({ className,
                             await postAPI(`/properties/delete`, { pids: [currentProperty.propertyId] }, { token: user!.token });
                             window.location.reload();
                         } catch (e) {
-                            console.log(e);
+                            console.error(e);
                             alert("Delete Failed");
                         } finally {
                             setPropertyContext({});
@@ -531,7 +531,7 @@ export const PropertyTable: React.FC<PropertyTableProps> = ({ selectable, showSe
                             await postAPI(`/properties/delete`, { pids: [currentProperty.propertyId] }, { token: user!.token });
                             window.location.reload();
                         } catch (e) {
-                            console.log(e);
+                            console.error(e);
                             alert("Delete Failed");
                         } finally {
                             setPropertyContext({});

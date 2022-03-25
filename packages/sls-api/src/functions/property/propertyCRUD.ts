@@ -56,7 +56,7 @@ export const propertyCRUD = async (event: APIGatewayRequestAuthorizerEvent & { b
       }
       return createResponse(result);
     } catch (e) {
-      console.log(e.message);
+      console.error(e.message);
       return createErrorResponse(e);
     }
   }

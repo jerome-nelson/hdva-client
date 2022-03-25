@@ -20,3 +20,12 @@ https://dpm.hdvirtualart.com/
 ## Technical Goals
 * All code should be scoped (frontend/backend)
 * Create a logging strategy and deploy it.
+
+## Frontend Development
+
+### Recommended Settings
+```
+REACT_APP_API=<URL OF SLS API>
+REACT_APP_IMG=<URL OF WEB IMAGE BUCKET>
+REACT_APP_DEBUG=true
+```

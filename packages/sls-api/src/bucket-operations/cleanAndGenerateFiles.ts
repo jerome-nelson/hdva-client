@@ -6,7 +6,6 @@ import { BadRequest, GeneralError } from "../utils/error";
 
 const _resizeImages = async (original: S3.Types.GetObjectOutput, size: number[]) => {
     try { 
-      console.log(original.Body);
         return await sharp(original.Body).resize(size[0], size[1], { fit: 'cover', position: 'center' }).toBuffer();    
     } catch (error) {
 
