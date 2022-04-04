@@ -3,9 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 ![production build](https://github.com/jerome-nelson/hdva-client/actions/workflows/merge.yaml/badge.svg)
 
-Full Stack Web Application for https://hdvirtualart.com/. Managed using NPM. Can be viewed on:
-https://dpm.hdvirtualart.com/
-
+Full Stack Web Application for https://hdvirtualart.com/.
 ## Services Used
 * Remote Containers (https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 * Serverless (https://www.serverless.com/)
