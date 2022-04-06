@@ -1,4 +1,6 @@
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
 import { Properties } from 'components/property/property-table';
 import { Popup } from 'components/upload/upload';
 import UploadPopup from 'components/upload/upload-popup';
@@ -29,6 +31,14 @@ const queryClient = new QueryClient({
             cacheTime: 1000 * 60 * 60 * 24
         }
     }
+});
+
+Sentry.init({
+    debug: process.env.REACT_APP_NODE_ENV === "development",
+    environment: process.env.REACT_APP_NODE_ENV === "development" ? "development" : "production",
+    dsn: process.env.REACT_APP_SENTRY_URL,
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 1.0,
 });
 
 // TODO: Minify
