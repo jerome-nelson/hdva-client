@@ -7,7 +7,6 @@ interface PropertiesModel {
     propertyId: number;
     groupId: number;
     folder: string;
-    _id: string;
 }
 
 export type MongoPropertiesDocument = mongoose.Document & PropertiesModel;
@@ -61,7 +60,7 @@ PropertiesSchema.statics.doPropertiesExist = async function (ids: number[]): Pro
 
 export const Properties: MongoPropertiesModel = mongoose.model<MongoPropertiesDocument, MongoPropertiesModel>('Properties', PropertiesSchema);
 export const addProperties = async (properties: Omit<PropertiesModel, "_id" | "createdOn" | "modifiedOn" | "propertyId">) => {
-    const currentTime = new Date().toDateString();
+    const currentTime = new Date();
     const lastId = (await Properties.find({}).sort({_id: -1}).limit(1))[0].propertyId;
     // TODO: Add arrays
     const propertiesToAdd = [{

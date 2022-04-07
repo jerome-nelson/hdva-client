@@ -5,55 +5,57 @@ import querystring from "querystring";
 import { Stream } from "stream";
 import { BucketInstance } from "../../config/config";
 import { ERROR_MSGS } from "../../config/messages";
-import { getMedia } from "../../models/media.model";
-import { getProperties } from "../../models/properties.model";
+import { getMedia, MongoMediaDocument } from "../../models/media.model";
+import { getProperties, MongoPropertiesDocument } from "../../models/properties.model";
 import { startMongoConn } from "../../utils/db";
 import { GeneralError } from "../../utils/error";
 import { createErrorResponse, createResponse } from "../../utils/responses";
 
-const _convertToSlug = (text: string) => {
-    return text
+export const convertToSlug = (text: string): string => {
+    return String(text)
         .toLowerCase()
-        .replace(/[^\w ]+/g, '')
-        .replace(/ +/g, '-')
-        ;
+        .replace(/[\\, /, :, *, ?, ", <, >, |]+/g, "-")
+        .replace(/ +/g, '-');
 }
 
-const _retrieveArchive = async (bucketName: string, fileKey: string) => {
+export const retrieveArchive = async (bucketName: string, fileKey: string): Promise<string> => {
     try {
         await BucketInstance.getObject({
             Bucket: bucketName,
-            Key: fileKey,
-
+            Key: fileKey
         }).promise();
 
         return await BucketInstance.getSignedUrlPromise("getObject", {
             Bucket: bucketName,
-            Key: fileKey,
-
+            Key: fileKey
         });
 
     } catch (e) {
-        return;
+        return "";
     }
 }
 
-export const _getProperty = async (id: number[]) => {
-    await startMongoConn();
-    const files = await getMedia(id);
-    const property = await getProperties({
-        pids: [Number(id[0])]
-    });
-
-    if (!property.length || !files.length) {
-        throw new Error("No media found");
+export const getProperty = async (id: number[]): Promise<{ zipname: string; files: MongoMediaDocument[]; property: MongoPropertiesDocument[] } | void> => {
+    try {
+        await startMongoConn();
+        const files = await getMedia(id);
+        const property = await getProperties({
+            pids: [Number(id[0])]
+        });
+    
+        if (!property.length || !files.length) {
+            throw new Error("No media found");
+        }
+    
+        return {
+            zipname: `${convertToSlug(property[0].name)}.zip`,
+            files,
+            property
+        }
+    } catch (e) {
+        return;
     }
 
-    return {
-        zipname: `${_convertToSlug(property[0].name)}.zip`,
-        files,
-        property
-    }
 }
 
 export const getZip = async (event: any, context: Context) => {
@@ -69,8 +71,13 @@ export const getZip = async (event: any, context: Context) => {
     const id = [Number(pid)];
 
     try {
-        const results = await _getProperty(id);
-        const existingArchive = await _retrieveArchive(process.env.zip_bucket_name, results.zipname);
+        const results = await getProperty(id);
+
+        if (!results) {
+            throw new Error("No results");
+        }
+
+        const existingArchive = await retrieveArchive(process.env.zip_bucket_name, results.zipname);
 
         if (existingArchive) {
             return createResponse(existingArchive)

@@ -13,11 +13,12 @@
     "target": "es5",                          
     "module": "commonjs",                 
     "lib": [
-      "ES2015"
+      "ES2020"
     ], 
   },
   "include": ["./**/*.ts"],
   "exclude": [
+    "src/**/*.spec.ts",
     "node_modules/**/*",
     ".serverless/**/*",
     ".webpack/**/*",
