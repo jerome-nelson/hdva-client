@@ -48,7 +48,7 @@ export const addMedia = async (media: Omit<MediaModel, "_id" | "createdOn" | "mo
         // TODO: Accept Arrays
         const result = await Media.insertMany([{
             ...media,
-            resource: media.resource.toLowerCase(),
+            resource: media.resource,
             propertyId: Number(media.propertyId),
             createdOn: currentTime,
             modifiedOn: currentTime

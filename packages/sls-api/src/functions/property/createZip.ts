@@ -62,15 +62,16 @@ export const getZip = async (event: any, context: Context) => {
 
     context.callbackWaitsForEmptyEventLoop = false;
 
-    if (!process.env.highres_bucket_name || !process.env.zip_bucket_name) {
-        throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
-    }
-
-    const { body } = event;
-    const { pid } = querystring.parse(body);
-    const id = [Number(pid)];
-
+    
     try {
+        if (!process.env.highres_bucket_name || !process.env.zip_bucket_name) {
+            throw new GeneralError(ERROR_MSGS.BUCKET_NOT_SET);
+        }
+    
+        const { body } = event;
+        const { pid } = querystring.parse(body);
+        const id = [Number(pid)];
+    
         const results = await getProperty(id);
 
         if (!results) {
@@ -80,7 +81,7 @@ export const getZip = async (event: any, context: Context) => {
         const existingArchive = await retrieveArchive(process.env.zip_bucket_name, results.zipname);
 
         if (existingArchive) {
-            return createResponse(existingArchive)
+            return createResponse(existingArchive);
         }
 
         const archive = archiver('zip');
@@ -99,7 +100,8 @@ export const getZip = async (event: any, context: Context) => {
             );
         });
 
-        for (const media of results.files) {
+        const filteredFiles = results.files.filter(({ type }) => type !== "vt");
+        for (const media of filteredFiles) {
             const fileKey = `properties/${results.property[0].name}/${media.resource}`;
             const objectData = BucketInstance.getObject({
                 Bucket: process.env.highres_bucket_name as string,
