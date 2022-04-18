@@ -1,37 +1,26 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"os"
+	"packages/sls-api/lib/auth/functions/db"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var secret []byte
-var conn DBConn
-
-// 1. Get Token
-// 2. Slice it
-// 3. If token is not valid, quit
-// 4. MongoDB
-// 	i. Connect to instance
-//  ii. fetch role and user data
-type DBConn struct {
-	Url        string
-	DbName     string
-	AuthSource string
-	Replica    string
-}
 
 type UserInfo struct {
-	Email  string
-	Group  int64
-	Name   string
-	Role   int64
-	UserId string
+	Email  string `json:"email"`
+	Group  int64  `json:"group"`
+	Name   string `json:"name"`
+	Role   int64  `json:"role"`
+	UserId string `json:"userId"`
 }
 
 type CustomClaimsExample struct {
@@ -41,16 +30,6 @@ type CustomClaimsExample struct {
 
 func init() {
 	secret = []byte(os.Getenv("jwt"))
-	conn = DBConn{
-		Url:        os.Getenv("dburl"),
-		DbName:     os.Getenv("dbname"),
-		AuthSource: os.Getenv("dbauth"),
-		Replica:    os.Getenv("dbreplica"),
-	}
-}
-
-func mongoConnect() {
-
 }
 
 func extractToken(token string) (UserInfo, error) {
@@ -77,22 +56,44 @@ func extractToken(token string) (UserInfo, error) {
 }
 
 func handler(request events.APIGatewayCustomAuthorizerRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
-	token, parseErr := extractToken(request.AuthorizationToken)
 
-	if (parseErr != nil || token == UserInfo{}) {
+	details, parseErr := extractToken(request.AuthorizationToken)
+
+	roleExists := bson.D{{"id", details.Role}}
+	count, err := db.Client.Database(os.Getenv("dbname")).Collection("roles").CountDocuments(context.TODO(), roleExists)
+
+	if err != nil || count == 0 {
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
-	return generatePolicy("user", "Allow", request.MethodArn), nil
+	uExists := bson.D{
+		{"$or",
+			bson.A{
+				bson.D{{"email", strings.ToLower(details.Email)}},
+				bson.D{{"username", strings.ToLower(details.Email)}},
+			},
+		},
+	}
+
+	count, err = db.Client.Database(os.Getenv("dbname")).Collection("users").CountDocuments(context.TODO(), uExists)
+
+	if err != nil || count == 0 {
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
+
+	if (parseErr != nil || details == UserInfo{}) {
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
+
+	return generatePolicy("user", "Allow", request.MethodArn, details), nil
 }
 
 func main() {
 	lambda.Start(handler)
 }
 
-func generatePolicy(principalID, effect, resource string) events.APIGatewayCustomAuthorizerResponse {
+func generatePolicy(principalID, effect, resource string, user UserInfo) events.APIGatewayCustomAuthorizerResponse {
 	authResponse := events.APIGatewayCustomAuthorizerResponse{PrincipalID: principalID}
-
 	if effect != "" && resource != "" {
 		authResponse.PolicyDocument = events.APIGatewayCustomAuthorizerPolicy{
 			Version: "2012-10-17",
@@ -103,6 +104,9 @@ func generatePolicy(principalID, effect, resource string) events.APIGatewayCusto
 					Resource: []string{resource},
 				},
 			},
+		}
+		authResponse.Context = map[string]interface{}{
+			"user": user,
 		}
 	}
 	return authResponse

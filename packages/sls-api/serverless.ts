@@ -351,7 +351,7 @@ const serverlessConfiguration: Serverless = {
         {
           http: {
             authorizer: {
-              name: "jwtAuth",
+              name: "goAuth",
               resultTtlInSeconds: 0,
               identitySource: "method.request.header.Authorization"
             },
