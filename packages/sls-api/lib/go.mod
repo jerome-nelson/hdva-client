@@ -1,4 +1,4 @@
-module packages/sls-api/lib/auth
+module packages/sls-api/lib
 
 go 1.13
 

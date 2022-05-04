@@ -3,9 +3,13 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
 	"os"
-	"packages/sls-api/lib/auth/functions/db"
+	"strconv"
 	"strings"
+
+	"packages/sls-api/lib/db"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -37,11 +41,13 @@ func extractToken(token string) (UserInfo, error) {
 	bearerToken := tokenSlice[len(tokenSlice)-1]
 
 	if len(bearerToken) == 0 {
+		fmt.Println("token is empty")
 		return UserInfo{}, errors.New("token is empty")
 	}
 
 	tokenMap, err := jwt.ParseWithClaims(bearerToken, &CustomClaimsExample{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			fmt.Println("unexpected signing method")
 			return nil, errors.New("unexpected signing method")
 		}
 		return secret, nil
@@ -62,7 +68,9 @@ func handler(request events.APIGatewayCustomAuthorizerRequest) (events.APIGatewa
 	roleExists := bson.D{{"id", details.Role}}
 	count, err := db.Client.Database(os.Getenv("dbname")).Collection("roles").CountDocuments(context.TODO(), roleExists)
 
+	// Needs to not be zero value
 	if err != nil || count == 0 {
+		log.Print("ucount error or count 0" + strconv.FormatInt(details.Role, 10))
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
@@ -78,17 +86,21 @@ func handler(request events.APIGatewayCustomAuthorizerRequest) (events.APIGatewa
 	count, err = db.Client.Database(os.Getenv("dbname")).Collection("users").CountDocuments(context.TODO(), uExists)
 
 	if err != nil || count == 0 {
+		log.Print("ucount error or count 0")
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
 	if (parseErr != nil || details == UserInfo{}) {
+		log.Print("Unauth details, parseErr")
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
+	log.Print("Generate Policy")
 	return generatePolicy("user", "Allow", request.MethodArn, details), nil
 }
 
 func main() {
+	fmt.Print("Lambda Started")
 	lambda.Start(handler)
 }
 
@@ -109,5 +121,6 @@ func generatePolicy(principalID, effect, resource string, user UserInfo) events.
 			"user": user,
 		}
 	}
+	fmt.Print("Auth Document returned")
 	return authResponse
 }

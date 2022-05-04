@@ -1,12 +1,6 @@
 import type { Serverless } from 'serverless/aws';
 import { ALLOWED_IMAGES } from './src/config/config';
 
-// TODO: Split bundles using Webpack (lambda packages too big)
-// TODO: Setup TEST API
-// TODO: Deal with DB Connection issues
-// TODO: If lambda fails
-// TODO: Deal with 'network error' error type 
-// TODO: Create Buckets for S3
 const sharedEnv = {
   jwt: "${ssm:hdva.jwt}",
   dburl: "${ssm:hdva.image.service.db}",
@@ -426,6 +420,7 @@ const serverlessConfiguration: Serverless = {
       handler: "src/functions/auth/jwtVerify.jwtVerify",
     },
     goAuth: {
+      environment: sharedEnv,
       runtime: "go1.x",
       memorySize: 128,
       package: {     	
