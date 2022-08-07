@@ -97,7 +97,6 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
     }),
     enabled: !location.state?.propertyId || !location.state?.propertyId
   })
-  const [currentMedia] = useState<Record<string, any>>();
   const [propertyData, setPropertyData] = useState<any>([]);
   const [openSubmenu, setOpenSubmenu] = useState(false);
   const [vtLink, setVTLink] = useState<any>(null);
@@ -288,10 +287,8 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
       <Hidden smDown>
         <Card className={classes.sidePanel} square elevation={0}>
           <Typography gutterBottom variant="h5" component="h2">
-            Overview
+            Options
           </Typography>
-          {currentMedia ? currentMedia.title : <Skeleton className={classes.variantBG} animation={false} variant="rect" height={20} width={400} />}
-          <div className={`${classes.variantBG} ${classes.photoBG}`} />
           <Grid container className={classes.containerBtns} justify="space-between">
             <Grid item xs={6}>
               <CTAButton
@@ -330,7 +327,7 @@ const PropertiesPage: React.SFC<PropertyProps> = () => {
                 disabled={!amountTxt.amount}
                 loading={loadingStates.downloadSome}
                 type="button">
-                Download {amountTxt.txt}
+                Download Selected
               </CTAButton>
             </Grid>
             <Grid item xs={5}>
