@@ -5,9 +5,11 @@ export const usePaginationStyles = makeStyles((theme: Theme) => createStyles({
     root: {
         padding: 0,
         "& > ul": {
+            overflow: "hidden",
             padding: `${theme.spacing(0.5)}px 0`,
             display: "flex",
             listStyle: "none",
+            justifyContent: "center",
             "& > li": {
                 margin: `0 10px`,
                 
