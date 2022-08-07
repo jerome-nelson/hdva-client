@@ -21,16 +21,9 @@ export const usePropertyStyles = makeStyles((theme: Theme) =>
             fontWeight: `bolder`,
             paddingBottom: `${theme.spacing(1)}px`
         },
-        variantBG: {
-            background: `rgba(0, 0, 0, 0.13)`,
-            marginBottom: `10px`,
-        },
-        photoBG: {
-            height: 300,
-            width: 400
-        },
         containerBtns: {
             width: 400,
+            marginTop: 140,
         },
         breadcrumb: {
             marginTop: `42px`,
