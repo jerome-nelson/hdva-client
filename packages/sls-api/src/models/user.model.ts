@@ -143,12 +143,12 @@ export const loginUserWithPassword = async (usernameOrEmail: string, password: s
         throw new BadRequest(ERROR_MSGS.USER_CREDENTIALS_FAIL);
     }
 
-    const item = await User.findOne({ 
+    const item = await User.findOne({
         $or: [
             { email: usernameOrEmail.toLowerCase() },
             { username: usernameOrEmail }
         ]
-     });
+    });
     const userToken = JSON.parse(JSON.stringify(item));
     const token = jwtSign(userToken);
 
@@ -209,21 +209,33 @@ export const findUsers = async ({ currentUserId, userSearch, groupId, offset, li
         limit
     }
     const textSearch: any = !!userSearch && String(userSearch) ? {
-        userId: {
-            $ne: currentUserId
-        },
-        name: {
-            $regex: userSearch,
-            $options: "i"
-        },
-        username: {
-            $regex: userSearch,
-            $options: "i",
-        },
-        email: {
-            $regex: userSearch,
-            $options: "i"
-        }
+        $and: [
+            {
+                userId: {
+                    $ne: currentUserId
+                },
+            }
+        ],
+        $or: [
+            {
+                name: {
+                    $regex: userSearch,
+                    $options: "i"
+                }
+            },
+            {
+                username: {
+                    $regex: userSearch,
+                    $options: "i",
+                }
+            },
+            {
+                email: {
+                    $regex: userSearch,
+                    $options: "i"
+                }
+            }
+        ]
     } : {};
     const params = groupId ? {
         group: {
