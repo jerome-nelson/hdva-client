@@ -63,7 +63,7 @@ const GroupForm: React.FC<any> = ({ existingGroup }) => {
     });
 
     useEffect(() => {
-        if (!Object.keys(existingGroup)) {
+        if (!!Object.keys(existingGroup)) {
             setDetails({
                 ...existingGroup
             });
@@ -162,7 +162,7 @@ const GroupList: React.FC<GroupListProps> = ({ onEdit, isFetching, isEmpty, grou
                                     <Avatar className={classes.avatarLarge}>{group.name.slice(0, 1)}</Avatar>
                                 </ListItemIcon>
                                 <ListItemText className={classes.listItem} primary={group.name} secondary={group.description} />
-                                {/* <CTAButton
+                                <CTAButton
                                     onClick={() => {
                                         onEdit({
                                             name: group.name,
@@ -173,7 +173,7 @@ const GroupList: React.FC<GroupListProps> = ({ onEdit, isFetching, isEmpty, grou
                                     size="medium"
                                     variant="contained"
                                     color="secondary"
-                                    type="button">Edit</CTAButton> */}
+                                    type="button">Edit</CTAButton>
                                 {/* <CTAButton
                                     loading={false}
                                     className={classes.btnOverride}
@@ -193,7 +193,6 @@ const GroupPage: React.FC = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const { user } = useContext(LoginContext);
     const [open, setOpen] = useState(false);
-    const [email, setEmail] = useState("");
     const [groupData, setGroupData] = useState<any>({});
     const [searchTerm, setSearchTerm] = useState("");
     const results = useQueries([
