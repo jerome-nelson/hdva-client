@@ -167,7 +167,8 @@ export const createOrEditUser = async (user: Record<string, any>) => {
     try {
         if (await User.userExists(user.email)) {
             const data = User.findOneAndUpdate({
-                email: user.email.toLowerCase()
+                email: user.email.toLowerCase(),
+                ...user
             });
             return data;
         }
