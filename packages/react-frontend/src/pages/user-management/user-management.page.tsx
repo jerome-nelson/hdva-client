@@ -36,6 +36,7 @@ interface Users {
     password: string;
     role: number;
     userId: string;
+    username?: string;
     _id: string;
 }
 
@@ -271,10 +272,10 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ open, onClose }) => {
             <DialogActions>
                 <Button onClick={onClose} color="primary">
                     Yes
-          </Button>
+                </Button>
                 <Button onClick={onClose} color="primary" autoFocus>
                     Cancel
-          </Button>
+                </Button>
             </DialogActions>
         </Dialog>
     )
@@ -297,42 +298,43 @@ const UserList: React.FC<UserListProps> = ({ onEdit, isFetching, isEmpty, userDa
                 <NotInterestedIcon />
             </Placeholder>
         ) : (
-                <React.Fragment>
-                    <div>
-                        {(userData.map((user: Users) => (
-                            <ListItem key={uuidv4()} button>
-                                <ListItemIcon>
-                                    <Avatar className={classes.avatarLarge}>{user.name.slice(0, 1)}</Avatar>
-                                </ListItemIcon>
-                                <ListItemText className={classes.listItem} primary={user.name} secondary={(groupData.filter(
-                                    (group: Groups) => String(user.group) === String(group.groupId))[0].name || "No Group")} />
-                                <CTAButton
-                                    onClick={() => {
-                                        onEdit({
-                                            name: user.name,
-                                            groupId: user.group,
-                                            roleId: user.role,
-                                            username: user.email,
-                                        });
-                                    }}
-                                    className={classes.btnOverride}
-                                    loading={false}
-                                    size="medium"
-                                    variant="contained"
-                                    color="secondary"
-                                    type="button">Edit</CTAButton>
-                                {/* <CTAButton
+            <React.Fragment>
+                <div>
+                    {(userData.map((user: Users) => (
+                        <ListItem key={uuidv4()} button>
+                            <ListItemIcon>
+                                <Avatar className={classes.avatarLarge}>{user.name.slice(0, 1)}</Avatar>
+                            </ListItemIcon>
+                            <ListItemText className={classes.listItem} primary={user.name} secondary={(groupData.filter(
+                                (group: Groups) => String(user.group) === String(group.groupId))[0].name || "No Group")} />
+                            <CTAButton
+                                onClick={() => {
+                                    onEdit({
+                                        name: user.name,
+                                        groupId: user.group,
+                                        roleId: user.role,
+                                        email: user.email,
+                                        username: user.username || user.email
+                                    });
+                                }}
+                                className={classes.btnOverride}
+                                loading={false}
+                                size="medium"
+                                variant="contained"
+                                color="secondary"
+                                type="button">Edit</CTAButton>
+                            {/* <CTAButton
                                     loading={false}
                                     className={classes.btnOverride}
                                     onClick={handleDeletion}
                                     size="medium"
                                     variant="contained"
                                     type="button">Delete</CTAButton> */}
-                            </ListItem>
-                        )))}
-                    </div>
-                </React.Fragment>
-            ));
+                        </ListItem>
+                    )))}
+                </div>
+            </React.Fragment>
+        ));
 }
 
 const UserPage: React.FC = () => {
@@ -351,7 +353,7 @@ const UserPage: React.FC = () => {
             enabled: Boolean(user)
         },
         {
-            queryKey: [`users`, user!.group, searchTerm],
+            queryKey: [`users`, user!.group, searchTerm, pageNumber],
             queryFn: () => postAPI<User>(
                 '/users',
                 {
@@ -375,6 +377,7 @@ const UserPage: React.FC = () => {
                 { token: user!.token }
             ),
             refetchOnMount: "always",
+            keepPreviousData: true,
             retry: 3,
             enabled: Boolean(user)
         }
@@ -404,7 +407,7 @@ const UserPage: React.FC = () => {
             <Breadcrumbs className={classes.breadcrumb} separator="›" aria-label="breadcrumb">
                 <Link color="textSecondary" href="/" onClick={() => { }} className={classes.link}>
                     <FolderSVG className={classes.icon} /> HDVA
-                    </Link>
+                </Link>
                 <Link color="secondary" onClick={() => { }} className={classes.link}>{messages["user.page.title"]}</Link>
             </Breadcrumbs>
         </Hidden>
@@ -438,12 +441,10 @@ const UserPage: React.FC = () => {
                         </Grid>
                         <Typography color="primary" variant="h6">{messages["user.recent.title"]}</Typography>
                     </PaperReplacement>
-                    {!isFetching && !isEmpty && (
-                        <CustomPagination
-                            count={Math.floor((results[2].data as unknown as number) / show)}
-                            onChange={pagenumber => { setPageNumber(pagenumber) }}
-                        />
-                    )}
+                    <CustomPagination
+                        count={Math.floor((results[2].data as unknown as number) / show)}
+                        onChange={pagenumber => { setPageNumber(pagenumber) }}
+                    />
                 </Grid>
                 <Grid item md={5} xs={12}>
                     <Grid container>
