@@ -1,3 +1,5 @@
+### Project discontinued - without a full time developer on it, client decided to go with a simpler solution after initial 6 month test period
+
 # HD Virtual Art Image Directory Stack
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
